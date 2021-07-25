@@ -109,13 +109,6 @@ class BasePrefetcher(ClockedObject):
             raise TypeError("argument must be a SimObject type")
         self._tlbs.append(simObj)
 
-class MultiPrefetcher(BasePrefetcher):
-    type = 'MultiPrefetcher'
-    cxx_class = 'Prefetcher::Multi'
-    cxx_header = 'mem/cache/prefetch/multi.hh'
-
-    prefetchers = VectorParam.BasePrefetcher([], "Array of prefetchers")
-
 class QueuedPrefetcher(BasePrefetcher):
     type = "QueuedPrefetcher"
     abstract = True
@@ -525,3 +518,36 @@ class PIFPrefetcher(QueuedPrefetcher):
         if not isinstance(simObj, SimObject):
             raise TypeError("argument must be of SimObject type")
         self.addEvent(HWPProbeEventRetiredInsts(self, simObj,"RetiredInstsPC"))
+
+class IPCPPrefetcher(QueuedPrefetcher):
+    type = 'IPCPPrefetcher'
+    cxx_class = 'Prefetcher::IPCPPrefetcher'
+    cxx_header = "mem/cache/prefetch/ipcp.hh"
+    degree = Param.Int(1, "Number of prefetches to generate")
+    
+class IPCPL2Prefetcher(QueuedPrefetcher):
+    type = 'IPCPL2Prefetcher'
+    cxx_class = 'Prefetcher::IPCPL2Prefetcher'
+    cxx_header = "mem/cache/prefetch/ipcpL2.hh"
+    degree = Param.Int(1, "Number of prefetches to generate")
+    
+class MultiPrefetcher(BasePrefetcher):
+    type = 'MultiPrefetcher'
+    cxx_class = 'Prefetcher::Multi'
+    cxx_header = 'mem/cache/prefetch/multi.hh'
+    prefetchers = VectorParam.BasePrefetcher([], "Array of prefetchers")
+
+class L1IPMultiPrefetcher(MultiPrefetcher):
+    prefetchers = VectorParam.BasePrefetcher([IPCPPrefetcher(), TaggedPrefetcher()], "Array of prefetchers")
+     
+class L2IPMultiPrefetcher(MultiPrefetcher):
+    prefetchers = VectorParam.BasePrefetcher([IPCPL2Prefetcher(), TaggedPrefetcher()], "Array of prefetchers")
+    
+class L1MultiPrefetcher(MultiPrefetcher):
+    prefetchers = VectorParam.BasePrefetcher([DCPTPrefetcher(), TaggedPrefetcher()], "Array of prefetchers")
+    
+class L2MultiPrefetcher(MultiPrefetcher):
+    prefetchers = VectorParam.BasePrefetcher([StridePrefetcher(), IrregularStreamBufferPrefetcher()], "Array of prefetchers")
+    
+class L3MultiPrefetcher(MultiPrefetcher):
+    prefetchers = VectorParam.BasePrefetcher([BOPPrefetcher(), IndirectMemoryPrefetcher(), AMPMPrefetcher()], "Array of prefetchers")

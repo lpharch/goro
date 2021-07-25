@@ -185,7 +185,11 @@ Queued::notify(const PacketPtr &pkt, const PrefetchInfo &pfi)
             statsQueued.pfIdentified++;
             DPRINTF(HWPrefetch, "Found a pf candidate addr: %#x, "
                     "inserting into prefetch queue.\n", new_pfi.getAddr());
-            // Create and insert the request
+            //Majid
+			// A simple trick to pass info on to L2 for IPCP
+			new_pfi.metadataICMP = addr_prio.second;
+			
+			// Create and insert the request
             insert(pkt, new_pfi, addr_prio.second);
             num_pfs += 1;
             if (num_pfs == max_pfs) {

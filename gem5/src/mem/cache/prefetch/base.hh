@@ -127,6 +127,8 @@ class Base : public ClockedObject
         uint8_t *data;
 
       public:
+		// Majid
+        int metadataICMP; //for ICMP prefecher
         /**
          * Obtains the address value of this Prefetcher address.
          * @return the addres value.
