@@ -224,6 +224,13 @@ class System : public SimObject, public PCEventScope
 
     void startup() override;
 
+	 //Majid
+    AbstractMemory * aMem;
+    AbstractMemory * getMem(){
+      return aMem;
+    }
+
+
     /**
      * Get a reference to the system port that can be used by
      * non-structural simulation objects like processes or threads, or

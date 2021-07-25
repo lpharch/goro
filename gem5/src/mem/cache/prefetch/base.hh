@@ -47,6 +47,9 @@
 #define __MEM_CACHE_PREFETCH_BASE_HH__
 
 #include <cstdint>
+#include <vector>
+
+using namespace std;
 
 #include "arch/generic/tlb.hh"
 #include "base/statistics.hh"
@@ -67,6 +70,9 @@ class Base : public ClockedObject
     class PrefetchListener : public ProbeListenerArgBase<PacketPtr>
     {
       public:
+		  
+	
+	
         PrefetchListener(Base &_parent, ProbeManager *pm,
                          const std::string &name, bool _isFill = false,
                          bool _miss = false)
@@ -82,6 +88,17 @@ class Base : public ClockedObject
     std::vector<PrefetchListener *> listeners;
 
   public:
+		//Majid
+		void CorrectIssued();
+		//RL
+		int RLdegree;
+		void SetDegree(int d);
+		void DecreaseDegree();
+		void IncreaseDegree();
+		void KeepDegree();
+		int PrintDegree();
+		vector<int > RLDegreeHist;
+		void printRLDegreeHist();
 
     /**
      * Class containing the information needed by the prefetch to train and

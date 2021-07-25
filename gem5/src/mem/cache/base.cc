@@ -2591,3 +2591,32 @@ WriteAllocator::updateMode(Addr write_addr, unsigned write_size,
     }
     nextAddr = write_addr + write_size;
 }
+
+
+
+// Majid
+void 
+BaseCache::setActionPytorch(int action, int index)
+{
+	std::cout<<name()<<" action:"<<action<<" index:"<<index<<std::endl;
+}
+
+
+vector<double> 
+BaseCache::stateBuilder()
+{
+    vector<double>  totStates;
+    return totStates;
+}
+
+void
+BaseCache::printState()
+{
+    if(prefetcher && name()=="system.l3"){
+        std::cout<<"BaseCache printState"<<std::endl;
+        vector<double>  state  = stateBuilder();
+        for(int i = 0 ; i < state.size(); i++){
+            cout<<state[i]<<" ";
+        }cout<<endl;
+    } 
+} 

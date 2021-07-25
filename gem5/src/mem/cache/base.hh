@@ -75,6 +75,10 @@
 #include "sim/sim_exit.hh"
 #include "sim/system.hh"
 
+
+#include <vector>
+using namespace std;
+
 namespace Prefetcher {
     class Base;
 }
@@ -1345,6 +1349,18 @@ class BaseCache : public ClockedObject
      */
     void serialize(CheckpointOut &cp) const override;
     void unserialize(CheckpointIn &cp) override;
+	
+	 //Majid
+    vector<double> stateBuilder(); 
+    void printState();
+    void onExit();
+    int actionPytorch;
+    void setActionPytorch(int action, int index);
+    int64_t lastInst = 0;
+	int64_t lastUse = 0;
+	int64_t lastAction = 0;
+	
+	
 };
 
 /**

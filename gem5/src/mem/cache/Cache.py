@@ -46,6 +46,9 @@ from m5.objects.Prefetcher import BasePrefetcher
 from m5.objects.ReplacementPolicies import *
 from m5.objects.Tags import *
 
+# Majid
+from m5.util.pybind import *
+
 # Enum for cache clusivity, currently mostly inclusive or mostly
 # exclusive.
 class Clusivity(Enum): vals = ['mostly_incl', 'mostly_excl']
@@ -73,6 +76,13 @@ class BaseCache(ClockedObject):
     type = 'BaseCache'
     abstract = True
     cxx_header = "mem/cache/base.hh"
+    
+    # Majid
+    cxx_exports = [
+        PyBindMethod("printState"),
+        PyBindMethod("stateBuilder"),
+        PyBindMethod("setActionPytorch"),
+    ]
 
     size = Param.MemorySize("Capacity")
     assoc = Param.Unsigned("Associativity")
@@ -147,6 +157,15 @@ class BaseCache(ClockedObject):
     # in the current cache. Typically, this would be enabled in the
     # data cache.
     write_allocator = Param.WriteAllocator(NULL, "Write allocator")
+    
+    # Majid
+    def getState(self):
+        return self._ccObject.stateBuilder()    
+
+    def setState(self, action, index):
+        self._ccObject.setActionPytorch(action, index) 
+        
+        
 
 class Cache(BaseCache):
     type = 'Cache'

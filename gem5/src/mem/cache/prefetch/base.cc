@@ -256,4 +256,71 @@ Base::addTLB(BaseTLB *t)
     tlb = t;
 }
 
+void 
+Base::SetDegree(int d)
+{
+    RLdegree = d;
+    RLDegreeHist[RLdegree]++;
+    printRLDegreeHist();
+}
+
+
+void 
+Base::DecreaseDegree()
+{
+    RLdegree --;
+    if(RLdegree<0)
+        RLdegree=0;
+    if(RLdegree<RLDegreeHist.size()){
+        RLDegreeHist[RLdegree]++;
+    }
+    printRLDegreeHist();
+
+}    
+
+void 
+Base::KeepDegree()
+{
+    if(RLdegree<RLDegreeHist.size()){
+        RLDegreeHist[RLdegree]++;
+    }
+    printRLDegreeHist();
+}
+
+void 
+Base::IncreaseDegree()
+{
+    RLdegree ++;
+    if(RLdegree>16)
+        RLdegree=16;
+    if(RLdegree<RLDegreeHist.size()){
+        RLDegreeHist[RLdegree]++;
+    }
+
+    printRLDegreeHist();
+}    
+
+int 
+Base::PrintDegree()
+{
+   return RLdegree;
+}   
+
+void 
+Base::printRLDegreeHist()
+{
+    cout<<name()<<" RL degree histogram ";
+    for(int i= 0 ; i < RLDegreeHist.size(); i++){
+        cout<<RLDegreeHist[i]<<" ";
+    }cout<<endl;
+}
+
+
+void 
+Base::CorrectIssued()
+{
+}
+
+
+
 } // namespace Prefetcher

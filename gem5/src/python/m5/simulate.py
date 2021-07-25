@@ -183,6 +183,27 @@ def simulate(*args, **kwargs):
 
     return sim_out
 
+# Majid
+def getL1State(system, core):
+    return(system.cpu[core].dcache.getState())
+    
+def getL2State(system, core):
+    return(system.cpu[core].l2cache.getState())
+    
+def getL3State(system):
+    return(system.l3.getState())    
+
+def setL3RLDegree(system, action, index):
+    system.l3.setState(action, index)
+    
+def setL2RLDegree(system, core, action, index):
+    system.cpu[core].l2cache.setState(action, index)
+    
+def setL1RLDegree(system, core, action, index):
+    system.cpu[core].dcache.setState(action, index)   
+
+
+
 def drain():
     """Drain the simulator in preparation of a checkpoint or memory mode
     switch.

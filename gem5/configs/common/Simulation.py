@@ -717,13 +717,28 @@ def run(options, root, testsys, cpu_class):
         if options.fast_forward:
             m5.stats.reset()
         print("**** REAL SIMULATION ****")
-
+        
         # If checkpoints are being taken, then the checkpoint instruction
         # will occur in the benchmark code it self.
         if options.repeat_switch and maxtick > options.repeat_switch:
+            print("----1")
             exit_event = repeatSwitch(testsys, repeat_switch_cpu_list,
                                       maxtick, options.repeat_switch)
         else:
+            print("----2")
+            m5.setL1RLDegree(testsys, 0, 5, 9)
+            m5.setL1RLDegree(testsys, 1, 6, 10)
+            m5.setL1RLDegree(testsys, 2, 7, 11)
+            m5.setL1RLDegree(testsys, 3, 8, 12)
+            
+            m5.setL2RLDegree(testsys, 0, 5, 9)
+            m5.setL2RLDegree(testsys, 1, 6, 10)
+            m5.setL2RLDegree(testsys, 2, 7, 11)
+            m5.setL2RLDegree(testsys, 3, 8, 12)
+            
+            m5.setL3RLDegree(testsys, 0, 0)
+
+        
             exit_event = benchCheckpoints(options, maxtick, cptdir)
 
     print('Exiting @ tick %i because %s' %
