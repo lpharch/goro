@@ -94,6 +94,11 @@ AbstractMemory::initState()
                     system()->cacheLineSize());
 
     panic_if(!image.write(proxy), "%s: Unable to write image.");
+	
+	//Majid
+    std::cout<<"name"<<name()<<std::endl;
+    system()->aMem = this;
+	
 }
 
 void

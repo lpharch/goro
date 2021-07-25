@@ -87,7 +87,7 @@ class Base : public ClockedObject
 
     std::vector<PrefetchListener *> listeners;
 
-  public:
+    public:
 		//Majid
 		void CorrectIssued();
 		//RL
@@ -344,13 +344,14 @@ class Base : public ClockedObject
 
     /** Total prefetches issued */
     uint64_t issuedPrefetches;
-    /** Total prefetches that has been useful */
-    uint64_t usefulPrefetches;
-
+    
     /** Registered tlb for address translations */
     BaseTLB * tlb;
 
   public:
+	/** Total prefetches that has been useful */
+    uint64_t usefulPrefetches;
+
     Base(const BasePrefetcherParams &p);
     virtual ~Base() = default;
 

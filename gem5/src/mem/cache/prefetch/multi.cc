@@ -79,4 +79,24 @@ Multi::getPacket()
     return nullptr;
 }
 
+void
+Multi::changeMask(int code)
+{
+	int maxCode = pow(2, prefetchers.size());
+
+	if(code>=maxCode) 
+			std::cout<<code<<" "<<maxCode<<std::endl;
+    assert(code<maxCode);
+
+	for(int i = 0 ; i < prefetchers.size(); i++){
+			if((code>>i)&0x1 ){
+					mask[i] = true;
+			}else{
+					mask[i] = false;
+			}
+	}
+
+}
+
+
 } // namespace Prefetcher

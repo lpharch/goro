@@ -60,6 +60,10 @@
 #include "params/MemCtrl.hh"
 #include "sim/eventq.hh"
 
+
+// Majid
+#include <vector>
+
 class DRAMInterface;
 class NVMInterface;
 
@@ -610,6 +614,10 @@ class MemCtrl : public QoS::MemCtrl
     void pruneBurstTick();
 
   public:
+    //Majid
+    std::vector<int > lastValStats;
+    std::vector<int > stateBuilder();
+	
 
     MemCtrl(const MemCtrlParams &p);
 

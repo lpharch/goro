@@ -89,7 +89,36 @@ MemCtrl::MemCtrl(const MemCtrlParams &p) :
         fatal("Write buffer low threshold %d must be smaller than the "
               "high threshold %d\n", p.write_low_thresh_perc,
               p.write_high_thresh_perc);
+  
+    //Majid
+    for(int i = 0 ; i < 10; i++){
+        lastValStats.push_back(0);
+    }
+	
 }
+
+std::vector<int > 
+MemCtrl::stateBuilder()
+{
+    std::vector<int > res;
+    res.push_back(stats.readReqs.value());
+    res.push_back(stats.writeReqs.value());
+    res.push_back(stats.readBursts.value());
+    res.push_back(stats.writeBursts.value());
+    res.push_back(stats.servicedByWrQ.value());
+    res.push_back(stats.mergedWrBursts.value());
+    res.push_back(stats.numWrRetry.value());
+    res.push_back(stats.bytesReadWrQ.value());
+    res.push_back(stats.bytesReadSys.value());
+
+    for(int i = 0 ; i < res.size(); i++){
+        res[i] = res[i] - lastValStats [i];
+        lastValStats [i] = res[i];
+    }
+    return res;
+}
+
+
 
 void
 MemCtrl::init()

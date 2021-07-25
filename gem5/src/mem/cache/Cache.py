@@ -159,8 +159,8 @@ class BaseCache(ClockedObject):
     write_allocator = Param.WriteAllocator(NULL, "Write allocator")
     
     # Majid
-    def getState(self):
-        return self._ccObject.stateBuilder()    
+    def getState(self, core):
+        return self._ccObject.stateBuilder(core)    
 
     def setState(self, action, index):
         self._ccObject.setActionPytorch(action, index) 

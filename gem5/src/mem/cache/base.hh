@@ -75,7 +75,7 @@
 #include "sim/sim_exit.hh"
 #include "sim/system.hh"
 
-
+//Majid
 #include <vector>
 using namespace std;
 
@@ -1351,8 +1351,8 @@ class BaseCache : public ClockedObject
     void unserialize(CheckpointIn &cp) override;
 	
 	 //Majid
-    vector<double> stateBuilder(); 
-    void printState();
+    vector<double> stateBuilder(int core); 
+    void printState(int core);
     void onExit();
     int actionPytorch;
     void setActionPytorch(int action, int index);

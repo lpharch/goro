@@ -62,6 +62,24 @@
 #include "params/WriteAllocator.hh"
 #include "sim/core.hh"
 
+
+//Majid
+#include <random>
+#include "cpu/base.hh"
+#include "cpu/o3/cpu.hh"
+#include "cpu/o3/impl.hh"
+#include "mem/cache/prefetch/queued.hh"
+#include "mem/cache/prefetch/multi.hh"
+#include "base/statistics.hh"
+#include "base/callback.hh"
+#include "sim/stats.hh"
+#include "mem/abstract_mem.hh"
+#include "mem/mem_ctrl.hh"
+
+using namespace std;
+
+#define MaxStates 21
+
 BaseCache::CacheResponsePort::CacheResponsePort(const std::string &_name,
                                           BaseCache *_cache,
                                           const std::string &_label)
@@ -2603,18 +2621,77 @@ BaseCache::setActionPytorch(int action, int index)
 
 
 vector<double> 
-BaseCache::stateBuilder()
+BaseCache::stateBuilder(int core)
 {
     vector<double>  totStates;
+	string level = "L2Cache";
+	if(name()=="system.l3"){
+		level = "L3Cache";
+	}else{
+		level = "NPC";
+		size_t  found = name().find("l2cache");
+		if (found != string::npos){
+			level = "L2Cache";
+		}
+		found = name().find("dcache");
+		if (found != string::npos){
+			level = "L1Cache";
+		}
+	}
+	if(level == "NPC"){
+		return totStates;
+	}
+	
+	
+	if(prefetcher && name()=="L3Cache"){
+        Prefetcher::Multi *mpf = dynamic_cast<Prefetcher::Multi * >(prefetcher);
+        int reward = mpf->usefulPrefetches-lastUse;
+        lastUse = mpf->usefulPrefetches;
+        totStates.push_back(reward);
+        totStates.push_back(stats.unusedPrefetches.value());
+        stats.unusedPrefetches.reset();
+        for (auto pf : mpf->prefetchers) {
+            Prefetcher::Queued *qpf = dynamic_cast<Prefetcher::Queued * >(pf);
+            totStates.push_back(qpf->PrintDegree());
+        }
+		
+		// Memory controller
+		MemCtrl *aMem = dynamic_cast<MemCtrl * >(system->getMem());
+		vector<int > res = aMem->stateBuilder();
+		for(int i = 0 ; i < res.size();i++){
+			totStates.push_back(res[i]);
+		}
+	
+    } else if (prefetcher && name()!="L2Cache"){
+        int reward = prefetcher->usefulPrefetches-lastUse;
+        lastUse = prefetcher->usefulPrefetches;
+        totStates.push_back(reward);
+        totStates.push_back(stats.unusedPrefetches.value());
+        stats.unusedPrefetches.reset();
+        totStates.push_back(prefetcher->PrintDegree());
+    } else if(prefetcher &&  "L1Cache"){
+		BaseCPU *bcpu = dynamic_cast<BaseCPU * >(system->threads[core]->getCpuPtr());
+        FullO3CPU<O3CPUImpl> *o3cpu = dynamic_cast<FullO3CPU<O3CPUImpl> * >(system->threads[core]->getCpuPtr());
+		totStates.push_back(o3cpu->cpuStats.timesIdled.value());
+		totStates.push_back(bcpu->numSimulatedInsts()-lastInst);
+        lastInst = bcpu->numSimulatedInsts();
+		
+	}
+	
+	// Common	
+	totStates.push_back(stats.replacements.value());
+    stats.replacements.reset();
+
+    
     return totStates;
 }
 
 void
-BaseCache::printState()
+BaseCache::printState(int core)
 {
     if(prefetcher && name()=="system.l3"){
         std::cout<<"BaseCache printState"<<std::endl;
-        vector<double>  state  = stateBuilder();
+        vector<double>  state  = stateBuilder(core);
         for(int i = 0 ; i < state.size(); i++){
             cout<<state[i]<<" ";
         }cout<<endl;

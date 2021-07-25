@@ -63,9 +63,11 @@ class Multi : public Base
     void notifyFill(const PacketPtr &pkt) override {};
     /** @} */
 
-  protected:
+  public:
     /** List of sub-prefetchers ordered by priority. */
     std::list<Base*> prefetchers;
+	std::vector<bool > mask;
+    void changeMask(int code);
 };
 
 } // namespace Prefetcher
