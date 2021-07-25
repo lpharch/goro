@@ -1,0 +1,3 @@
+cd /home/gem5/spec2017/benchspec/CPU/502.gcc_r/run/run_base_refrate_mytest-64.0000
+taskset -c 0 ./cpugcc_r_base.mytest-64 gcc-pp.c -O3 -finline-limit=0 -fif-conversion -fif-conversion2 -o gcc-pp.opts-O3_-finline-limit_0_-fif-conversion_-fif-conversion2.s & taskset -c 1 ./cpugcc_r_base.mytest-64 gcc-pp.c -O3 -finline-limit=0 -fif-conversion -fif-conversion2 -o gcc-pp.opts-O3_-finline-limit_0_-fif-conversion_-fif-conversion2.s & taskset -c 2 ./cpugcc_r_base.mytest-64 gcc-pp.c -O3 -finline-limit=0 -fif-conversion -fif-conversion2 -o gcc-pp.opts-O3_-finline-limit_0_-fif-conversion_-fif-conversion2.s & taskset -c 3 ./cpugcc_r_base.mytest-64 gcc-pp.c -O3 -finline-limit=0 -fif-conversion -fif-conversion2 -o gcc-pp.opts-O3_-finline-limit_0_-fif-conversion_-fif-conversion2.s
+

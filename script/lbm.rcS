@@ -1,0 +1,2 @@
+cd /home/gem5/spec2017/benchspec/CPU/519.lbm_r/run/run_base_refrate_mytest-64.0000
+taskset -c 0 ./lbm_r_base.mytest-64 2000 reference.dat 0 0 200_200_260_ldc.of & taskset -c 1 ./lbm_r_base.mytest-64 2000 reference.dat 0 0 200_200_260_ldc.of &  taskset -c 2 ./lbm_r_base.mytest-64 2000 reference.dat 0 0 200_200_260_ldc.of &  taskset -c 3 ./lbm_r_base.mytest-64 2000 reference.dat 0 0 200_200_260_ldc.of 
