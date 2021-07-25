@@ -124,6 +124,7 @@ def addNoISAOptions(parser):
                       help="use external port for SystemC TLM cosimulation")
     parser.add_option("--caches", action="store_true")
     parser.add_option("--l2cache", action="store_true")
+    parser.add_option("--l3cache", action="store_true")
     parser.add_option("--num-dirs", type="int", default=1)
     parser.add_option("--num-l2caches", type="int", default=1)
     parser.add_option("--num-l3caches", type="int", default=1)
@@ -131,11 +132,17 @@ def addNoISAOptions(parser):
     parser.add_option("--l1i_size", type="string", default="32kB")
     parser.add_option("--l2_size", type="string", default="2MB")
     parser.add_option("--l3_size", type="string", default="16MB")
-    parser.add_option("--l1d_assoc", type="int", default=2)
-    parser.add_option("--l1i_assoc", type="int", default=2)
+    parser.add_option("--l1d_assoc", type="int", default=4)
+    parser.add_option("--l1i_assoc", type="int", default=4)
     parser.add_option("--l2_assoc", type="int", default=8)
     parser.add_option("--l3_assoc", type="int", default=16)
     parser.add_option("--cacheline_size", type="int", default=64)
+    
+    #Majid
+    parser.add_option("--RL", action="store_true",
+        help="Enabled RL Throttler  " )
+    parser.add_option("--app", type="string", default="unknown",
+        help="APP name" )
 
     # Enable Ruby
     parser.add_option("--ruby", action="store_true")
@@ -215,9 +222,18 @@ def addCommonOptions(parser):
                       type of hardware prefetcher to use with the L2 cache.
                       (if not set, use the default prefetcher of
                       the selected cache)""")
+    
+    # Majid
+    parser.add_option("--l3-hwp-type", type="choice", default=None,
+                      choices=ObjectList.hwp_list.get_names(),
+                      help = """
+                      type of hardware prefetcher to use with the L2 cache.
+                      (if not set, use the default prefetcher of
+                      the selected cache)""")
+                      
     parser.add_option("--checker", action="store_true");
     parser.add_option("--cpu-clock", action="store", type="string",
-                      default='2GHz',
+                      default='3.66GHz',
                       help="Clock for blocks running at CPU speed")
     parser.add_option("--smt", action="store_true", default=False,
                       help = """
