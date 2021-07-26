@@ -727,32 +727,47 @@ def run(options, root, testsys, cpu_class):
         else:
             print("----2")
             # system, core, action, index
-            m5.setL1RLDegree(testsys, 0, 1, 0)
-            m5.setL1RLDegree(testsys, 0, 1, 1)
+            # getL1State(system, core):
             
-            m5.setL1RLDegree(testsys, 1, 1, 0)
-            m5.setL1RLDegree(testsys, 1, 1, 1)
+            # m5.setL1RLDegree(testsys, 0, 1, 0)
+            # m5.setL1RLDegree(testsys, 0, 1, 1)
             
-            m5.setL1RLDegree(testsys, 2, 1, 0)
-            m5.setL1RLDegree(testsys, 3, 1, 1)
+            # m5.setL1RLDegree(testsys, 1, 1, 0)
+            # m5.setL1RLDegree(testsys, 1, 1, 1)
             
-            m5.setL2RLDegree(testsys, 0, 1, 0)
-            m5.setL2RLDegree(testsys, 0, 1, 1)
+            # m5.setL1RLDegree(testsys, 2, 1, 0)
+            # m5.setL1RLDegree(testsys, 3, 1, 1)
             
-            m5.setL2RLDegree(testsys, 1, 1, 0)
-            m5.setL2RLDegree(testsys, 1, 1, 1)
+            # m5.setL2RLDegree(testsys, 0, 1, 0)
+            # m5.setL2RLDegree(testsys, 0, 1, 1)
             
-            m5.setL2RLDegree(testsys, 2, 1, 0)
-            m5.setL2RLDegree(testsys, 2, 1, 1)
+            # m5.setL2RLDegree(testsys, 1, 1, 0)
+            # m5.setL2RLDegree(testsys, 1, 1, 1)
             
-            m5.setL2RLDegree(testsys, 3, 1, 0)
-            m5.setL2RLDegree(testsys, 3, 1, 1)
+            # m5.setL2RLDegree(testsys, 2, 1, 0)
+            # m5.setL2RLDegree(testsys, 2, 1, 1)
             
-            m5.setL3RLDegree(testsys, 0, 0)
-            m5.setL3RLDegree(testsys, 0, 1)
-            m5.setL3RLDegree(testsys, 0, 2)
+            # m5.setL2RLDegree(testsys, 3, 1, 0)
+            # m5.setL2RLDegree(testsys, 3, 1, 1)
+            
+            # m5.setL3RLDegree(testsys, 0, 0)
+            # m5.setL3RLDegree(testsys, 0, 1)
+            # m5.setL3RLDegree(testsys, 0, 2)
 
-        
+            print(m5.getL1State(testsys, 0) )
+            print(m5.getL1State(testsys, 1))
+            print(m5.getL1State(testsys, 2))
+            print(m5.getL1State(testsys, 3))
+            
+            print(m5.getL2State(testsys, 0))
+            print(m5.getL2State(testsys, 1))
+            print(m5.getL2State(testsys, 2))
+            print(m5.getL2State(testsys, 3))
+            
+            print(m5.getL3State(testsys, 0))
+            
+            
+            
             exit_event = benchCheckpoints(options, maxtick, cptdir)
 
     print('Exiting @ tick %i because %s' %

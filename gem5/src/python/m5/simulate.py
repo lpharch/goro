@@ -184,23 +184,23 @@ def simulate(*args, **kwargs):
     return sim_out
 
 # Majid
-def getL1State(system, core):
-    return(system.cpu[core].dcache.getState())
+def getL1State(system, core_num):
+    return(system.cpu[core_num].dcache.getState(core_num))
     
-def getL2State(system, core):
-    return(system.cpu[core].l2cache.getState())
+def getL2State(system, core_num):
+    return(system.cpu[core_num].l2cache.getState(core_num))
     
-def getL3State(system):
-    return(system.l3.getState())    
+def getL3State(system, core_num):
+    return(system.l3.getState(core_num))    
 
 def setL3RLDegree(system, action, index):
     system.l3.setState(action, index)
     
-def setL2RLDegree(system, core, action, index):
-    system.cpu[core].l2cache.setState(action, index)
+def setL2RLDegree(system, core_num, action, index):
+    system.cpu[core_num].l2cache.setState(action, index)
     
-def setL1RLDegree(system, core, action, index):
-    system.cpu[core].dcache.setState(action, index)   
+def setL1RLDegree(system, core_num, action, index):
+    system.cpu[core_num].dcache.setState(action, index)   
 
 
 

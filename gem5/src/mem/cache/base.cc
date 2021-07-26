@@ -2670,38 +2670,44 @@ BaseCache::stateBuilder(int core)
 	
 	
 	if(prefetcher && level=="L3Cache"){
-        Prefetcher::Multi *mpf = dynamic_cast<Prefetcher::Multi * >(prefetcher);
+		Prefetcher::Multi *mpf = dynamic_cast<Prefetcher::Multi * >(prefetcher);
         int reward = mpf->usefulPrefetches-lastUse;
+		
         lastUse = mpf->usefulPrefetches;
         totStates.push_back(reward);
         totStates.push_back(stats.unusedPrefetches.value());
         stats.unusedPrefetches.reset();
+		
         for (auto pf : mpf->prefetchers) {
             Prefetcher::Queued *qpf = dynamic_cast<Prefetcher::Queued * >(pf);
             totStates.push_back(qpf->PrintDegree());
         }
 		
 		// Memory controller
-		MemCtrl *aMem = dynamic_cast<MemCtrl * >(system->getMem());
-		vector<int > res = aMem->stateBuilder();
-		for(int i = 0 ; i < res.size();i++){
-			totStates.push_back(res[i]);
-		}
-	
+		// std::cout<<"0 "<<system->getMem()<<std::endl;
+		// MemCtrl *aMem = dynamic_cast<MemCtrl * >(system->getMem());
+		// std::cout<<"1"<<std::endl;
+		// vector<int > res = aMem->stateBuilder();
+		// std::cout<<"2"<<std::endl;
+		// for(int i = 0 ; i < res.size();i++){
+			// std::cout<<"3"<<std::endl;
+			// totStates.push_back(res[i]);
+		// }
+		
     } else if (prefetcher && level!="L2Cache"){
-        int reward = prefetcher->usefulPrefetches-lastUse;
+		int reward = prefetcher->usefulPrefetches-lastUse;
         lastUse = prefetcher->usefulPrefetches;
         totStates.push_back(reward);
         totStates.push_back(stats.unusedPrefetches.value());
         stats.unusedPrefetches.reset();
         totStates.push_back(prefetcher->PrintDegree());
+		
     } else if(prefetcher &&  level == "L1Cache"){
 		BaseCPU *bcpu = dynamic_cast<BaseCPU * >(system->threads[core]->getCpuPtr());
         FullO3CPU<O3CPUImpl> *o3cpu = dynamic_cast<FullO3CPU<O3CPUImpl> * >(system->threads[core]->getCpuPtr());
 		totStates.push_back(o3cpu->cpuStats.timesIdled.value());
 		totStates.push_back(bcpu->numSimulatedInsts()-lastInst);
         lastInst = bcpu->numSimulatedInsts();
-		
 	}
 	
 	// Common	
