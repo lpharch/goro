@@ -726,17 +726,31 @@ def run(options, root, testsys, cpu_class):
                                       maxtick, options.repeat_switch)
         else:
             print("----2")
-            m5.setL1RLDegree(testsys, 0, 5, 9)
-            m5.setL1RLDegree(testsys, 1, 6, 10)
-            m5.setL1RLDegree(testsys, 2, 7, 11)
-            m5.setL1RLDegree(testsys, 3, 8, 12)
+            # system, core, action, index
+            m5.setL1RLDegree(testsys, 0, 1, 0)
+            m5.setL1RLDegree(testsys, 0, 1, 1)
             
-            m5.setL2RLDegree(testsys, 0, 5, 9)
-            m5.setL2RLDegree(testsys, 1, 6, 10)
-            m5.setL2RLDegree(testsys, 2, 7, 11)
-            m5.setL2RLDegree(testsys, 3, 8, 12)
+            m5.setL1RLDegree(testsys, 1, 1, 0)
+            m5.setL1RLDegree(testsys, 1, 1, 1)
+            
+            m5.setL1RLDegree(testsys, 2, 1, 0)
+            m5.setL1RLDegree(testsys, 3, 1, 1)
+            
+            m5.setL2RLDegree(testsys, 0, 1, 0)
+            m5.setL2RLDegree(testsys, 0, 1, 1)
+            
+            m5.setL2RLDegree(testsys, 1, 1, 0)
+            m5.setL2RLDegree(testsys, 1, 1, 1)
+            
+            m5.setL2RLDegree(testsys, 2, 1, 0)
+            m5.setL2RLDegree(testsys, 2, 1, 1)
+            
+            m5.setL2RLDegree(testsys, 3, 1, 0)
+            m5.setL2RLDegree(testsys, 3, 1, 1)
             
             m5.setL3RLDegree(testsys, 0, 0)
+            m5.setL3RLDegree(testsys, 0, 1)
+            m5.setL3RLDegree(testsys, 0, 2)
 
         
             exit_event = benchCheckpoints(options, maxtick, cptdir)

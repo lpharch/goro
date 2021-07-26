@@ -2617,13 +2617,30 @@ void
 BaseCache::setActionPytorch(int action, int index)
 {
 	std::cout<<name()<<" action:"<<action<<" index:"<<index<<std::endl;
+	
+    if(prefetcher){
+        Prefetcher::Multi *mpf = dynamic_cast<Prefetcher::Multi * >(prefetcher);
+        int i = 0;
+        for (auto pf : mpf->prefetchers) {
+           Prefetcher::Queued *qpf = dynamic_cast<Prefetcher::Queued * >(pf);
+		   // a code name for print		
+           if(action==-10 && index==-10){
+                cout<<name()<<" Prefetcher "<<i<<" "<< qpf->PrintDegree()<<endl;
+           }else{
+                if(i==index){
+                    cout<<"name "<<qpf->name()<<endl;
+                    qpf->SetDegree(action);
+                }
+           }
+         
+           i++;
+        }
+    }
 }
 
-
-vector<double> 
-BaseCache::stateBuilder(int core)
+string 
+BaseCache::levelFinder()
 {
-    vector<double>  totStates;
 	string level = "L2Cache";
 	if(name()=="system.l3"){
 		level = "L3Cache";
@@ -2638,12 +2655,21 @@ BaseCache::stateBuilder(int core)
 			level = "L1Cache";
 		}
 	}
+	return level;
+}
+
+vector<double> 
+BaseCache::stateBuilder(int core)
+{
+    vector<double>  totStates;
+	
+	string level = levelFinder();
 	if(level == "NPC"){
 		return totStates;
 	}
 	
 	
-	if(prefetcher && name()=="L3Cache"){
+	if(prefetcher && level=="L3Cache"){
         Prefetcher::Multi *mpf = dynamic_cast<Prefetcher::Multi * >(prefetcher);
         int reward = mpf->usefulPrefetches-lastUse;
         lastUse = mpf->usefulPrefetches;
@@ -2662,14 +2688,14 @@ BaseCache::stateBuilder(int core)
 			totStates.push_back(res[i]);
 		}
 	
-    } else if (prefetcher && name()!="L2Cache"){
+    } else if (prefetcher && level!="L2Cache"){
         int reward = prefetcher->usefulPrefetches-lastUse;
         lastUse = prefetcher->usefulPrefetches;
         totStates.push_back(reward);
         totStates.push_back(stats.unusedPrefetches.value());
         stats.unusedPrefetches.reset();
         totStates.push_back(prefetcher->PrintDegree());
-    } else if(prefetcher &&  "L1Cache"){
+    } else if(prefetcher &&  level == "L1Cache"){
 		BaseCPU *bcpu = dynamic_cast<BaseCPU * >(system->threads[core]->getCpuPtr());
         FullO3CPU<O3CPUImpl> *o3cpu = dynamic_cast<FullO3CPU<O3CPUImpl> * >(system->threads[core]->getCpuPtr());
 		totStates.push_back(o3cpu->cpuStats.timesIdled.value());

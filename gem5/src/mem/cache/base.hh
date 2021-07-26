@@ -1353,6 +1353,7 @@ class BaseCache : public ClockedObject
 	 //Majid
     vector<double> stateBuilder(int core); 
     void printState(int core);
+	string levelFinder();
     void onExit();
     int actionPytorch;
     void setActionPytorch(int action, int index);

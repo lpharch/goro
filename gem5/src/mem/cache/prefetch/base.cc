@@ -99,6 +99,11 @@ Base::Base(const BasePrefetcherParams &p)
       prefetchStats(this), issuedPrefetches(0),
       usefulPrefetches(0), tlb(nullptr)
 {
+	RLdegree=1;
+    for(int i=0;i<10; i++)
+        RLDegreeHist.push_back(0);
+    cout<<"base prefetcher constructor"<<endl;
+    cout<<"RLDegreeHist size "<<RLDegreeHist.size()<<endl;
 }
 
 void
