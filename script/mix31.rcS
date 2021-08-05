@@ -1,8 +1,8 @@
-cd /home/gem5/spec2017/benchspec/CPU/507.cactuBSSN_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 0 ./cactusBSSN_r_base.mytest-64 spec_ref.par &
-cd /home/gem5/spec2017/benchspec/CPU/549.fotonik3d_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 1 ./fotonik3d_r_base.mytest-64 &
-cd /home/gem5/spec2017/benchspec/CPU/521.wrf_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 2 ./wrf_r_base.mytest-64 &
-cd /home/gem5/spec2017/benchspec/CPU/527.cam4_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 3 ./cam4_r_base.mytest-64
+cd /home/gem5/spec2017/benchspec/CPU/511.povray_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 0 ./povray_r_base.mytest-64 SPEC-benchmark-ref.ini &
+cd /home/gem5/spec2017/benchspec/CPU/510.parest_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 1 ./parest_r_base.mytest-64 ref.prm &
+cd /home/gem5/spec2017/benchspec/CPU/503.bwaves_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 2 ./bwaves_r_base.mytest-64 bwaves_1 < bwaves_1.in &
+cd /home/gem5/spec2017/benchspec/CPU/541.leela_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 3 ./leela_r_base.mytest-64 ref.sgf 

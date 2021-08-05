@@ -1,8 +1,8 @@
-cd /home/gem5/spec2017/benchspec/CPU/510.parest_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 0 ./parest_r_base.mytest-64 ref.prm &
-cd /home/gem5/spec2017/benchspec/CPU/500.perlbench_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 1 ./perlbench_r_base.mytest-64 -I./lib checkspam.pl 2500 5 25 11 150 1 1 1 1 &
-cd /home/gem5/spec2017/benchspec/CPU/541.leela_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 2 ./leela_r_base.mytest-64 ref.sgf  &
-cd /home/gem5/spec2017/benchspec/CPU/507.cactuBSSN_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 3 ./cactusBSSN_r_base.mytest-64 spec_ref.par
+cd /home/gem5/spec2017/benchspec/CPU/503.bwaves_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 0 ./bwaves_r_base.mytest-64 bwaves_1 < bwaves_1.in &
+cd /home/gem5/spec2017/benchspec/CPU/519.lbm_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 1 ./lbm_r_base.mytest-64 3000 reference.dat 0 0 100_100_130_ldc.of &
+cd /home/gem5/spec2017/benchspec/CPU/521.wrf_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 2 ./wrf_r_base.mytest-64 &
+cd /home/gem5/spec2017/benchspec/CPU/548.exchange2_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 3 ./exchange2_r_base.mytest-64 6

@@ -1,8 +1,8 @@
-cd /home/gem5/spec2017/benchspec/CPU/554.roms_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 0 ./roms_r_base.mytest-64 < ocean_benchmark2.in.x &
-cd /home/gem5/spec2017/benchspec/CPU/500.perlbench_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 1 ./perlbench_r_base.mytest-64 -I./lib checkspam.pl 2500 5 25 11 150 1 1 1 1 &
-cd /home/gem5/spec2017/benchspec/CPU/508.namd_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 2 ./namd_r_base.mytest-64 --input apoa1.input --output apoa1.ref.output --iterations 65 &
-cd /home/gem5/spec2017/benchspec/CPU/548.exchange2_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 3 ./exchange2_r_base.mytest-64 6
+cd /home/gem5/spec2017/benchspec/CPU/503.bwaves_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 0 ./bwaves_r_base.mytest-64 bwaves_1 < bwaves_1.in &
+cd /home/gem5/spec2017/benchspec/CPU/557.xz_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 1 ./xz_r_base.mytest-64 cld.tar.xz 160 19cf30ae51eddcbefda78dd06014b4b96281456e078ca7c13e1c0c9e6aaea8dff3efb4ad6b0456697718cede6bd5454852652806a657bb56e07d61128434b474 59796407 61004416 6 &
+cd /home/gem5/spec2017/benchspec/CPU/519.lbm_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 2 ./lbm_r_base.mytest-64 3000 reference.dat 0 0 100_100_130_ldc.of &
+cd /home/gem5/spec2017/benchspec/CPU/527.cam4_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 3 ./cam4_r_base.mytest-64

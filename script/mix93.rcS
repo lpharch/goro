@@ -1,8 +1,8 @@
-cd /home/gem5/spec2017/benchspec/CPU/526.blender_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 0 ./blender_r_base.mytest-64 sh3_no_char.blend --render-output sh3_no_char_ --threads 1 -b -F RAWTGA -s 849 -e 849 -a &
-cd /home/gem5/spec2017/benchspec/CPU/510.parest_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 1 ./parest_r_base.mytest-64 ref.prm &
+cd /home/gem5/spec2017/benchspec/CPU/511.povray_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 0 ./povray_r_base.mytest-64 SPEC-benchmark-ref.ini &
+cd /home/gem5/spec2017/benchspec/CPU/519.lbm_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 1 ./lbm_r_base.mytest-64 3000 reference.dat 0 0 100_100_130_ldc.of &
 cd /home/gem5/spec2017/benchspec/CPU/527.cam4_r/run/run_base_refrate_mytest-64.0000/
 taskset -c 2 ./cam4_r_base.mytest-64 &
-cd /home/gem5/spec2017/benchspec/CPU/508.namd_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 3 ./namd_r_base.mytest-64 --input apoa1.input --output apoa1.ref.output --iterations 65
+cd /home/gem5/spec2017/benchspec/CPU/549.fotonik3d_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 3 ./fotonik3d_r_base.mytest-64

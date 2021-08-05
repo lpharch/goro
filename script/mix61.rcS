@@ -1,8 +1,8 @@
-cd /home/gem5/spec2017/benchspec/CPU/500.perlbench_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 0 ./perlbench_r_base.mytest-64 -I./lib checkspam.pl 2500 5 25 11 150 1 1 1 1 &
-cd /home/gem5/spec2017/benchspec/CPU/520.omnetpp_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 1 ./omnetpp_r_base.mytest-64 -c General -r 0 &
+cd /home/gem5/spec2017/benchspec/CPU/510.parest_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 0 ./parest_r_base.mytest-64 ref.prm &
+cd /home/gem5/spec2017/benchspec/CPU/527.cam4_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 1 ./cam4_r_base.mytest-64 &
 cd /home/gem5/spec2017/benchspec/CPU/505.mcf_r/run/run_base_refrate_mytest-64.0000/
 taskset -c 2 ./mcf_r_base.mytest-64 inp.in &
-cd /home/gem5/spec2017/benchspec/CPU/527.cam4_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 3 ./cam4_r_base.mytest-64
+cd /home/gem5/spec2017/benchspec/CPU/554.roms_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 3 ./roms_r_base.mytest-64 < ocean_benchmark2.in.x
