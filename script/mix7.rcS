@@ -1,0 +1,8 @@
+cd /home/gem5/spec2017/benchspec/CPU/521.wrf_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 0 ./wrf_r_base.mytest-64 &
+cd /home/gem5/spec2017/benchspec/CPU/503.bwaves_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 1 ./bwaves_r_base.mytest-64 bwaves_1 < bwaves_1.in &
+cd /home/gem5/spec2017/benchspec/CPU/549.fotonik3d_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 2 ./fotonik3d_r_base.mytest-64 &
+cd /home/gem5/spec2017/benchspec/CPU/526.blender_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 3 ./blender_r_base.mytest-64 sh3_no_char.blend --render-output sh3_no_char_ --threads 1 -b -F RAWTGA -s 849 -e 849 -a

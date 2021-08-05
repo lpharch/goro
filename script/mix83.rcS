@@ -1,0 +1,8 @@
+cd /home/gem5/spec2017/benchspec/CPU/520.omnetpp_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 0 ./omnetpp_r_base.mytest-64 -c General -r 0 &
+cd /home/gem5/spec2017/benchspec/CPU/519.lbm_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 1 ./lbm_r_base.mytest-64 3000 reference.dat 0 0 100_100_130_ldc.of &
+cd /home/gem5/spec2017/benchspec/CPU/510.parest_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 2 ./parest_r_base.mytest-64 ref.prm &
+cd /home/gem5/spec2017/benchspec/CPU/527.cam4_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 3 ./cam4_r_base.mytest-64

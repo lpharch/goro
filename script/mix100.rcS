@@ -1,0 +1,8 @@
+cd /home/gem5/spec2017/benchspec/CPU/523.xalancbmk_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 0 ./cpuxalan_r_base.mytest-64 -v t5.xml xalanc.xsl &
+cd /home/gem5/spec2017/benchspec/CPU/503.bwaves_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 1 ./bwaves_r_base.mytest-64 bwaves_1 < bwaves_1.in &
+cd /home/gem5/spec2017/benchspec/CPU/544.nab_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 2 ./nab_r_base.mytest-64 1am0 1122214447 122 &
+cd /home/gem5/spec2017/benchspec/CPU/510.parest_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 3 ./parest_r_base.mytest-64 ref.prm

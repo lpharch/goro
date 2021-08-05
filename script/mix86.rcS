@@ -1,0 +1,8 @@
+cd /home/gem5/spec2017/benchspec/CPU/520.omnetpp_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 0 ./omnetpp_r_base.mytest-64 -c General -r 0 &
+cd /home/gem5/spec2017/benchspec/CPU/508.namd_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 1 ./namd_r_base.mytest-64 --input apoa1.input --output apoa1.ref.output --iterations 65 &
+cd /home/gem5/spec2017/benchspec/CPU/511.povray_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 2 ./povray_r_base.mytest-64 SPEC-benchmark-ref.ini &
+cd /home/gem5/spec2017/benchspec/CPU/521.wrf_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 3 ./wrf_r_base.mytest-64

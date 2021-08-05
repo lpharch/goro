@@ -1,0 +1,8 @@
+cd /home/gem5/spec2017/benchspec/CPU/523.xalancbmk_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 0 ./cpuxalan_r_base.mytest-64 -v t5.xml xalanc.xsl &
+cd /home/gem5/spec2017/benchspec/CPU/527.cam4_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 1 ./cam4_r_base.mytest-64 &
+cd /home/gem5/spec2017/benchspec/CPU/549.fotonik3d_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 2 ./fotonik3d_r_base.mytest-64 &
+cd /home/gem5/spec2017/benchspec/CPU/520.omnetpp_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 3 ./omnetpp_r_base.mytest-64 -c General -r 0

@@ -1,0 +1,8 @@
+cd /home/gem5/spec2017/benchspec/CPU/508.namd_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 0 ./namd_r_base.mytest-64 --input apoa1.input --output apoa1.ref.output --iterations 65 &
+cd /home/gem5/spec2017/benchspec/CPU/505.mcf_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 1 ./mcf_r_base.mytest-64 inp.in &
+cd /home/gem5/spec2017/benchspec/CPU/523.xalancbmk_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 2 ./cpuxalan_r_base.mytest-64 -v t5.xml xalanc.xsl &
+cd /home/gem5/spec2017/benchspec/CPU/557.xz_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 3 ./xz_r_base.mytest-64 cld.tar.xz 160 19cf30ae51eddcbefda78dd06014b4b96281456e078ca7c13e1c0c9e6aaea8dff3efb4ad6b0456697718cede6bd5454852652806a657bb56e07d61128434b474 59796407 61004416 6
