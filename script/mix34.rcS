@@ -1,0 +1,8 @@
+cd /home/gem5/spec2017/benchspec/CPU/523.xalancbmk_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 0 ./cpuxalan_r_base.mytest-64 -v t5.xml xalanc.xsl &
+cd /home/gem5/spec2017/benchspec/CPU/526.blender_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 1 ./blender_r_base.mytest-64 sh3_no_char.blend --render-output sh3_no_char_ --threads 1 -b -F RAWTGA -s 849 -e 849 -a &
+cd /home/gem5/spec2017/benchspec/CPU/520.omnetpp_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 2 ./omnetpp_r_base.mytest-64 -c General -r 0 &
+cd /home/gem5/spec2017/benchspec/CPU/544.nab_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 3 ./nab_r_base.mytest-64 1am0 1122214447 122

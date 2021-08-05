@@ -1,0 +1,8 @@
+cd /home/gem5/spec2017/benchspec/CPU/505.mcf_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 0 ./mcf_r_base.mytest-64 inp.in &
+cd /home/gem5/spec2017/benchspec/CPU/508.namd_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 1 ./namd_r_base.mytest-64 --input apoa1.input --output apoa1.ref.output --iterations 65 &
+cd /home/gem5/spec2017/benchspec/CPU/541.leela_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 2 ./leela_r_base.mytest-64 ref.sgf  &
+cd /home/gem5/spec2017/benchspec/CPU/531.deepsjeng_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 3 ./deepsjeng_r_base.mytest-64 ref.txt
