@@ -1,8 +1,0 @@
-cd /home/gem5/spec2017/benchspec/CPU/526.blender_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 0 ./blender_r_base.mytest-64 sh3_no_char.blend --render-output sh3_no_char_ --threads 1 -b -F RAWTGA -s 849 -e 849 -a &
-cd /home/gem5/spec2017/benchspec/CPU/527.cam4_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 1 ./cam4_r_base.mytest-64 &
-cd /home/gem5/spec2017/benchspec/CPU/510.parest_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 2 ./parest_r_base.mytest-64 ref.prm &
-cd /home/gem5/spec2017/benchspec/CPU/554.roms_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 3 ./roms_r_base.mytest-64 < ocean_benchmark2.in.x

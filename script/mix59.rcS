@@ -1,8 +1,0 @@
-cd /home/gem5/spec2017/benchspec/CPU/554.roms_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 0 ./roms_r_base.mytest-64 < ocean_benchmark2.in.x &
-cd /home/gem5/spec2017/benchspec/CPU/511.povray_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 1 ./povray_r_base.mytest-64 SPEC-benchmark-ref.ini &
-cd /home/gem5/spec2017/benchspec/CPU/519.lbm_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 2 ./lbm_r_base.mytest-64 3000 reference.dat 0 0 100_100_130_ldc.of &
-cd /home/gem5/spec2017/benchspec/CPU/531.deepsjeng_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 3 ./deepsjeng_r_base.mytest-64 ref.txt

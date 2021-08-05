@@ -1,8 +1,0 @@
-cd /home/gem5/spec2017/benchspec/CPU/549.fotonik3d_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 0 ./fotonik3d_r_base.mytest-64 &
-cd /home/gem5/spec2017/benchspec/CPU/507.cactuBSSN_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 1 ./cactusBSSN_r_base.mytest-64 spec_ref.par &
-cd /home/gem5/spec2017/benchspec/CPU/519.lbm_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 2 ./lbm_r_base.mytest-64 3000 reference.dat 0 0 100_100_130_ldc.of &
-cd /home/gem5/spec2017/benchspec/CPU/527.cam4_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 3 ./cam4_r_base.mytest-64

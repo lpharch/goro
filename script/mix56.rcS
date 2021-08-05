@@ -1,8 +1,0 @@
-cd /home/gem5/spec2017/benchspec/CPU/521.wrf_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 0 ./wrf_r_base.mytest-64 &
-cd /home/gem5/spec2017/benchspec/CPU/510.parest_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 1 ./parest_r_base.mytest-64 ref.prm &
-cd /home/gem5/spec2017/benchspec/CPU/538.imagick_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 2 ./imagick_r_base.mytest-64 -limit disk 0 refrate_input.tga -edge 41 -resample 181% -emboss 31 -colorspace YUV -mean-shift 19x19+15% -resize 30% refrate_output.tga &
-cd /home/gem5/spec2017/benchspec/CPU/500.perlbench_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 3 ./perlbench_r_base.mytest-64 -I./lib checkspam.pl 2500 5 25 11 150 1 1 1 1

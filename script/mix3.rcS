@@ -1,9 +1,0 @@
-cd /home/gem5/spec2017/benchspec/CPU/544.nab_r/run/run_base_refrate_mytest-64.0000
-taskset -c 0 ./nab_r_base.mytest-64 1am0 1122214447 122 & 
-cd /home/gem5/spec2017/benchspec/CPU/511.povray_r/run/run_base_refrate_mytest-64.0000
-taskset -c 1 ./povray_r_base.mytest-64 SPEC-benchmark-ref.ini & 
-cd /home/gem5/spec2017/benchspec/CPU/507.cactuBSSN_r/run/run_base_refrate_mytest-64.0000
-taskset -c 2 ./cactusBSSN_r_base.mytest-64 spec_ref.par &
-cd /home/gem5/spec2017/benchspec/CPU/521.wrf_r/run/run_base_refrate_mytest-64.0000
-taskset -c 3 ./wrf_r_base.mytest-64
-

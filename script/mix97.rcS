@@ -1,8 +1,0 @@
-cd /home/gem5/spec2017/benchspec/CPU/525.x264_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 0 ./x264_r_base.mytest-64 --pass 1 --stats x264_stats.log --bitrate 1000 --frames 1000 -o BuckBunny_New.264 BuckBunny.yuv 1280x720 &
-cd /home/gem5/spec2017/benchspec/CPU/526.blender_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 1 ./blender_r_base.mytest-64 sh3_no_char.blend --render-output sh3_no_char_ --threads 1 -b -F RAWTGA -s 849 -e 849 -a &
-cd /home/gem5/spec2017/benchspec/CPU/519.lbm_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 2 ./lbm_r_base.mytest-64 3000 reference.dat 0 0 100_100_130_ldc.of &
-cd /home/gem5/spec2017/benchspec/CPU/500.perlbench_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 3 ./perlbench_r_base.mytest-64 -I./lib checkspam.pl 2500 5 25 11 150 1 1 1 1

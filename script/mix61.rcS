@@ -1,8 +1,0 @@
-cd /home/gem5/spec2017/benchspec/CPU/525.x264_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 0 ./x264_r_base.mytest-64 --pass 1 --stats x264_stats.log --bitrate 1000 --frames 1000 -o BuckBunny_New.264 BuckBunny.yuv 1280x720 &
-cd /home/gem5/spec2017/benchspec/CPU/511.povray_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 1 ./povray_r_base.mytest-64 SPEC-benchmark-ref.ini &
-cd /home/gem5/spec2017/benchspec/CPU/541.leela_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 2 ./leela_r_base.mytest-64 ref.sgf  &
-cd /home/gem5/spec2017/benchspec/CPU/521.wrf_r/run/run_base_refrate_mytest-64.0000/
-taskset -c 3 ./wrf_r_base.mytest-64
