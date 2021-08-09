@@ -1,0 +1,2 @@
+cd /home/gem5/spec2017/benchspec/CPU/531.deepsjeng_r/run/run_base_refrate_mytest-64.0000
+taskset -c 0 ./deepsjeng_r_base.mytest-64 ref.txt & taskset -c 1 ./deepsjeng_r_base.mytest-64 ref.txt & taskset -c 2 ./deepsjeng_r_base.mytest-64 ref.txt & taskset -c 3 ./deepsjeng_r_base.mytest-64 ref.txt 

@@ -1,0 +1,8 @@
+cd /home/gem5/spec2017/benchspec/CPU/505.mcf_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 0 ./mcf_r_base.mytest-64 inp.in &
+cd /home/gem5/spec2017/benchspec/CPU/500.perlbench_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 1 ./perlbench_r_base.mytest-64 -I./lib checkspam.pl 2500 5 25 11 150 1 1 1 1 &
+cd /home/gem5/spec2017/benchspec/CPU/508.namd_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 2 ./namd_r_base.mytest-64 --input apoa1.input --output apoa1.ref.output --iterations 65 &
+cd /home/gem5/spec2017/benchspec/CPU/519.lbm_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 3 ./lbm_r_base.mytest-64 3000 reference.dat 0 0 100_100_130_ldc.of

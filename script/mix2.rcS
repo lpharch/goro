@@ -1,9 +1,8 @@
-cd /home/gem5/spec2017/benchspec/CPU/505.mcf_r/run/run_base_refrate_mytest-64.0000
-taskset -c 0 ./mcf_r_base.mytest-64 inp.in &  
-cd /home/gem5/spec2017/benchspec/CPU/519.lbm_r/run/run_base_refrate_mytest-64.0000
-taskset -c 1 ./lbm_r_base.mytest-64 2000 reference.dat 0 0 200_200_260_ldc.of & 
-cd /home/gem5/spec2017/benchspec/CPU/507.cactuBSSN_r/run/run_base_refrate_mytest-64.0000
-taskset -c 2 ./cactusBSSN_r_base.mytest-64 spec_ref.par &
-cd /home/gem5/spec2017/benchspec/CPU/521.wrf_r/run/run_base_refrate_mytest-64.0000
-taskset -c 3 ./wrf_r_base.mytest-64
-
+cd /home/gem5/spec2017/benchspec/CPU/557.xz_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 0 ./xz_r_base.mytest-64 cld.tar.xz 160 19cf30ae51eddcbefda78dd06014b4b96281456e078ca7c13e1c0c9e6aaea8dff3efb4ad6b0456697718cede6bd5454852652806a657bb56e07d61128434b474 59796407 61004416 6 &
+cd /home/gem5/spec2017/benchspec/CPU/523.xalancbmk_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 1 ./cpuxalan_r_base.mytest-64 -v t5.xml xalanc.xsl &
+cd /home/gem5/spec2017/benchspec/CPU/505.mcf_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 2 ./mcf_r_base.mytest-64 inp.in &
+cd /home/gem5/spec2017/benchspec/CPU/519.lbm_r/run/run_base_refrate_mytest-64.0000/
+taskset -c 3 ./lbm_r_base.mytest-64 3000 reference.dat 0 0 100_100_130_ldc.of
