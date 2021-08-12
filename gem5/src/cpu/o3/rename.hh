@@ -477,7 +477,8 @@ class DefaultRename
      * the stall.
      */
     inline void incrFullStat(const FullSource &source);
-
+	
+	public:
     struct RenameStats : public Stats::Group {
         RenameStats(Stats::Group *parent);
 

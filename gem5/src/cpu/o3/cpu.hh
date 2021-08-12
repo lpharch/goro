@@ -74,6 +74,7 @@ class Checkpoint;
 class Process;
 
 struct BaseCPUParams;
+using namespace std;
 
 class BaseO3CPU : public BaseCPU
 {
@@ -117,7 +118,8 @@ class FullO3CPU : public BaseO3CPU
 
     /** Overall CPU status. */
     Status _status;
-
+	//Majid
+	vector<double> tmp_loc;
   private:
 
     /** The tick event used for scheduling CPU ticks. */
@@ -777,6 +779,7 @@ class FullO3CPU : public BaseO3CPU
     // hardware transactional memory
     void htmSendAbortSignal(ThreadID tid, uint64_t htm_uid,
                             HtmFailureFaultCause cause);
+	vector<double > state_builder();
 };
 
 #endif // __CPU_O3_CPU_HH__

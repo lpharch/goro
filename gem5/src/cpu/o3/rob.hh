@@ -320,7 +320,7 @@ class ROB
     /** Number of active threads. */
     ThreadID numThreads;
 
-
+	public:
     struct ROBStats : public Stats::Group {
         ROBStats(Stats::Group *parent);
 

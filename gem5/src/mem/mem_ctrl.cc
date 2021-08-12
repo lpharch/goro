@@ -100,21 +100,39 @@ MemCtrl::MemCtrl(const MemCtrlParams &p) :
 std::vector<int > 
 MemCtrl::stateBuilder()
 {
+	// mem_ctrls.totGap
+	// mem_ctrls.rdQLenPdf::3
+	// mem_ctrls.numStayReadState
+	// system.mem_ctrls.requestorReadAccesses::cpu0.dcache.prefetcher.prefetchers1
+		
     std::vector<int > res;
-    res.push_back(stats.readReqs.value());
-    res.push_back(stats.writeReqs.value());
-    res.push_back(stats.readBursts.value());
-    res.push_back(stats.writeBursts.value());
-    res.push_back(stats.servicedByWrQ.value());
-    res.push_back(stats.mergedWrBursts.value());
-    res.push_back(stats.numWrRetry.value());
-    res.push_back(stats.bytesReadWrQ.value());
-    res.push_back(stats.bytesReadSys.value());
+	
+    res.push_back(stats.totGap.value()-lastValStats[0]);
+	lastValStats[0] = stats.totGap.value();
+	
+	std::vector<double > rd_res;
+	stats.rdQLenPdf.value(rd_res);
+	res.push_back(rd_res[3]-lastValStats[1]);
+	lastValStats[1] = rd_res[3];
+	
+	res.push_back(QoS::MemCtrl::stats.numStayReadState.value()-lastValStats[2]);
+	lastValStats[2] = QoS::MemCtrl::stats.numStayReadState.value();
+	
+	uint64_t tot_rd_access = 0;
+	std::vector<double > res1;
+	stats.requestorReadAccesses.value(res1);
+			
+	const auto max_requestors = system()->maxRequestors();
+	for (int i = 0; i < max_requestors; i++) {
+        const std::string requestor = system()->getRequestorName(i);
+		std::size_t found = requestor.find("prefetcher");
+		if (found!=std::string::npos){
+			tot_rd_access += res1[i];
+		}
+	}
+	res.push_back(tot_rd_access - lastValStats[3]);
+	lastValStats[3] = tot_rd_access;
 
-    for(int i = 0 ; i < res.size(); i++){
-        res[i] = res[i] - lastValStats [i];
-        lastValStats [i] = res[i];
-    }
     return res;
 }
 

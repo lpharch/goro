@@ -1360,7 +1360,7 @@ class BaseCache : public ClockedObject
     int64_t lastInst = 0;
 	int64_t lastUse = 0;
 	int64_t lastAction = 0;
-	
+	vector<double>  tmp_loc;
 	
 };
 

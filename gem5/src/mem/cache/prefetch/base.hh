@@ -336,7 +336,10 @@ class Base : public ClockedObject
     Addr pageOffset(Addr a) const;
     /** Build the address of the i-th block inside the page */
     Addr pageIthBlockAddress(Addr page, uint32_t i) const;
-    struct StatGroup : public Stats::Group
+    
+
+  public:
+	struct StatGroup : public Stats::Group
     {
         StatGroup(Stats::Group *parent);
         Stats::Scalar pfIssued;
@@ -347,8 +350,8 @@ class Base : public ClockedObject
     
     /** Registered tlb for address translations */
     BaseTLB * tlb;
-
-  public:
+	
+	
 	/** Total prefetches that has been useful */
     uint64_t usefulPrefetches;
 

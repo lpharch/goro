@@ -542,7 +542,7 @@ class DefaultFetch
     /** Event used to delay fault generation of translation faults */
     FinishTranslationEvent finishTranslationEvent;
 
-  protected:
+  public:
     struct FetchStatGroup : public Stats::Group
     {
         FetchStatGroup(O3CPU *cpu, DefaultFetch *fetch);

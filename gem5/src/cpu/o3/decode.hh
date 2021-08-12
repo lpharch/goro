@@ -292,6 +292,8 @@ class DefaultDecode
      */
     bool squashAfterDelaySlot[Impl::MaxThreads];
 
+	public:
+	
     struct DecodeStats : public Stats::Group {
         DecodeStats(O3CPU *cpu);
 

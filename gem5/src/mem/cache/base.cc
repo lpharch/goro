@@ -75,6 +75,7 @@
 #include "sim/stats.hh"
 #include "mem/abstract_mem.hh"
 #include "mem/mem_ctrl.hh"
+#include <numeric>
 
 using namespace std;
 
@@ -147,7 +148,11 @@ BaseCache::BaseCache(const BaseCacheParams &p, unsigned blk_size)
     warn_if(!compressor && dynamic_cast<CompressedTags*>(tags),
         "Compressed cache %s does not have a compression algorithm", name());
     if (compressor)
-        compressor->setCache(this);
+		compressor->setCache(this);
+	
+	//Majid
+	for (int i = 0; i< 10; i++)
+		tmp_loc.push_back(0);
 }
 
 BaseCache::~BaseCache()
@@ -2661,6 +2666,9 @@ BaseCache::levelFinder()
 vector<double> 
 BaseCache::stateBuilder(int core)
 {
+	std::vector<std::unique_ptr<CacheCmdStats>> cmd;
+	int demnads_code[6] = {MemCmd::ReadReq, MemCmd::WriteReq, MemCmd::WriteLineReq, MemCmd::ReadExReq, MemCmd::ReadCleanReq, MemCmd::ReadSharedReq };
+	 
     vector<double>  totStates;
 	
 	string level = levelFinder();
@@ -2670,6 +2678,12 @@ BaseCache::stateBuilder(int core)
 	
 	
 	if(prefetcher && level=="L3Cache"){
+		// system.l3.ReadSharedReq.accesses::total
+		// system.l3.prefetcher.prefetchers0.pfSpanPage
+		// system.l3.ReadSharedReq.mshrMisses::total
+		// system.l3.tags.totalRefs
+		// system.l3.demandAccesses::total
+
 		Prefetcher::Multi *mpf = dynamic_cast<Prefetcher::Multi * >(prefetcher);
         int reward = mpf->usefulPrefetches-lastUse;
 		
@@ -2683,6 +2697,11 @@ BaseCache::stateBuilder(int core)
             totStates.push_back(qpf->PrintDegree());
         }
 		
+		// mem_ctrls.totGap
+		// mem_ctrls.rdQLenPdf::3
+		// mem_ctrls.numStayReadState
+		// system.mem_ctrls.requestorReadAccesses::cpu0.dcache.prefetcher.prefetchers1
+
 		// Memory controller
 		// std::cout<<"0 "<<system->getMem()<<std::endl;
 		// MemCtrl *aMem = dynamic_cast<MemCtrl * >(system->getMem());
@@ -2695,24 +2714,93 @@ BaseCache::stateBuilder(int core)
 		// }
 		
     } else if (prefetcher && level!="L2Cache"){
-		int reward = prefetcher->usefulPrefetches-lastUse;
-        lastUse = prefetcher->usefulPrefetches;
-        totStates.push_back(reward);
-        totStates.push_back(stats.unusedPrefetches.value());
-        stats.unusedPrefetches.reset();
+		// Feature 0: prefetchers degree
         totStates.push_back(prefetcher->PrintDegree());
 		
+		// Feature 1: l2cache.ReadReq.hits::total
+		vector<double > res;
+		stats.cmd[MemCmd::ReadReq]->hits.value(res);
+		uint64_t sum_of_elems = std::accumulate(res.begin(), res.end(), 0);
+		totStates.push_back(sum_of_elems-tmp_loc[0]);
+		tmp_loc[0] = sum_of_elems;
+		
+		// Feature 2: l2cache.demandAccesses::total
+		uint64_t tot_hits = 0;
+		uint64_t tot_misses = 0;
+		for(int i =0; i < 6; i++){
+			// // Hits
+			vector<double > res_hit;
+			stats.cmd[demnads_code[i]]->hits.value(res_hit);
+			tot_hits += std::accumulate(res_hit.begin(), res_hit.end(), 0);
+			// // Misses
+			vector<double > res_miss;
+			stats.cmd[demnads_code[i]]->misses.value(res_miss);
+			tot_misses += std::accumulate(res_miss.begin(), res_miss.end(), 0);
+		}
+		sum_of_elems = tot_misses + tot_hits;
+		totStates.push_back(sum_of_elems-tmp_loc[1]);
+		tmp_loc[1] = sum_of_elems;
+		
+		
     } else if(prefetcher &&  level == "L1Cache"){
+		// Cache related
+		// Feature 1: system.cpu0.dcache.ReadReq.mshrMissRate::total
+		vector<double > res;
+		stats.cmd[MemCmd::ReadReq]->mshrMisses.value(res);
+		uint64_t sum_of_elems = std::accumulate(res.begin(), res.end(), 0);
+		uint64_t mshr_misses = sum_of_elems - tmp_loc[0]; 
+		tmp_loc[0] = sum_of_elems;
+		
+		uint64_t tot_hits = 0;
+		uint64_t tot_misses = 0;
+		for(int i =0; i < stats.cmd.size(); i++){
+			// // Hits
+			vector<double > res_hit;
+			stats.cmd[i]->hits.value(res_hit);
+			tot_hits += std::accumulate(res_hit.begin(), res_hit.end(), 0);
+			// // Misses
+			vector<double > res_miss;
+			stats.cmd[i]->misses.value(res_miss);
+			tot_misses += std::accumulate(res_miss.begin(), res_miss.end(), 0);
+		}
+		uint64_t tot_access = tot_misses+tot_hits;
+		uint64_t tot_access_epoch = tot_access - tmp_loc[1]; 
+		tmp_loc[1] = tot_access;
+		
+		double mshr_miss_ratio = mshr_misses / (tot_access_epoch*1.0);
+		totStates.push_back(mshr_miss_ratio);
+
+		// Feature 2: system.cpu0.dcache.prefetcher.prefetchers1.pfIssued
+		Prefetcher::Multi *mpf = dynamic_cast<Prefetcher::Multi * >(prefetcher);
+        uint64_t issued = mpf->prefetchStats.pfIssued.value();
+        uint64_t issued_epoch = issued - tmp_loc[2];
+		tmp_loc[2] = issued;
+		totStates.push_back(issued_epoch);
+		
+		// Core related
+		// rob.reads
+		// fetch.cycles
+		// rename.LQFullEvents
+		// decode.blockedCycles
+		// rename.unblockCycles
+		// switch_cpus0.numRate
+		// system.switch_cpus0.issueRate
+
 		BaseCPU *bcpu = dynamic_cast<BaseCPU * >(system->threads[core]->getCpuPtr());
         FullO3CPU<O3CPUImpl> *o3cpu = dynamic_cast<FullO3CPU<O3CPUImpl> * >(system->threads[core]->getCpuPtr());
 		totStates.push_back(o3cpu->cpuStats.timesIdled.value());
 		totStates.push_back(bcpu->numSimulatedInsts()-lastInst);
         lastInst = bcpu->numSimulatedInsts();
+		// cout<<o3cpu->rob.reads<<endl;
+		vector<double > core_related = o3cpu->state_builder();
+		for(int i = 0 ; i < core_related.size(); i++ ){
+			totStates.push_back(core_related[i]);
+		}
+		// Page Walker
+		// mmu.dtb.writeMisses
+		
 	}
-	
-	// Common	
-	totStates.push_back(stats.replacements.value());
-    stats.replacements.reset();
+
 
     
     return totStates;

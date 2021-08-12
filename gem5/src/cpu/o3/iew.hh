@@ -423,7 +423,7 @@ class DefaultIEW
     /** Maximum size of the skid buffer. */
     unsigned skidBufferMax;
 
-
+	public:	
     struct IEWStats : public Stats::Group
     {
         IEWStats(O3CPU *cpu);
@@ -459,7 +459,8 @@ class DefaultIEW
         /** Stat for total number of mispredicted branches detected at
          *  execute. */
         Stats::Formula branchMispredicts;
-
+		
+		
         struct ExecutedInstStats : public Stats::Group
         {
             ExecutedInstStats(O3CPU* cpu);

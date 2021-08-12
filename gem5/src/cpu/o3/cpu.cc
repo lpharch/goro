@@ -350,8 +350,13 @@ FullO3CPU<Impl>::FullO3CPU(const DerivO3CPUParams &params)
               "Ensure createInterruptController() is called.\n", name());
     }
 
-    for (ThreadID tid = 0; tid < this->numThreads; tid++)
-        this->thread[tid]->setFuncExeInst(0);
+    for (ThreadID tid = 0; tid < this->numThreads; tid++){
+		this->thread[tid]->setFuncExeInst(0);
+	}
+	
+	for(int i = 0; i <10; i++){
+		tmp_loc.push_back(0);
+	}
 }
 
 template <class Impl>
@@ -1840,5 +1845,37 @@ FullO3CPU<Impl>::htmSendAbortSignal(ThreadID tid, uint64_t htm_uid,
     }
 }
 
+template <class Impl>
+vector<double >
+FullO3CPU<Impl>::state_builder()
+{
+	std::cout<<"---state_builder---"<<std::endl;
+	// Core related
+	// rob.reads
+	// fetch.cycles
+	// rename.LQFullEvents
+	// rename.unblockCycles
+	// decode.blockedCycles
+	// switch_cpus0.numRate
+	// system.switch_cpus0.issueRate
+		
+	vector<double> a;
+	a.push_back(rob.stats.reads.value() - tmp_loc[0]);
+	tmp_loc[0] = rob.stats.reads.value();
+	a.push_back(fetch.fetchStats.cycles.value() - tmp_loc[1]);
+	tmp_loc[1] = fetch.fetchStats.cycles.value();
+	a.push_back(rename.stats.LQFullEvents.value() - tmp_loc[2]);
+	tmp_loc[2] = rename.stats.LQFullEvents.value();
+	a.push_back(rename.stats.unblockCycles.value() - tmp_loc[3]);
+	tmp_loc[3] = rename.stats.unblockCycles.value();
+	a.push_back(iew.iewStats.executedInstStats.numInsts.value() - tmp_loc[4]);
+	tmp_loc[4] = iew.iewStats.executedInstStats.numInsts.value();
+	a.push_back(baseStats.numCycles.value() - tmp_loc[5]);
+	tmp_loc[5] = baseStats.numCycles.value();
+	a.push_back(decode.stats.blockedCycles.value() - tmp_loc[6]);
+	tmp_loc[6] = decode.stats.blockedCycles.value();
+	return a;
+	
+}
 // Forward declaration of FullO3CPU.
 template class FullO3CPU<O3CPUImpl>;
