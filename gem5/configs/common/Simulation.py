@@ -761,7 +761,9 @@ def run(options, root, testsys, cpu_class):
             
             print(m5.getL3State(testsys, 0))
             
-            
+            for i in range(np):
+                # testsys.switch_cpus[i].setMaxInst(62356)
+                testsys.cpu[i].setMaxInst(262356)
             
             exit_event = benchCheckpoints(options, maxtick, cptdir)
 

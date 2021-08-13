@@ -316,6 +316,10 @@ class BaseCPU : public ClockedObject
     void init() override;
     void startup() override;
     void regStats() override;
+	
+	//Majid
+    void setMaxInst(uint64_t inst);
+	
 
     void regProbePoints() override;
 

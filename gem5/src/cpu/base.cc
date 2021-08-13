@@ -88,6 +88,8 @@ CPUProgressEvent::CPUProgressEvent(BaseCPU *_cpu, Tick ival)
         cpu->schedule(this, curTick() + _interval);
 }
 
+
+
 void
 CPUProgressEvent::process()
 {
@@ -175,6 +177,18 @@ BaseCPU::BaseCPU(const Params &p, bool is_checker)
         fatal("Number of ISAs (%i) assigned to the CPU does not equal number "
               "of threads (%i).\n", params().isa.size(), numThreads);
     }
+}
+
+void 
+BaseCPU::setMaxInst(uint64_t inst)
+{
+	if (inst!= 0) {
+        std::cout<<"Setting max_insts_any_thread "<<params().max_insts_any_thread<<std::endl;
+        const char *cause = "a thread reached the max instruction count";
+        for (ThreadID tid = 0; tid < numThreads; ++tid)
+            scheduleInstStop(tid, inst, cause);
+    }
+    std::cout<<"---Done new_termination"<<std::endl;
 }
 
 void
@@ -271,6 +285,8 @@ BaseCPU::init()
     // Set up instruction-count-based termination events, if any. This needs
     // to happen after threadContexts has been constructed.
     if (params().max_insts_any_thread != 0) {
+		std::cout<<"New max was set for the simulation "<<params().max_insts_any_thread<<std::endl;
+		
         const char *cause = "a thread reached the max instruction count";
         for (ThreadID tid = 0; tid < numThreads; ++tid)
             scheduleInstStop(tid, params().max_insts_any_thread, cause);

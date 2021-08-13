@@ -98,6 +98,7 @@ class BaseCPU(ClockedObject):
         PyBindMethod("totalInsts"),
         PyBindMethod("scheduleInstStop"),
         PyBindMethod("getCurrentInstCount"),
+        PyBindMethod("setMaxInst"),
     ]
 
     @classmethod
@@ -122,7 +123,9 @@ class BaseCPU(ClockedObject):
     def takeOverFrom(self, old_cpu):
         self._ccObject.takeOverFrom(old_cpu._ccObject)
 
-
+    def setMaxInst(self, inst):
+        self._ccObject.setMaxInst(inst)
+        
     system = Param.System(Parent.any, "system object")
     cpu_id = Param.Int(-1, "CPU identifier")
     socket_id = Param.Unsigned(0, "Physical Socket identifier")
