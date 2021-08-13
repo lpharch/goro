@@ -587,9 +587,9 @@ class MemCtrl : public QoS::MemCtrl
         // per-requestor raed and write average memory access latency
         Stats::Formula requestorReadAvgLat;
         Stats::Formula requestorWriteAvgLat;
-    };
+    }stats;
 
-    CtrlStats stats;
+    // CtrlStats stats;
 
     /**
      * Upstream caches need this packet until true is returned, so
@@ -614,9 +614,7 @@ class MemCtrl : public QoS::MemCtrl
     void pruneBurstTick();
 
   public:
-    //Majid
-    std::vector<int > lastValStats;
-    std::vector<int > stateBuilder();
+    
 	
 
     MemCtrl(const MemCtrlParams &p);
@@ -707,6 +705,12 @@ class MemCtrl : public QoS::MemCtrl
     virtual void init() override;
     virtual void startup() override;
     virtual void drainResume() override;
+	
+	//Majid
+    std::vector<double > lastValStats;
+    std::vector<double > stateBuilder();
+	
+	uint64_t m_tot_gaps;
 
   protected:
 

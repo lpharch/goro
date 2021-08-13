@@ -1849,7 +1849,7 @@ template <class Impl>
 vector<double >
 FullO3CPU<Impl>::state_builder()
 {
-	std::cout<<"---state_builder---"<<std::endl;
+	// std::cout<<"---state_builder---"<<std::endl;
 	// Core related
 	// rob.reads
 	// fetch.cycles

@@ -66,9 +66,17 @@
 #include "sim/sim_object.hh"
 #include "sim/workload.hh"
 
+
+//Majid 
+// #include "mem/mem_ctrl.hh"
+class MemCtrl;
+
+
 class BaseRemoteGDB;
 class KvmVM;
 class ThreadContext;
+
+
 
 class System : public SimObject, public PCEventScope
 {
@@ -225,8 +233,9 @@ class System : public SimObject, public PCEventScope
     void startup() override;
 
 	 //Majid
-    AbstractMemory * aMem;
-    AbstractMemory * getMem(){
+	
+    MemCtrl * aMem;
+    MemCtrl * getMem(){
       return aMem;
     }
 

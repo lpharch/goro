@@ -726,6 +726,7 @@ def run(options, root, testsys, cpu_class):
                                       maxtick, options.repeat_switch)
         else:
             print("----2")
+            m5.simulate(1000000000)
             # system, core, action, index
             # getL1State(system, core):
             
@@ -754,15 +755,9 @@ def run(options, root, testsys, cpu_class):
             # m5.setL3RLDegree(testsys, 0, 1)
             # m5.setL3RLDegree(testsys, 0, 2)
 
-            print(m5.getL1State(testsys, 0) )
-            print(m5.getL1State(testsys, 1))
-            print(m5.getL1State(testsys, 2))
-            print(m5.getL1State(testsys, 3))
-            
-            print(m5.getL2State(testsys, 0))
-            print(m5.getL2State(testsys, 1))
-            print(m5.getL2State(testsys, 2))
-            print(m5.getL2State(testsys, 3))
+            for i in range(np):
+                print("L1 Core "+str(i), m5.getL1State(testsys, i))            
+                print("L2 core "+str(i), m5.getL2State(testsys, i))
             
             print(m5.getL3State(testsys, 0))
             

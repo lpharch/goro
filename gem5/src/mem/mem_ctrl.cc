@@ -49,6 +49,7 @@
 #include "mem/mem_interface.hh"
 #include "sim/system.hh"
 
+using namespace std;
 MemCtrl::MemCtrl(const MemCtrlParams &p) :
     QoS::MemCtrl(p),
     port(name() + ".port", *this), isTimingMode(false),
@@ -94,29 +95,34 @@ MemCtrl::MemCtrl(const MemCtrlParams &p) :
     for(int i = 0 ; i < 10; i++){
         lastValStats.push_back(0);
     }
+	std::cout<<"name"<<name()<<std::endl;
+    system()->aMem = this;//dynamic_cast<AbstractMemory * >(this);
 	
 }
 
-std::vector<int > 
+std::vector<double > 
 MemCtrl::stateBuilder()
 {
+	
 	// mem_ctrls.totGap
 	// mem_ctrls.rdQLenPdf::3
 	// mem_ctrls.numStayReadState
 	// system.mem_ctrls.requestorReadAccesses::cpu0.dcache.prefetcher.prefetchers1
 		
-    std::vector<int > res;
+    std::vector<double > res;
+	res.push_back(m_tot_gaps-lastValStats[0]);
+	lastValStats[0] = m_tot_gaps;
 	
-    res.push_back(stats.totGap.value()-lastValStats[0]);
-	lastValStats[0] = stats.totGap.value();
 	
 	std::vector<double > rd_res;
 	stats.rdQLenPdf.value(rd_res);
 	res.push_back(rd_res[3]-lastValStats[1]);
 	lastValStats[1] = rd_res[3];
 	
+	
 	res.push_back(QoS::MemCtrl::stats.numStayReadState.value()-lastValStats[2]);
 	lastValStats[2] = QoS::MemCtrl::stats.numStayReadState.value();
+	
 	
 	uint64_t tot_rd_access = 0;
 	std::vector<double > res1;
@@ -132,8 +138,7 @@ MemCtrl::stateBuilder()
 	}
 	res.push_back(tot_rd_access - lastValStats[3]);
 	lastValStats[3] = tot_rd_access;
-
-    return res;
+	return res;
 }
 
 
@@ -285,6 +290,7 @@ MemCtrl::addToReadQueue(PacketPtr pkt, unsigned int pkt_count, bool is_dram)
                                 "write queue\n",
                                 addr, size);
                         stats.bytesReadWrQ += burst_size;
+						std::cout<<"-------------------------------------"<<std::endl;
                         break;
                     }
                 }
@@ -475,6 +481,8 @@ MemCtrl::recvTimingReq(PacketPtr pkt)
     // Calc avg gap between requests
     if (prevArrival != 0) {
         stats.totGap += curTick() - prevArrival;
+        m_tot_gaps += curTick() - prevArrival;
+		
     }
     prevArrival = curTick();
 
@@ -1401,7 +1409,7 @@ MemCtrl::CtrlStats::regStats()
         requestorWriteTotalLat.subname(i, requestor);
         requestorWriteAvgLat.subname(i, requestor);
     }
-
+	totGap.flags(nozero);
     // Formula stats
     avgRdBWSys = (bytesReadSys) / simSeconds;
     avgWrBWSys = (bytesWrittenSys) / simSeconds;

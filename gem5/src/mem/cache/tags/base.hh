@@ -102,6 +102,7 @@ class BaseTags : public ClockedObject
     /**
      * TODO: It would be good if these stats were acquired after warmup.
      */
+	 public:
     struct BaseTagStats : public Stats::Group
     {
         BaseTagStats(BaseTags &tags);
@@ -154,7 +155,7 @@ class BaseTags : public ClockedObject
         Stats::Scalar dataAccesses;
     } stats;
 
-  public:
+  
     typedef BaseTagsParams Params;
     BaseTags(const Params &p);
 
