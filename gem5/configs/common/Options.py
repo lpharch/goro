@@ -143,7 +143,8 @@ def addNoISAOptions(parser):
         help="Enabled RL Throttler  " )
     parser.add_option("--app", type="string", default="unknown",
         help="APP name" )
-
+    parser.add_option("--mode", type="string", default="unknown",
+        help="mode of dimulation: baseline, multi, RL, random" )
     # Enable Ruby
     parser.add_option("--ruby", action="store_true")
 

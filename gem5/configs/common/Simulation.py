@@ -49,6 +49,10 @@ from m5.defines import buildEnv
 from m5.objects import *
 from m5.util import *
 
+# Majid
+from random import random
+from random import randint
+
 addToPath('../common')
 
 def getCPUClass(cpu_type):
@@ -259,6 +263,46 @@ def scriptCheckpoints(options, maxtick, cptdir):
                     num_checkpoints += 1
 
     return exit_event
+
+def apply_degree(testsys, mode, np):
+    L1_prefetcher_count = 2
+    L2_prefetcher_count = 2
+    L3_prefetcher_count = 3
+    if(mode =="baseline"):
+        for i in range(np):
+            # system, core_num, action, index
+            degree = [1, 0]
+            for p in range(L2_prefetcher_count):
+                m5.setL2RLDegree(testsys, i, degree[p], p)
+            for p in range(L1_prefetcher_count):
+                m5.setL1RLDegree(testsys, i, degree[p], p)
+        for p in range(L1_prefetcher_count):
+            L3_degree = [1,0,0]
+            m5.setL3RLDegree(testsys, L3_degree[p], p)
+    elif(mode =="multi"):
+        for i in range(np):
+            # system, core_num, action, index
+            for p in range(L2_prefetcher_count):
+                m5.setL2RLDegree(testsys, i, 1, p)
+            for p in range(L1_prefetcher_count):
+                m5.setL1RLDegree(testsys, i, 1, p)
+        for p in range(L1_prefetcher_count):
+            m5.setL3RLDegree(testsys, 1, p)
+    elif(mode == "random"):
+        for i in range(np):
+            # system, core_num, action, index
+            for p in range(2): # There are 2 prefetchers per level
+                l1_degree = randint(0, 4)
+                l2_degree = randint(0, 4)
+                m5.setL2RLDegree(testsys, i, l1_degree, p)
+                m5.setL1RLDegree(testsys, i, l2_degree, p)
+        for p in range(3): # There are 2 prefetchers per level
+            degree = randint(0, 5)
+            m5.setL3RLDegree(testsys, degree, p)
+    # RL: TO be added
+    
+            
+                
 
 def benchCheckpoints(options, maxtick, cptdir):
     exit_event = m5.simulate(maxtick - m5.curTick())
@@ -727,44 +771,13 @@ def run(options, root, testsys, cpu_class):
         else:
             print("----2")
             m5.simulate(1000000000)
-            # system, core, action, index
-            # getL1State(system, core):
             
-            # m5.setL1RLDegree(testsys, 0, 1, 0)
-            # m5.setL1RLDegree(testsys, 0, 1, 1)
-            
-            # m5.setL1RLDegree(testsys, 1, 1, 0)
-            # m5.setL1RLDegree(testsys, 1, 1, 1)
-            
-            # m5.setL1RLDegree(testsys, 2, 1, 0)
-            # m5.setL1RLDegree(testsys, 3, 1, 1)
-            
-            # m5.setL2RLDegree(testsys, 0, 1, 0)
-            # m5.setL2RLDegree(testsys, 0, 1, 1)
-            
-            # m5.setL2RLDegree(testsys, 1, 1, 0)
-            # m5.setL2RLDegree(testsys, 1, 1, 1)
-            
-            # m5.setL2RLDegree(testsys, 2, 1, 0)
-            # m5.setL2RLDegree(testsys, 2, 1, 1)
-            
-            # m5.setL2RLDegree(testsys, 3, 1, 0)
-            # m5.setL2RLDegree(testsys, 3, 1, 1)
-            
-            # m5.setL3RLDegree(testsys, 0, 0)
-            # m5.setL3RLDegree(testsys, 0, 1)
-            # m5.setL3RLDegree(testsys, 0, 2)
-
-            for i in range(np):
-                print("L1 Core "+str(i), m5.getL1State(testsys, i))            
-                print("L2 core "+str(i), m5.getL2State(testsys, i))
-            
-            print(m5.getL3State(testsys, 0))
-            
-            for i in range(np):
+            # for i in range(np):
                 # testsys.switch_cpus[i].setMaxInst(62356)
-                testsys.cpu[i].setMaxInst(262356)
-            
+                # testsys.cpu[i].setMaxInst(2623000056)
+            # apply_degree(testsys, "baseline", np)
+            # apply_degree(testsys, "multi", np)
+            apply_degree(testsys, options.mode, np)
             exit_event = benchCheckpoints(options, maxtick, cptdir)
 
     print('Exiting @ tick %i because %s' %
