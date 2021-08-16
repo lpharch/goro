@@ -2664,13 +2664,13 @@ BaseCache::levelFinder()
 }
 
 
-vector<double> 
+map<string, double> 
 BaseCache::stateBuilder(int core)
 {
 	std::vector<std::unique_ptr<CacheCmdStats>> cmd;
 	int demnads_code[6] = {MemCmd::ReadReq, MemCmd::WriteReq, MemCmd::WriteLineReq, MemCmd::ReadExReq, MemCmd::ReadCleanReq, MemCmd::ReadSharedReq };
 	 
-    vector<double>  totStates;
+    map<string, double> totStates;
 	
 	string level = levelFinder();
 	if(level == "NPC"){
@@ -2696,14 +2696,16 @@ BaseCache::stateBuilder(int core)
 		stats.cmd[MemCmd::ReadSharedReq]->misses.value(res_misses);
 		uint64_t sum_misses = std::accumulate(res_misses.begin(), res_misses.end(), 0);
 		
-		totStates.push_back(sum_misses+sum_hits-tmp_loc[0]);
+		// totStates.push_back(sum_misses+sum_hits-tmp_loc[0]);
+		totStates["system.l3.ReadSharedReq.accesses::total"] = (sum_misses+sum_hits-tmp_loc[0]);
 		tmp_loc[0] = sum_misses+sum_hits;
 		
 		// Feature 2: ReadSharedReq.mshrMisses::total
 		vector<double > res_misses_mshr;
 		stats.cmd[MemCmd::ReadSharedReq]->mshrMisses.value(res_misses_mshr);
 		uint64_t sum_misses_mshr = std::accumulate(res_misses_mshr.begin(), res_misses_mshr.end(), 0);
-		totStates.push_back(sum_misses_mshr-tmp_loc[1]);
+		// totStates.push_back(sum_misses_mshr-tmp_loc[1]);
+		totStates["ReadSharedReq.mshrMisses::total"] = (sum_misses_mshr-tmp_loc[1]);
 		tmp_loc[1] = sum_misses_mshr;
 		
 		
@@ -2721,7 +2723,8 @@ BaseCache::stateBuilder(int core)
 			tot_misses += std::accumulate(res_miss.begin(), res_miss.end(), 0);
 		}
 		uint64_t sum_of_elems = tot_misses + tot_hits;
-		totStates.push_back(sum_of_elems-tmp_loc[2]);
+		// totStates.push_back(sum_of_elems-tmp_loc[2]);
+		totStates["system.l3.demandAccesses::total"] = (sum_of_elems-tmp_loc[2]);
 		tmp_loc[2] = sum_of_elems;
 		
 		// Feature 4: system.l3.prefetcher.prefetchersx.pfSpanPage
@@ -2731,11 +2734,13 @@ BaseCache::stateBuilder(int core)
             Prefetcher::Queued *qpf = dynamic_cast<Prefetcher::Queued * >(pf);
             tot_pfSpan += qpf->statsQueued.pfSpanPage.value();
         }
-		totStates.push_back(tot_pfSpan-tmp_loc[3]);
+		// totStates.push_back(tot_pfSpan-tmp_loc[3]);
+		totStates["system.l3.prefetcher.prefetchersx.pfSpanPage"] = (tot_pfSpan-tmp_loc[3]);
 		tmp_loc[3] = tot_pfSpan;
 		
 		// Feature 5: system.l3.tags.totalRefs
-        totStates.push_back(tags->stats.totalRefs.value()-tmp_loc[4]);
+        // totStates.push_back(tags->stats.totalRefs.value()-tmp_loc[4]);
+        totStates["system.l3.tags.totalRefs"] = (tags->stats.totalRefs.value()-tmp_loc[4]);
 		tmp_loc[4] = tags->stats.totalRefs.value();
 		
 		// Memory controller
@@ -2747,20 +2752,24 @@ BaseCache::stateBuilder(int core)
 		
 		// std::cout<<"0 "<<system->getMem()<<std::endl;
 		MemCtrl *aMem = dynamic_cast<MemCtrl * >(system->getMem());
+		string mem_features[4]= {"mem_ctrls.totGap", "mem_ctrls.rdQLenPdf::3", "mem_ctrls.numStayReadState",
+								"system.mem_ctrls.requestorReadAccesses::cpu0.dcache.prefetcher.prefetchers1"};
 		vector<double > res = aMem->stateBuilder();
 		for(int i = 0 ; i < res.size();i++){
-			totStates.push_back(res[i]);
+			// totStates.push_back(res[i]);
+			totStates[mem_features[i]] = (res[i]);
 		}
 		
     } else if (prefetcher && level=="L2Cache"){
 		// Feature 0: prefetchers degree
-        totStates.push_back(prefetcher->PrintDegree());
+        // totStates.push_back(prefetcher->PrintDegree());
 		
 		// Feature 1: l2cache.ReadReq.hits::total
 		vector<double > res;
 		stats.cmd[MemCmd::ReadReq]->hits.value(res);
 		uint64_t sum_of_elems = std::accumulate(res.begin(), res.end(), 0);
-		totStates.push_back(sum_of_elems-tmp_loc[0]);
+		// totStates.push_back(sum_of_elems-tmp_loc[0]);
+		totStates["l2cache.ReadReq.hits::total"] = (sum_of_elems-tmp_loc[0]);
 		tmp_loc[0] = sum_of_elems;
 		
 		// Feature 2: l2cache.demandAccesses::total
@@ -2777,7 +2786,8 @@ BaseCache::stateBuilder(int core)
 			tot_misses += std::accumulate(res_miss.begin(), res_miss.end(), 0);
 		}
 		sum_of_elems = tot_misses + tot_hits;
-		totStates.push_back(sum_of_elems-tmp_loc[1]);
+		// totStates.push_back(sum_of_elems-tmp_loc[1]);
+		totStates["l2cache.demandAccesses::total"] = (sum_of_elems-tmp_loc[1]);
 		tmp_loc[1] = sum_of_elems;
 		
 		
@@ -2807,14 +2817,16 @@ BaseCache::stateBuilder(int core)
 		tmp_loc[1] = tot_access;
 		
 		double mshr_miss_ratio = mshr_misses / (tot_access_epoch*1.0);
-		totStates.push_back(mshr_miss_ratio);
+		// totStates.push_back(mshr_miss_ratio);
+		totStates["system.cpu0.dcache.ReadReq.mshrMissRate::total"] = (mshr_miss_ratio);
 
 		// Feature 2: system.cpu0.dcache.prefetcher.prefetchers1.pfIssued
 		Prefetcher::Multi *mpf = dynamic_cast<Prefetcher::Multi * >(prefetcher);
         uint64_t issued = mpf->prefetchStats.pfIssued.value();
         uint64_t issued_epoch = issued - tmp_loc[2];
 		tmp_loc[2] = issued;
-		totStates.push_back(issued_epoch);
+		// totStates.push_back(issued_epoch);
+		totStates["system.cpu0.dcache.prefetcher.prefetchers1.pfIssued"] = (issued_epoch);
 		
 		// Core related
 		// (0) rob.reads
@@ -2824,15 +2836,21 @@ BaseCache::stateBuilder(int core)
 		// (4) rename.unblockCycles
 		// (5) switch_cpus0.numRate
 		// (6) system.switch_cpus0.issueRate
-
+		string core_features[7] = {"rob.reads", "fetch.cycles", "rename.LQFullEvents", "decode.blockedCycles", "rename.unblockCycles",
+								"switch_cpus0.numRate", "system.switch_cpus0.issueRate"};
 		BaseCPU *bcpu = dynamic_cast<BaseCPU * >(system->threads[core]->getCpuPtr());
         FullO3CPU<O3CPUImpl> *o3cpu = dynamic_cast<FullO3CPU<O3CPUImpl> * >(system->threads[core]->getCpuPtr());
-		totStates.push_back(o3cpu->cpuStats.timesIdled.value());
-		totStates.push_back(bcpu->numSimulatedInsts()-lastInst);
+		// totStates.push_back(o3cpu->cpuStats.timesIdled.value());
+		totStates["timesIdled"] = (o3cpu->cpuStats.timesIdled.value());
+		
+		// totStates.push_back(bcpu->numSimulatedInsts()-lastInst);
+		totStates["numSimulatedInsts"] = (bcpu->numSimulatedInsts()-lastInst);
         lastInst = bcpu->numSimulatedInsts();
+		
 		vector<double > core_related = o3cpu->state_builder();
 		for(int i = 0 ; i < core_related.size(); i++ ){
-			totStates.push_back(core_related[i]);
+			// totStates.push_back(core_related[i]);
+			totStates[core_features[i]] = (core_related[i]);
 		}
 		// Page Walker
 		// mmu.dtb.writeMisses
@@ -2849,9 +2867,9 @@ BaseCache::printState(int core)
 {
     if(prefetcher && name()=="system.l3"){
         std::cout<<"BaseCache printState"<<std::endl;
-        vector<double>  state  = stateBuilder(core);
-        for(int i = 0 ; i < state.size(); i++){
-            cout<<state[i]<<" ";
-        }cout<<endl;
+        // vector<double>  state  = stateBuilder(core);
+        // for(int i = 0 ; i < state.size(); i++){
+            // cout<<state[i]<<" ";
+        // }cout<<endl;
     } 
 } 

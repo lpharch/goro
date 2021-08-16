@@ -771,7 +771,11 @@ def run(options, root, testsys, cpu_class):
         else:
             print("----2")
             m5.simulate(1000000000)
+            for i in range(np):
+                print("L1 Core "+str(i), m5.getL1State(testsys, i))            
+                print("L2 core "+str(i), m5.getL2State(testsys, i))
             
+            print(m5.getL3State(testsys, 0))
             # for i in range(np):
                 # testsys.switch_cpus[i].setMaxInst(62356)
                 # testsys.cpu[i].setMaxInst(2623000056)

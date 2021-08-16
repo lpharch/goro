@@ -77,6 +77,7 @@
 
 //Majid
 #include <vector>
+#include <map>
 using namespace std;
 
 namespace Prefetcher {
@@ -1351,7 +1352,7 @@ class BaseCache : public ClockedObject
     void unserialize(CheckpointIn &cp) override;
 	
 	 //Majid
-    vector<double> stateBuilder(int core); 
+    map<string, double> stateBuilder(int core); 
     void printState(int core);
 	string levelFinder();
     void onExit();
