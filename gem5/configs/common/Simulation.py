@@ -288,6 +288,15 @@ def apply_degree(testsys, mode, np):
                 m5.setL1RLDegree(testsys, i, 1, p)
         for p in range(L1_prefetcher_count):
             m5.setL3RLDegree(testsys, 1, p)
+    elif(mode =="nopf"):
+        for i in range(np):
+            # system, core_num, action, index
+            for p in range(L2_prefetcher_count):
+                m5.setL2RLDegree(testsys, i, 0, p)
+            for p in range(L1_prefetcher_count):
+                m5.setL1RLDegree(testsys, i, 0, p)
+        for p in range(L1_prefetcher_count):
+            m5.setL3RLDegree(testsys, 0, p)
     elif(mode == "random"):
         for i in range(np):
             # system, core_num, action, index
@@ -435,7 +444,7 @@ def restoreSimpointCheckpoint():
 
     if exit_cause == "simpoint starting point found":
         print("Warmed up! Dumping and resetting stats!")
-        m5.stats.dump()
+        # m5.stats.dump()
         m5.stats.reset()
 
         exit_event = m5.simulate()

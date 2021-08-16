@@ -193,6 +193,11 @@ SnoopFilter::lookupSnoop(const Packet* cpkt)
     auto sf_it = cachedLocations.find(line_addr);
     bool is_hit = (sf_it != cachedLocations.end());
 
+	if(!is_hit && (cachedLocations.size() >= maxEntryCount)){
+		std::cout<<"-----------------DANGER --------------"<<std::endl;
+		std::cout<<"cachedLocations.size():"<<cachedLocations.size()<<std::endl;
+		std::cout<<"maxEntryCount:"<<maxEntryCount<<std::endl;
+	}
     panic_if(!is_hit && (cachedLocations.size() >= maxEntryCount),
              "snoop filter exceeded capacity of %d cache blocks\n",
              maxEntryCount);

@@ -97,6 +97,9 @@ class SnoopFilter : public SimObject {
         maxEntryCount(p.max_capacity / p.system->cacheLineSize()),
         stats(this)
     {
+		std::cout<<"p.max_capacity "<<p.max_capacity<<std::endl;
+		std::cout<<"p.system->cacheLineSize() "<<p.system->cacheLineSize()<<std::endl;
+		std::cout<<"p.max_capacity / p.system->cacheLineSize() "<<p.max_capacity / p.system->cacheLineSize()<<std::endl;
     }
 
     /**
@@ -300,7 +303,7 @@ class SnoopFilter : public SimObject {
     /** Latency for doing a lookup in the filter */
     const Cycles lookupLatency;
     /** Max capacity in terms of cache blocks tracked, for sanity checking */
-    const unsigned maxEntryCount;
+    const uint64_t maxEntryCount;
 
     /**
      * Use the lower bits of the address to keep track of the line status
