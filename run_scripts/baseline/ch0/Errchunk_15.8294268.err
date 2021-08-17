@@ -1,0 +1,113 @@
+
+Lmod is automatically replacing "python2/2.7.15" with "python3/3.7.0".
+
+/tmp/slurmd/job8294268/slurm_script: line 18: /work/05330/jalili/stampede2/goro/gem5/v21/bin/activate: No such file or directory
+warn: DRAM device capacity (16384 Mbytes) does not match the address range assigned (65536 Mbytes)
+warn: DRAM device capacity (16384 Mbytes) does not match the address range assigned (65536 Mbytes)
+info: kernel located at: /work/05330/jalili/stampede2/goro/disks/binaries/vmlinux.arm64
+info: kernel located at: /work/05330/jalili/stampede2/goro/disks/binaries/vmlinux.arm64
+warn: Not reserving swap space. May cause SIGSEGV on actual usage
+warn: Not reserving swap space. May cause SIGSEGV on actual usage
+warn: Sockets disabled, not accepting vnc client connections
+warn: Sockets disabled, not accepting vnc client connections
+warn: Sockets disabled, not accepting terminal connections
+warn: Sockets disabled, not accepting terminal connections
+warn: Sockets disabled, not accepting gdb connections
+warn: Sockets disabled, not accepting gdb connections
+warn: Existing EnergyCtrl, but no enabled DVFSHandler found.
+warn: iobus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: bridge.master is deprecated. `master` is now called `mem_side_port`
+warn: membus.master is deprecated. `master` is now called `mem_side_ports`
+warn: bridge.slave is deprecated. `slave` is now called `cpu_side_port`
+warn: membus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: iobus.master is deprecated. `master` is now called `mem_side_ports`
+warn: membus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: tol3bus.master is deprecated. `master` is now called `mem_side_ports`
+warn: membus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: tol3bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: tol3bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: tol3bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: tol3bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: No dot file generated. Please install pydot to generate the dot file and pdf.
+info: Entering event queue @ 7314123835473.  Starting simulation...
+warn: PowerState: Already in the requested power state, request ignored
+warn: User mode does not have SPSR
+warn: User mode does not have SPSR
+warn: User mode does not have SPSR
+warn: User mode does not have SPSR
+warn: User mode does not have SPSR
+warn: User mode does not have SPSR
+warn: User mode does not have SPSR
+warn: User mode does not have SPSR
+info: Entering event queue @ 7314123845473.  Starting simulation...
+warn: Existing EnergyCtrl, but no enabled DVFSHandler found.
+warn: iobus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: bridge.master is deprecated. `master` is now called `mem_side_port`
+warn: membus.master is deprecated. `master` is now called `mem_side_ports`
+warn: bridge.slave is deprecated. `slave` is now called `cpu_side_port`
+warn: membus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: iobus.master is deprecated. `master` is now called `mem_side_ports`
+warn: membus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: tol3bus.master is deprecated. `master` is now called `mem_side_ports`
+warn: membus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: tol3bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: tol3bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: tol3bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: toL2Bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: tol3bus.slave is deprecated. `slave` is now called `cpu_side_ports`
+warn: No dot file generated. Please install pydot to generate the dot file and pdf.
+info: Entering event queue @ 6823107672108.  Starting simulation...
+warn: PowerState: Already in the requested power state, request ignored
+warn: User mode does not have SPSR
+warn: User mode does not have SPSR
+warn: User mode does not have SPSR
+warn: User mode does not have SPSR
+warn: User mode does not have SPSR
+warn: User mode does not have SPSR
+warn: User mode does not have SPSR
+warn: User mode does not have SPSR
+info: Entering event queue @ 6823107682108.  Starting simulation...
+warn: 	instruction 'csdb' unimplemented
+warn: 	instruction 'csdb' unimplemented
+info: Entering event queue @ 6825773535672.  Starting simulation...
+info: Entering event queue @ 7316232982149.  Starting simulation...
+gem5 has encountered a segmentation fault!
+
+--- BEGIN LIBC BACKTRACE ---
+/work/05330/jalili/stampede2/goro/gem5/build/ARM/gem5.opt(_Z15print_backtracev+0x15)[0x1f48255]
+/work/05330/jalili/stampede2/goro/gem5/build/ARM/gem5.opt[0x1f635cd]
+/lib64/libpthread.so.0(+0xf5d0)[0x2b03b17a05d0]
+/work/05330/jalili/stampede2/goro/gem5/build/ARM/gem5.opt(hostname+0x0)[0x3331388]
+--- END LIBC BACKTRACE ---
+/tmp/slurmd/job8294268/slurm_script: line 22: 48897 Segmentation fault      /work/05330/jalili/stampede2/goro/gem5/build/ARM/gem5.opt -d /work/05330/jalili/stampede2/goro/resultsbaseline/mix6 /work/05330/jalili/stampede2/goro/gem5/configs/example/fs.py --caches --kernel /work/05330/jalili/stampede2/goro/disks/binaries/vmlinux.arm64 --disk-image /work/05330/jalili/stampede2/goro/disks/disks/ubuntu-18.04-arm64-docker_big.img --cpu-type=DerivO3CPU --restore-simpoint-checkpoint -r 1 --checkpoint-dir /work/05330/jalili/stampede2/goro/simpoints/ch0/mix6 --restore-with-cpu=AtomicSimpleCPU --l3cache --l3-hwp-type=L3MultiPrefetcher --l2-hwp-type=L2MultiPrefetcher --l1d-hwp-type=L1MultiPrefetcher --mem-size=64GB --mem-type=DDR4_2400_8x8 -n 4 --mode baseline > /work/05330/jalili/stampede2/goro/outputsbaseline/mix6.out

@@ -1,0 +1,10 @@
+
+Lmod is automatically replacing "python2/2.7.15" with "python3/3.7.0".
+
+/tmp/slurmd/job8299569/slurm_script: line 18: /work/05330/jalili/stampede2/goro/gem5/v21/bin/activate: No such file or directory
+Usage: fs.py [options]
+
+fs.py: error: option -m: invalid integer value: 'ode'
+Usage: fs.py [options]
+
+fs.py: error: option -m: invalid integer value: 'ode'
