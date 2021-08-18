@@ -52,6 +52,8 @@ from m5.util import *
 # Majid
 from random import random
 from random import randint
+import pandas as pd
+
 
 addToPath('../common')
 
@@ -264,12 +266,37 @@ def scriptCheckpoints(options, maxtick, cptdir):
 
     return exit_event
 
-def read_state(testsys, np):
+def read_state(testsys, np, app, timestamp):
+    values = []
+    keys = []
+    
     for i in range(np):
-        print("L1 Core "+str(i), m5.getL1State(testsys, i))            
-        print("L2 core "+str(i), m5.getL2State(testsys, i))
-        print(m5.getL3State(testsys, 0))
-        
+        L1 = m5.getL1State(testsys, i)
+        L1_keys = L1.keys()
+        L1_values = L1.values()
+        for k in L1_keys:
+            keys.append("core"+str(i)+"."+k)
+        for v in L1_values:
+            values.append(v)
+            
+        L2 = m5.getL2State(testsys, i)
+        L2_keys = L2.keys()
+        L2_values = L2.values()
+        for k in L2_keys:
+            keys.append("core"+str(i)+"."+k)
+        for v in L2_values:
+            values.append(v)
+     
+    
+    L3 =  m5.getL3State(testsys, 0)
+    L3_keys = L3.keys()
+    L3_values = L3.values()
+    for k in L3_keys:
+        keys.append("core"+str(i)+"."+k)
+    for v in L3_values:
+        values.append(v)
+    df = pd.DataFrame(values, index=keys,  columns =[app+"_"+str(timestamp)])
+    return df.T
         
 def apply_degree(testsys, mode, np):
     print("*********apply_degree: ", mode)
@@ -791,11 +818,13 @@ def run(options, root, testsys, cpu_class):
         # If checkpoints are being taken, then the checkpoint instruction
         # will occur in the benchmark code it self.
         if options.repeat_switch and maxtick > options.repeat_switch:
-            print("----1")
+            
             exit_event = repeatSwitch(testsys, repeat_switch_cpu_list,
                                       maxtick, options.repeat_switch)
         else:
-            
+            print("----1")
+            m5.simulate(1000000000)
+            print(read_state(testsys, np, options.app, 0))
             exit_event = benchCheckpoints(options, maxtick, cptdir)
 
     print('Exiting @ tick %i because %s' %
