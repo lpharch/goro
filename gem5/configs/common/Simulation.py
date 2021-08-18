@@ -264,7 +264,15 @@ def scriptCheckpoints(options, maxtick, cptdir):
 
     return exit_event
 
+def read_state(testsys, np):
+    for i in range(np):
+        print("L1 Core "+str(i), m5.getL1State(testsys, i))            
+        print("L2 core "+str(i), m5.getL2State(testsys, i))
+        print(m5.getL3State(testsys, 0))
+        
+        
 def apply_degree(testsys, mode, np):
+    print("*********apply_degree: ", mode)
     L1_prefetcher_count = 2
     L2_prefetcher_count = 2
     L3_prefetcher_count = 3
@@ -764,6 +772,15 @@ def run(options, root, testsys, cpu_class):
 
     # Restore from SimPoint checkpoints
     elif options.restore_simpoint_checkpoint:
+        print("----2")
+        # m5.simulate(1000000000)
+        
+        # for i in range(np):
+        # testsys.switch_cpus[i].setMaxInst(62356)
+        # testsys.cpu[i].setMaxInst(2623000056)
+        # apply_degree(testsys, "baseline", np)
+        # apply_degree(testsys, "multi", np)
+        apply_degree(testsys, options.mode, np)
         restoreSimpointCheckpoint()
 
     else:
@@ -778,19 +795,7 @@ def run(options, root, testsys, cpu_class):
             exit_event = repeatSwitch(testsys, repeat_switch_cpu_list,
                                       maxtick, options.repeat_switch)
         else:
-            print("----2")
-            m5.simulate(1000000000)
-            for i in range(np):
-                print("L1 Core "+str(i), m5.getL1State(testsys, i))            
-                print("L2 core "+str(i), m5.getL2State(testsys, i))
             
-            print(m5.getL3State(testsys, 0))
-            # for i in range(np):
-                # testsys.switch_cpus[i].setMaxInst(62356)
-                # testsys.cpu[i].setMaxInst(2623000056)
-            # apply_degree(testsys, "baseline", np)
-            # apply_degree(testsys, "multi", np)
-            apply_degree(testsys, options.mode, np)
             exit_event = benchCheckpoints(options, maxtick, cptdir)
 
     print('Exiting @ tick %i because %s' %

@@ -163,7 +163,17 @@ Queued::notify(const PacketPtr &pkt, const PrefetchInfo &pfi)
 
     // Calculate prefetches given this access
     std::vector<AddrPriority> addresses;
-    calculatePrefetch(pfi, addresses);
+	if(RLdegree > 0 ){
+		calculatePrefetch(pfi, addresses);	
+		for (AddrPriority& addr_prio : addresses) {
+			for(int d = 1 ; d <= RLdegree; d++){
+				Addr blkAddr = blockAddress(addr_prio.first);
+				Addr newAddr = blkAddr + d*(blkSize);
+				addresses.push_back(AddrPriority(newAddr,0));
+			}	
+		}
+	}
+    
 
     // Get the maximu number of prefetches that we are allowed to generate
     size_t max_pfs = getMaxPermittedPrefetches(addresses.size());
