@@ -323,6 +323,15 @@ def apply_degree(testsys, mode, np):
                 m5.setL1RLDegree(testsys, i, 1, p)
         for p in range(L1_prefetcher_count):
             m5.setL3RLDegree(testsys, 1, p)
+    elif(mode =="multid4"):
+        for i in range(np):
+            # system, core_num, action, index
+            for p in range(L2_prefetcher_count):
+                m5.setL2RLDegree(testsys, i, 4, p)
+            for p in range(L1_prefetcher_count):
+                m5.setL1RLDegree(testsys, i, 4, p)
+        for p in range(L1_prefetcher_count):
+            m5.setL3RLDegree(testsys, 4, p)
     elif(mode =="nopf"):
         for i in range(np):
             # system, core_num, action, index
