@@ -824,7 +824,14 @@ def run(options, root, testsys, cpu_class):
         else:
             print("----1")
             m5.simulate(1000000000)
-            print(read_state(testsys, np, options.app, 0))
+            a  = read_state(testsys, np, options.app, 0)
+            print("a at 0")
+            print(a)
+            print("-----")
+            m5.simulate(1000000000)
+            a = a.append(read_state(testsys, np, options.app, 1))
+            print("a at 1")
+            print(a)
             exit_event = benchCheckpoints(options, maxtick, cptdir)
 
     print('Exiting @ tick %i because %s' %
