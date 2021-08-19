@@ -531,11 +531,15 @@ def restoreSimpointCheckpoint():
     sys.exit(exit_event.getCode())
 
 def restoreSimpointCheckpoint_train(options, testsys):
-    print("Collecting samples started!")
+    print("******Collecting samples started!")
+    testsys.switch_cpus[0].setMaxInst(options.sample_length)
     np = options.num_cpus
-    m5.simulate(1000000)
-    actions = []
+    name = options.app
+    actions = apply_degree(testsys, "random", np)
+    m5.simulate()
     state = read_state(testsys, np, options.app, 0)
+    df = dataset_create(state, state, actions, name+".00")
+    
     for sample in range(options.num_sample):
         print("***********Sample ", sample)
         testsys.switch_cpus[0].setMaxInst(options.sample_length)
@@ -543,21 +547,23 @@ def restoreSimpointCheckpoint_train(options, testsys):
         exit_event = m5.simulate()
         exit_cause = exit_event.getCause()
         next_state = read_state(testsys, np, options.app, sample)
-        dataset_create(state, next_state, actions)
+        df = df.append(dataset_create(state, next_state, actions, name+"."+str(sample)))
         state = next_state
     
     print("--------Time to exit-------------")
+    df.to_csv("/home/cc/goro/csv/"+name+".csv")
+    df.to_csv("/home/cc/goro/csv/all.csv", mode='a', header=False)
     sys.exit(0)
 
-def dataset_create(state, next_state, actions):
+def dataset_create(state, next_state, actions, name):
     print("dataset_create*************")
     state = state.add_prefix('S_')
     next_state = next_state.add_prefix('NS_')
-    state = state.rename(index={state.index[0]: "x"})
-    next_state = next_state.rename(index={next_state.index[0]: "x"})
-    actions = actions.rename(index={actions.index[0]: "x"})
+    state = state.rename(index={state.index[0]: name})
+    next_state = next_state.rename(index={next_state.index[0]: name})
+    actions = actions.rename(index={actions.index[0]: name})
     df = pd.concat([state, next_state, actions], axis=1)
-    print(df)
+    return df
     
     
 def repeatSwitch(testsys, repeat_switch_cpu_list, maxtick, switch_freq):
@@ -867,16 +873,14 @@ def run(options, root, testsys, cpu_class):
 
     # Restore from SimPoint checkpoints
     elif options.restore_simpoint_checkpoint:
-        print("----2")
+        print("------------restore_simpoint_checkpoint")
         # m5.simulate(1000000000)
         
         if(options.train):
+            print("--------train----")
             restoreSimpointCheckpoint_train(options, testsys)
-            # for i in range(np):
-                # testsys.switch_cpus[i].setMaxInst(62356)
-                # testsys.cpu[i].setMaxInst(2623000056)
-                # apply_degree(testsys, "baseline", np)
         else:
+            print("--------Inference----")
             apply_degree(testsys, options.mode, np)
             restoreSimpointCheckpoint()
 
@@ -888,17 +892,12 @@ def run(options, root, testsys, cpu_class):
         # If checkpoints are being taken, then the checkpoint instruction
         # will occur in the benchmark code it self.
         if options.repeat_switch and maxtick > options.repeat_switch:
-            
+            print("--------------1")
             exit_event = repeatSwitch(testsys, repeat_switch_cpu_list,
                                       maxtick, options.repeat_switch)
         else:
+            print("--------------2")
             apply_degree(testsys, "random", np)
-            m5.simulate(100000000)
-            state = read_state(testsys, np, options.app, 0)
-            actions = apply_degree(testsys, "random", np)
-            m5.simulate(100000000)
-            next_state = read_state(testsys, np, options.app, 1)
-            dataset_create(state, next_state, actions)
             exit_event = benchCheckpoints(options, maxtick, cptdir)
 
     print('Exiting @ tick %i because %s' %
