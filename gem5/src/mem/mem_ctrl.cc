@@ -290,7 +290,7 @@ MemCtrl::addToReadQueue(PacketPtr pkt, unsigned int pkt_count, bool is_dram)
                                 "write queue\n",
                                 addr, size);
                         stats.bytesReadWrQ += burst_size;
-						std::cout<<"-------------------------------------"<<std::endl;
+						// std::cout<<"-------------------------------------"<<std::endl;
                         break;
                     }
                 }

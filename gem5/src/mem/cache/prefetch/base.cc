@@ -266,7 +266,7 @@ Base::SetDegree(int d)
 {
     RLdegree = d;
     RLDegreeHist[RLdegree]++;
-    printRLDegreeHist();
+    // printRLDegreeHist();
 }
 
 
@@ -279,7 +279,7 @@ Base::DecreaseDegree()
     if(RLdegree<RLDegreeHist.size()){
         RLDegreeHist[RLdegree]++;
     }
-    printRLDegreeHist();
+    // printRLDegreeHist();
 
 }    
 
@@ -289,7 +289,7 @@ Base::KeepDegree()
     if(RLdegree<RLDegreeHist.size()){
         RLDegreeHist[RLdegree]++;
     }
-    printRLDegreeHist();
+    // printRLDegreeHist();
 }
 
 void 
@@ -302,7 +302,7 @@ Base::IncreaseDegree()
         RLDegreeHist[RLdegree]++;
     }
 
-    printRLDegreeHist();
+    // printRLDegreeHist();
 }    
 
 int 

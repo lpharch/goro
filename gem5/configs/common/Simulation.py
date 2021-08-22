@@ -54,6 +54,19 @@ from random import random
 from random import randint
 import pandas as pd
 
+def tic():
+    #Homemade version of matlab tic and toc functions
+    import time
+    global startTime_for_tictoc
+    startTime_for_tictoc = time.time()
+
+def toc():
+    import time
+    if 'startTime_for_tictoc' in globals():
+        print ("Elapsed time is " + str(time.time() - startTime_for_tictoc) + " seconds.")
+    else:
+        print ("Toc: start time not set")
+        
 
 addToPath('../common')
 
@@ -532,23 +545,43 @@ def restoreSimpointCheckpoint():
 
 def restoreSimpointCheckpoint_train(options, testsys):
     print("******Collecting samples started!")
-    testsys.switch_cpus[0].setMaxInst(options.sample_length)
+    tic()
     np = options.num_cpus
     name = options.app
-    actions = apply_degree(testsys, "random", np)
-    m5.simulate()
-    state = read_state(testsys, np, options.app, 0)
-    df = dataset_create(state, state, actions, name+".00")
+    df = pd.DataFrame()
     
-    for sample in range(options.num_sample):
+    testsys.switch_cpus[0].setMaxInst(options.sample_length)
+    exit_event = m5.simulate()
+    exit_cause = exit_event.getCause()
+    print("exit_cause", exit_cause)
+    state = read_state(testsys, np, options.app, 0)
+    print("state")
+    print(state)
+    toc()
+    print("Warmup done")
+    
+    
+    for sample in range(0, options.num_sample):
         print("***********Sample ", sample)
+        m5.simulate(1000)
+        tic()
         testsys.switch_cpus[0].setMaxInst(options.sample_length)
         actions = apply_degree(testsys, "random", np)
         exit_event = m5.simulate()
+        # exit_event = m5.simulate()
         exit_cause = exit_event.getCause()
+        print("exit_cause", exit_cause)
         next_state = read_state(testsys, np, options.app, sample)
-        df = df.append(dataset_create(state, next_state, actions, name+"."+str(sample)))
+        # print("state")
+        # print(state)
+        # print("next_state")
+        # print(next_state)
+        
+        df1 = dataset_create(state, next_state, actions, name+"."+str(sample))
+        df = df.append(df1)
         state = next_state
+        toc()
+        print("--------ITR DONE-------------")
     
     print("--------Time to exit-------------")
     df.to_csv("/home/cc/goro/csv/"+name+".csv")
@@ -897,6 +930,27 @@ def run(options, root, testsys, cpu_class):
                                       maxtick, options.repeat_switch)
         else:
             print("--------------2")
+            name = options.app
+            actions = apply_degree(testsys, "random", np)
+            testsys.cpu[0].setMaxInst(options.sample_length)
+            m5.simulate()
+            state = read_state(testsys, np, options.app, 0)
+            df = dataset_create(state, state, actions, name+".00")
+            
+            for sample in range(options.num_sample):
+                print("***********Sample ", sample)
+                testsys.cpu[0].setMaxInst(options.sample_length)
+                actions = apply_degree(testsys, "random", np)
+                exit_event = m5.simulate()
+                exit_cause = exit_event.getCause()
+                next_state = read_state(testsys, np, options.app, sample)
+                df = df.append(dataset_create(state, next_state, actions, name+"."+str(sample)))
+                # print(df)
+                state = next_state
+            df.to_csv("test.csv")
+        
+        
+        
             apply_degree(testsys, "random", np)
             exit_event = benchCheckpoints(options, maxtick, cptdir)
 

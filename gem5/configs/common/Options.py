@@ -146,8 +146,8 @@ def addNoISAOptions(parser):
     parser.add_option("--mode", type="string", default="baseline",
         help="mode of simulation: baseline, multi, RL, random" )
     parser.add_option("--train", action="store_true")
-    parser.add_option("--num_sample", type="int", default=2)
-    parser.add_option("--sample_length", type="int", default=100000)
+    parser.add_option("--num_sample", type="int", default=10)
+    parser.add_option("--sample_length", type="int", default=10000000)
     
     # Enable Ruby
     parser.add_option("--ruby", action="store_true")

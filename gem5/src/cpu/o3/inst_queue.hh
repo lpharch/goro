@@ -468,7 +468,7 @@ class InstructionQueue
      *  IQ.
      */
     void dumpInsts();
-
+   public:
     struct IQStats : public Stats::Group
     {
         IQStats(O3CPU *cpu, const unsigned &total_width);

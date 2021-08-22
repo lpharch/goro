@@ -2621,7 +2621,7 @@ WriteAllocator::updateMode(Addr write_addr, unsigned write_size,
 void 
 BaseCache::setActionPytorch(int action, int index)
 {
-	std::cout<<name()<<" action:"<<action<<" index:"<<index<<std::endl;
+	// std::cout<<name()<<" action:"<<action<<" index:"<<index<<std::endl;
 	
     if(prefetcher){
         Prefetcher::Multi *mpf = dynamic_cast<Prefetcher::Multi * >(prefetcher);
@@ -2633,7 +2633,7 @@ BaseCache::setActionPytorch(int action, int index)
                 cout<<name()<<" Prefetcher "<<i<<" "<< qpf->PrintDegree()<<endl;
            }else{
                 if(i==index){
-                    cout<<"name "<<qpf->name()<<endl;
+                    // cout<<"name "<<qpf->name()<<endl;
                     qpf->SetDegree(action);
                 }
            }
@@ -2822,11 +2822,20 @@ BaseCache::stateBuilder(int core)
 
 		// Feature 2: system.cpu0.dcache.prefetcher.prefetchers1.pfIssued
 		Prefetcher::Multi *mpf = dynamic_cast<Prefetcher::Multi * >(prefetcher);
-        uint64_t issued = mpf->prefetchStats.pfIssued.value();
-        uint64_t issued_epoch = issued - tmp_loc[2];
-		tmp_loc[2] = issued;
+		int idx = 0;
+		for (auto pf : mpf->prefetchers) {
+			if(idx  == 1){
+				uint64_t issued = pf->prefetchStats.pfIssued.value();
+				uint64_t issued_epoch = issued - tmp_loc[2];
+				tmp_loc[2] = issued;
+				totStates["system.cpu0.dcache.prefetcher.prefetchers1.pfIssued"] = (issued_epoch);
+				break;
+			}
+			idx += 1;
+        }
+        
 		// totStates.push_back(issued_epoch);
-		totStates["system.cpu0.dcache.prefetcher.prefetchers1.pfIssued"] = (issued_epoch);
+		
 		
 		// Core related
 		// (0) rob.reads
@@ -2836,6 +2845,8 @@ BaseCache::stateBuilder(int core)
 		// (4) rename.unblockCycles
 		// (5) switch_cpus0.numRate
 		// (6) system.switch_cpus0.issueRate
+		
+	
 		string core_features[7] = {"rob.reads", "fetch.cycles", "rename.LQFullEvents", "decode.blockedCycles", "rename.unblockCycles",
 								"switch_cpus0.numRate", "system.switch_cpus0.issueRate"};
 		BaseCPU *bcpu = dynamic_cast<BaseCPU * >(system->threads[core]->getCpuPtr());
@@ -2846,6 +2857,11 @@ BaseCache::stateBuilder(int core)
 		// totStates.push_back(bcpu->numSimulatedInsts()-lastInst);
 		totStates["numSimulatedInsts"] = (bcpu->numSimulatedInsts()-lastInst);
         lastInst = bcpu->numSimulatedInsts();
+		
+		uint64_t num_cycles = bcpu->baseStats.numCycles.value();
+        uint64_t num_cycles_epoch = num_cycles - tmp_loc[3];
+		totStates["numCycles"] = (num_cycles_epoch);
+		tmp_loc[3] = num_cycles;
 		
 		vector<double > core_related = o3cpu->state_builder();
 		for(int i = 0 ; i < core_related.size(); i++ ){

@@ -1845,35 +1845,48 @@ FullO3CPU<Impl>::htmSendAbortSignal(ThreadID tid, uint64_t htm_uid,
     }
 }
 
+//Majid
 template <class Impl>
 vector<double >
 FullO3CPU<Impl>::state_builder()
 {
 	// std::cout<<"---state_builder---"<<std::endl;
 	// Core related
-	// rob.reads
-	// fetch.cycles
-	// rename.LQFullEvents
-	// rename.unblockCycles
-	// decode.blockedCycles
-	// switch_cpus0.numRate
-	// system.switch_cpus0.issueRate
-		
+	// (0) rob.reads
+	// (1) fetch.cycles
+	// (2) rename.LQFullEvents
+	// (3) decode.blockedCycles
+	// (4) rename.unblockCycles
+	// (5) switch_cpus0.numRate
+	// (6) system.switch_cpus0.issueRate
+	
+	uint64_t num_cycles = (baseStats.numCycles.value() - tmp_loc[7]);
+	tmp_loc[7] = baseStats.numCycles.value();
+	
 	vector<double> a;
 	a.push_back(rob.stats.reads.value() - tmp_loc[0]);
 	tmp_loc[0] = rob.stats.reads.value();
+	
 	a.push_back(fetch.fetchStats.cycles.value() - tmp_loc[1]);
 	tmp_loc[1] = fetch.fetchStats.cycles.value();
+	
 	a.push_back(rename.stats.LQFullEvents.value() - tmp_loc[2]);
 	tmp_loc[2] = rename.stats.LQFullEvents.value();
-	a.push_back(rename.stats.unblockCycles.value() - tmp_loc[3]);
-	tmp_loc[3] = rename.stats.unblockCycles.value();
-	a.push_back(iew.iewStats.executedInstStats.numInsts.value() - tmp_loc[4]);
-	tmp_loc[4] = iew.iewStats.executedInstStats.numInsts.value();
-	a.push_back(baseStats.numCycles.value() - tmp_loc[5]);
-	tmp_loc[5] = baseStats.numCycles.value();
-	a.push_back(decode.stats.blockedCycles.value() - tmp_loc[6]);
-	tmp_loc[6] = decode.stats.blockedCycles.value();
+	
+	a.push_back(decode.stats.blockedCycles.value() - tmp_loc[3]);
+	tmp_loc[3] = decode.stats.blockedCycles.value();
+	
+	a.push_back(rename.stats.unblockCycles.value() - tmp_loc[4]);
+	tmp_loc[4] = rename.stats.unblockCycles.value();
+	
+	a.push_back((iew.iewStats.executedInstStats.numInsts.value() - tmp_loc[5])/(num_cycles*1.0));
+	tmp_loc[5] = iew.iewStats.executedInstStats.numInsts.value();
+	
+	
+	a.push_back((iew.instQueue.iqStats.instsIssued.value() - tmp_loc[6])/(num_cycles*1.0));
+	tmp_loc[6] = iew.instQueue.iqStats.instsIssued.value();
+	
+	
 	return a;
 	
 }
