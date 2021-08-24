@@ -44,9 +44,10 @@ os.makedirs('./model_weights', exist_ok=True)
 
 
 # env = gym.make("BipedalWalker-v3")
-state_space  = 16
-action_space = 7
-action_scale = 5
+state_space  = 65
+action_space = 19
+action_scale = 6
+csv_paths = "/home/ml/test/gem5/goro/csv/"
 # print('observation space : ', env.observation_space)
 # print('action space : ', env.action_space)
 # print(env.action_space.low, env.action_space.high)
@@ -63,25 +64,19 @@ if args.load != 'no':
 memory = ReplayBuffer(200000000, action_space, device)
 # real_action = np.linspace(-1.,1., action_scale)
 
-
+ 
 
 def run():
-    fcsvs = os.listdir("/home/ml/test/BipedalWalker-BranchingDQN/csvs")
+    fcsvs = os.listdir(csv_paths)
     
-    # for csv in fcsvs:
-        # memory.load("./csvs/"+csv)
-        # print(csv+" loaded", memory.size())
-        # print(csv+" loaded", memory.size())
-        # break
-    memory.load("./intset.csv")
-    print("loaded", memory.size())
-    print("info", memory.info())
-    # memory.print_buffer()
+    for csv in fcsvs:
+        memory.load(csv_paths+csv)
+        print(csv+" loaded. Number of entries: ", memory.size())
 
     for n_epi in range(1000000):
         done = False
         score = 0.0
-        loss=agent.train_mode(n_epi, memory, batch_size, gamma, use_tensorboard,writer)
+        loss = agent.train_model(n_epi, memory, batch_size, gamma, use_tensorboard,writer)
         if(n_epi%1000==0):
             print("Loss", loss, n_epi)
             agent.save_model(n_epi)
