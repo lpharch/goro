@@ -2,13 +2,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-
+import pandas as pd
 import numpy as np
 import os
 import time
 import random
 import argparse
-
+from tqdm import tqdm
 from utils import ReplayBuffer
 from agent import BQN
 import torch.autograd.profiler as profiler
@@ -20,7 +20,7 @@ parser.add_argument('--render', type=bool, default=False, help="(default: False)
 parser.add_argument('--epochs', type=int, default=1000, help='number of epochs, (default: 1000)')
 parser.add_argument('--tensorboard', type=bool, default=False, help='use_tensorboard, (default: False)')
 parser.add_argument('--lr_rate', type=float, default=1e-6, help='learning rate (default : 0.0001)')
-parser.add_argument('--batch_size', type=int, default=32, help='batch size(default : 64)')
+parser.add_argument('--batch_size', type=int, default=64, help='batch size(default : 64)')
 parser.add_argument('--gamma', type=float, default=0.99, help='gamma (default : 0.99)')
 parser.add_argument('--action_scale', type=int, default=6, help='action scale between -1 ~ +1')
 
@@ -47,7 +47,7 @@ os.makedirs('./model_weights', exist_ok=True)
 state_space  = 65
 action_space = 19
 action_scale = 6
-csv_paths = "/home/ml/test/gem5/goro/csv/"
+csv_paths = "/home/ml/test/goro/csv/"
 # print('observation space : ', env.observation_space)
 # print('action space : ', env.action_space)
 # print(env.action_space.low, env.action_space.high)
@@ -68,15 +68,17 @@ memory = ReplayBuffer(200000000, action_space, device)
 
 def run():
     fcsvs = os.listdir(csv_paths)
-    
-    for csv in fcsvs:
-        memory.load(csv_paths+csv)
-        print(csv+" loaded. Number of entries: ", memory.size())
-
-    for n_epi in range(1000000):
+    for csv in tqdm(fcsvs):
+        memory.read(csv_paths+csv)
+    print("reading csv file is done, loading to the buffer..")    
+    memory.load()
+    print("Number of entries: ", memory.size())
+    print("reward Distribution: ", memory.info())
+    for n_epi in range(10000000):
         done = False
         score = 0.0
         loss = agent.train_model(n_epi, memory, batch_size, gamma, use_tensorboard,writer)
+        
         if(n_epi%1000==0):
             print("Loss", loss, n_epi)
             agent.save_model(n_epi)

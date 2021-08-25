@@ -9,14 +9,14 @@ class QNetwork(nn.Module):
         # self.dropout = nn.Dropout(0.25)
         
         self.actions = [nn.Sequential(nn.Linear(state_space*1,state_space*1),
-              nn.ReLU(),
+              nn.LeakyReLU(0.1),
               nn.Linear(state_space*1,action_scale)
               ) for _ in range(action_num)]
 
         self.actions = nn.ModuleList(self.actions)
 
         self.value = nn.Sequential(nn.Linear(state_space*1,state_space*1),
-              nn.ReLU(),
+              nn.LeakyReLU(0.1),
               nn.Linear(state_space*1,1)
               )
         
