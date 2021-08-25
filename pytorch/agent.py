@@ -2,7 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
- 
+from random import random
+from random import randint
 from network import QNetwork
 
 # torch.autograd.set_detect_anomaly(True)
@@ -10,7 +11,7 @@ from network import QNetwork
 class BQN(nn.Module):
     def __init__(self,state_space : int, action_num : int,action_scale : int, learning_rate, device : str):
         super(BQN,self).__init__()
-
+        self.device = device
         self.q = QNetwork(state_space, action_num,action_scale).to(device)
         self.target_q = QNetwork(state_space, action_num,action_scale).to(device)
         self.target_q.load_state_dict(self.q.state_dict())
@@ -29,8 +30,17 @@ class BQN(nn.Module):
                                     # ])
         self.update_freq = 1000
         self.update_count = 0
+    
     def action(self,x):
-        return self.q(x)
+        acc = []
+        if(random()< 0.05):
+            for _ in range(19):
+                acc.append(randint(0, 5))
+        else:
+            out =  self.q(torch.tensor(x, dtype=torch.float).to(self.device))
+            for tor in out:
+                acc.append(torch.argmax(tor, dim=1)[[0]].item() )
+        return acc
     
     def save_model(self, name):
         torch.save({

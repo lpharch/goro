@@ -6,20 +6,32 @@ import numpy as np
 from sklearn import preprocessing
 from tqdm import tqdm
 global_rewards = np.zeros(5) 
-
+import math
+import random
+from random import randint
+    
 class ReplayBuffer():
     def __init__(self,buffer_limit,action_space,device):
         self.buffer = collections.deque(maxlen=buffer_limit)
         self.action_space = action_space
         self.device = device
+        self.total_error = 0
         self.simulator = pd.DataFrame()
-        self.states_trings = {"core0.decode.blockedCycles", "core0.fetch.cycles", "core0.numCycles", "core0.numSimulatedInsts", "core0.rename.LQFullEvents", "core0.rename.unblockCycles", "core0.rob.reads", "core0.switch_cpus0.numRate", "core0.system.cpu0.dcache.ReadReq.mshrMissRate::total", "core0.system.cpu0.dcache.prefetcher.prefetchers1.pfIssued", "core0.system.switch_cpus0.issueRate", "core0.timesIdled", "core0.l2cache.ReadReq.hits::total", "core0.l2cache.demandAccesses::total", "core1.decode.blockedCycles", "core1.fetch.cycles", "core1.numCycles", "core1.numSimulatedInsts", "core1.rename.LQFullEvents", "core1.rename.unblockCycles", "core1.rob.reads", "core1.switch_cpus0.numRate", "core1.system.cpu0.dcache.ReadReq.mshrMissRate::total", "core1.system.cpu0.dcache.prefetcher.prefetchers1.pfIssued", "core1.system.switch_cpus0.issueRate", "core1.timesIdled", "core1.l2cache.ReadReq.hits::total", "core1.l2cache.demandAccesses::total", "core2.decode.blockedCycles", "core2.fetch.cycles", "core2.numCycles", "core2.numSimulatedInsts", "core2.rename.LQFullEvents", "core2.rename.unblockCycles", "core2.rob.reads", "core2.switch_cpus0.numRate", "core2.system.cpu0.dcache.ReadReq.mshrMissRate::total", "core2.system.cpu0.dcache.prefetcher.prefetchers1.pfIssued", "core2.system.switch_cpus0.issueRate", "core2.timesIdled", "core2.l2cache.ReadReq.hits::total", "core2.l2cache.demandAccesses::total", "core3.decode.blockedCycles", "core3.fetch.cycles", "core3.numCycles", "core3.numSimulatedInsts", "core3.rename.LQFullEvents", "core3.rename.unblockCycles", "core3.rob.reads", "core3.switch_cpus0.numRate", "core3.system.cpu0.dcache.ReadReq.mshrMissRate::total", "core3.system.cpu0.dcache.prefetcher.prefetchers1.pfIssued", "core3.system.switch_cpus0.issueRate", "core3.timesIdled", "core3.l2cache.ReadReq.hits::total", "core3.l2cache.demandAccesses::total", "core3.ReadSharedReq.mshrMisses::total", "core3.mem_ctrls.numStayReadState", "core3.mem_ctrls.rdQLenPdf::3", "core3.mem_ctrls.totGap", "core3.system.l3.ReadSharedReq.accesses::total", "core3.system.l3.demandAccesses::total", "core3.system.l3.prefetcher.prefetchersx.pfSpanPage", "core3.system.l3.tags.totalRefs", "core3.system.mem_ctrls.requestorReadAccesses::cpu0.dcache.prefetcher.prefetchers1"} 
+        self.state_strings = {"core0.decode.blockedCycles", "core0.fetch.cycles", "core0.numCycles", "core0.numSimulatedInsts", "core0.rename.LQFullEvents", "core0.rename.unblockCycles", "core0.rob.reads", "core0.switch_cpus0.numRate", "core0.system.cpu0.dcache.ReadReq.mshrMissRate::total", "core0.system.cpu0.dcache.prefetcher.prefetchers1.pfIssued", "core0.system.switch_cpus0.issueRate", "core0.timesIdled", "core0.l2cache.ReadReq.hits::total", "core0.l2cache.demandAccesses::total", "core1.decode.blockedCycles", "core1.fetch.cycles", "core1.numCycles", "core1.numSimulatedInsts", "core1.rename.LQFullEvents", "core1.rename.unblockCycles", "core1.rob.reads", "core1.switch_cpus0.numRate", "core1.system.cpu0.dcache.ReadReq.mshrMissRate::total", "core1.system.cpu0.dcache.prefetcher.prefetchers1.pfIssued", "core1.system.switch_cpus0.issueRate", "core1.timesIdled", "core1.l2cache.ReadReq.hits::total", "core1.l2cache.demandAccesses::total", "core2.decode.blockedCycles", "core2.fetch.cycles", "core2.numCycles", "core2.numSimulatedInsts", "core2.rename.LQFullEvents", "core2.rename.unblockCycles", "core2.rob.reads", "core2.switch_cpus0.numRate", "core2.system.cpu0.dcache.ReadReq.mshrMissRate::total", "core2.system.cpu0.dcache.prefetcher.prefetchers1.pfIssued", "core2.system.switch_cpus0.issueRate", "core2.timesIdled", "core2.l2cache.ReadReq.hits::total", "core2.l2cache.demandAccesses::total", "core3.decode.blockedCycles", "core3.fetch.cycles", "core3.numCycles", "core3.numSimulatedInsts", "core3.rename.LQFullEvents", "core3.rename.unblockCycles", "core3.rob.reads", "core3.switch_cpus0.numRate", "core3.system.cpu0.dcache.ReadReq.mshrMissRate::total", "core3.system.cpu0.dcache.prefetcher.prefetchers1.pfIssued", "core3.system.switch_cpus0.issueRate", "core3.timesIdled", "core3.l2cache.ReadReq.hits::total", "core3.l2cache.demandAccesses::total", "core3.ReadSharedReq.mshrMisses::total", "core3.mem_ctrls.numStayReadState", "core3.mem_ctrls.rdQLenPdf::3", "core3.mem_ctrls.totGap", "core3.system.l3.ReadSharedReq.accesses::total", "core3.system.l3.demandAccesses::total", "core3.system.l3.prefetcher.prefetchersx.pfSpanPage", "core3.system.l3.tags.totalRefs", "core3.system.mem_ctrls.requestorReadAccesses::cpu0.dcache.prefetcher.prefetchers1"} 
         self.actions_string = {"Core0.L1.P0.degree", "Core0.L1.P1.degree", "Core0.L2.P0.degree", "Core0.L2.P1.degree", "Core1.L1.P0.degree", "Core1.L1.P1.degree", "Core1.L2.P0.degree", "Core1.L2.P1.degree", "Core2.L1.P0.degree", "Core2.L1.P1.degree", "Core2.L2.P0.degree", "Core2.L2.P1.degree", "Core3.L1.P0.degree", "Core3.L1.P1.degree", "Core3.L2.P0.degree", "Core3.L2.P1.degree" , "LLC.P1.degree", "LLC.P2.degree", "LLC.P0.degree"}
    
-    
+        # self.state_strings = {"core0.numCycles", "core0.numSimulatedInsts", "core1.numCycles", "core1.numSimulatedInsts", "core2.numCycles", "core2.numSimulatedInsts", "core3.numCycles", "core3.numSimulatedInsts", "core3.rename.LQFullEvents"} 
+        # self.actions_string = {"Core0.L1.P0.degree", "Core0.L1.P1.degree"}
     def put(self, transition):
         self.buffer.append(transition)
     
+    def write_buffer(self, state, next_state, actions, reward):
+        state = np.array(state)
+        next_state = np.array(next_state)
+        actions = np.array(actions)
+        reward = np.array(reward)[0]
+        self.put((state, actions, reward, next_state, 0))
+        
     def read(self, path):
         df_tmp = pd.read_csv(path)
         self.simulator = self.simulator.append(df_tmp)
@@ -33,6 +45,44 @@ class ReplayBuffer():
     def print_buffer(self):
         print(self.buffer)
     
+    def dot_product(self, v1, v2):
+        return sum(map(lambda x: x[0] * x[1], zip(v1, v2)))
+
+    def cosine_measure(self, v1, v2):
+        prod = self.dot_product(v1, v2)
+        len1 = math.sqrt(self.dot_product(v1, v1))
+        len2 = math.sqrt(self.dot_product(v2, v2))
+        return prod / (len1 * len2)
+    
+    def state_similarity(self, df, state):
+      length_state = len(state)
+      cur_state = 0
+      df["state_prod"] = 0
+      state_len1 = 0
+      df["state_len2"] = 0
+      for i, st in enumerate(self.state_strings):
+        df["state_prod"] += (state[i]*self.simulator["S_"+st])
+        state_len1 += (state[i]*state[i])
+        df["state_len2"] += (self.simulator["S_"+st]*self.simulator["S_"+st])
+      
+      df["state_sim"] = df["state_prod"] / ( math.sqrt(state_len1) + np.sqrt(df["state_len2"]) )
+      
+      return df["state_sim"]
+    
+    def action_similarity(self, df, actions):
+      length_state = len(actions)
+      cur_state = 0
+      df["actions_prod"] = 0
+      state_len1 = 0
+      df["actions_len2"] = 0
+      for i, st in enumerate(self.actions_string):
+        df["actions_prod"] += (actions[i]*self.simulator[st])
+        state_len1 += (actions[i]*actions[i])
+        df["actions_len2"] += (self.simulator[st]*self.simulator[st])
+      
+      
+      df["actions_sim"] = df["actions_prod"] / ( math.sqrt(state_len1) + np.sqrt(df["actions_len2"]) )
+      return df["actions_sim"]
     
     def prepare(self):
       self.simulator["reward"] = (self.simulator["NS_core0.numSimulatedInsts"]+self.simulator["NS_core1.numSimulatedInsts"]+self.simulator["NS_core2.numSimulatedInsts"]+self.simulator["NS_core3.numSimulatedInsts"])/(self.simulator["NS_core0.numCycles"]+self.simulator["NS_core1.numCycles"]+self.simulator["NS_core2.numCycles"]+self.simulator["NS_core3.numCycles"])
@@ -43,13 +93,42 @@ class ReplayBuffer():
               val = self.simulator[col].mean()
               self.simulator[col].fillna(value=val, inplace=True)
       
-      for st in self.states_trings:
+      for st in self.state_strings:
           self.simulator["S_"+st] = (self.simulator["S_"+st] - self.simulator["S_"+st].min()) / (self.simulator["S_"+st].max() - self.simulator["S_"+st].min())
           self.simulator["NS_"+st] = (self.simulator["NS_"+st] - self.simulator["S_"+st].min()) / (self.simulator["NS_"+st].max() - self.simulator["NS_"+st].min())
           
       print("***Is there any null", self.simulator.isnull().sum().sum())
       
+    
       
+    # This function should find the most similar state and action in the simulator and return the next state
+    def step(self, state_sim, action_sim):
+      df_state  = self.state_similarity(self.simulator, state_sim)
+      df_action = self.action_similarity(self.simulator, action_sim)
+      df_sub = np.abs(df_state-df_action)
+      self.total_error += df_sub.iloc[df_sub.idxmin(axis=1)]
+      idx = df_sub.idxmin(axis=1)
+      next_state = []
+      reward = []
+      for st in self.state_strings:
+          next_state.append(self.simulator["NS_"+st].iloc[idx])
+      reward.append(self.simulator["reward"].iloc[idx])
+      
+      # next_state = np.array(next_state)
+      # reward = np.array(reward)[0]
+      
+      return next_state, reward
+    
+    def init(self):
+      idx = len(self.simulator)
+      idx = randint(0, idx)
+      state = []
+      for st in self.state_strings:
+          state.append(self.simulator["S_"+st].iloc[idx])
+      state = np.array(state)
+      return state
+
+    
     def load(self):
       self.prepare()
       for index, row in tqdm(self.simulator.iterrows()):
@@ -57,7 +136,7 @@ class ReplayBuffer():
           next_state = []
           actions = []
           reward = []
-          for st in self.states_trings:
+          for st in self.state_strings:
               state.append((row["S_"+st]))
               next_state.append((row["NS_"+st]))
           for st in self.actions_string:
@@ -65,12 +144,9 @@ class ReplayBuffer():
           reward.append(row["reward"])
           
           
-          state = np.array(state)
-          next_state = np.array(next_state)
-          actions = np.array(actions)
-          reward = np.array(reward)[0]
+          
  
-          self.put((state, actions, reward, next_state, 0))
+          # 
           global_rewards[reward] += 1
                     
        

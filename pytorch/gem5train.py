@@ -72,18 +72,32 @@ def run():
         memory.read(csv_paths+csv)
     print("reading csv file is done, loading to the buffer..")    
     memory.load()
-    print("Number of entries: ", memory.size())
-    print("reward Distribution: ", memory.info())
-    for n_epi in range(10000000):
-        done = False
-        score = 0.0
-        loss = agent.train_model(n_epi, memory, batch_size, gamma, use_tensorboard,writer)
+    total_reward = 0 
+    for episod in range(10):
+        loss_val = 0
+        reward = 0
+        state = memory.init()
+        episode_reward = 0 
+        for n_itr in range(10000):
+            actions = agent.action(state)
+            next_state, reward = memory.step(state, actions)
+            total_reward += reward[0]
+            episode_reward += reward[0]
+            if(n_itr > batch_size):
+                loss = agent.train_model(n_itr, memory, batch_size, gamma, use_tensorboard,writer)
+                loss_val = loss.item()
+                if(n_itr%1000==0):
+                    agent.save_model(n_itr)
+                        
+            memory.write_buffer(state, next_state, actions, reward)
+            state = next_state        
+
+            output = "Episode: %r Iteratio:%r reward:%r total_reward:%r episode_reward:%r, loss:%r #items:%r." % (episod, n_itr, reward[0], total_reward, episode_reward, round(loss_val, 2), memory.size())
+            print(output)
+            print("Actions: ", actions)
         
-        if(n_epi%1000==0):
-            print("Loss", loss, n_epi)
-            agent.save_model(n_epi)
-                    
-                    
+        
+        
 print("---Running the gem5 model")
 run()       
 # with profiler.profile(record_shapes=True) as prof:
