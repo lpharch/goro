@@ -53,6 +53,10 @@ from m5.util import *
 from random import random
 from random import randint
 import pandas as pd
+import torch
+import numpy as np
+from common import network
+
 
 def tic():
     #Homemade version of matlab tic and toc functions
@@ -404,6 +408,20 @@ def takeSimpointCheckpoints(simpoints, interval_length, cptdir):
     print("%d checkpoints taken" % num_checkpoints)
     sys.exit(code)
 
+def take_action(state):
+    state_space  = 65
+    action_space = 19
+    action_scale = 6
+    acc = []
+    q_model = network.QNetwork(state_space, action_space, action_scale)
+    checkpoint = torch.load(("/home/cc/goro/pytorch/gem5model_latest"), map_location=torch.device('cpu'))
+    q_model.load_state_dict(checkpoint['modelA_state_dict'])
+        
+    out =  q_model(torch.tensor(state, dtype=torch.float))
+    for tor in out:
+        acc.append(torch.argmax(tor, dim=1)[[0]].item() )
+    print("Actions suggested by the model ", acc)
+ 
 def read_state(testsys, np, app, timestamp):
     values = []
     keys = []
@@ -507,11 +525,11 @@ def apply_degree(testsys, mode, np):
         for i in range(np):
             # system, core_num, action, index
             for p in range(L1_prefetcher_count): # There are 2 prefetchers per level
-                l1_degree = randint(0, 4)
+                l1_degree = randint(0, 5)
                 degrees.append(l1_degree)
                 m5.setL1RLDegree(testsys, i, l1_degree, p)
             for p in range(L2_prefetcher_count): # There are 2 prefetchers per level    
-                l2_degree = randint(0, 4)
+                l2_degree = randint(0, 5)
                 degrees.append(l2_degree)
                 m5.setL2RLDegree(testsys, i, l2_degree, p)
                 
@@ -585,7 +603,6 @@ def restoreSimpointCheckpoint_train(options, testsys):
     
     print("--------Time to exit-------------")
     df.to_csv("/home/cc/goro/csv/"+name+".csv")
-    df.to_csv("/home/cc/goro/csv/all.csv", mode='a', header=False)
     sys.exit(0)
 
 def dataset_create(state, next_state, actions, name):
@@ -911,6 +928,15 @@ def run(options, root, testsys, cpu_class):
         
         if(options.train):
             print("--------train----")
+            
+            for r in range(10):
+                print("-----------------------------")
+                state = [] 
+                for s in range(65):
+                    state.append(random())
+                print("state")
+                print(state)
+                take_action(state)
             restoreSimpointCheckpoint_train(options, testsys)
         else:
             print("--------Inference----")
