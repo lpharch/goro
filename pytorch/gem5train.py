@@ -6,13 +6,15 @@ import pandas as pd
 import numpy as np
 import os
 import time
-import random
 import argparse
 from tqdm import tqdm
 from utils import ReplayBuffer
 from agent import BQN
 import torch.autograd.profiler as profiler
 import gym
+from random import random
+from random import randint
+
 
 parser = argparse.ArgumentParser('parameters')
 parser.add_argument('--train', type=bool, default=True, help="(default: True)")
@@ -53,6 +55,7 @@ csv_paths = "/home/ml/test/goro/csv/"
 # print(env.action_space.low, env.action_space.high)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+# device = 'cpu'
 if device == 'cuda':
     agent = BQN(state_space,action_space,(action_scale), learning_rate, device).cuda()
 else : 
@@ -61,7 +64,7 @@ if args.load != 'no':
     agent.load_state_dict(torch.load('./model_weights/'+args.load))
 
 
-memory = ReplayBuffer(200000000, action_space, device)
+memory = ReplayBuffer(10000, action_space, device)
 # real_action = np.linspace(-1.,1., action_scale)
 
  
@@ -76,25 +79,31 @@ def run():
     for episod in range(10):
         loss_val = 0
         reward = 0
+        conf = 0
+        not_conf = 0
         state = memory.init()
         episode_reward = 0 
         for n_itr in range(10000):
             actions = agent.action(state)
-            next_state, reward = memory.step(state, actions)
+            next_state, reward, confidence = memory.step(state, actions)
             total_reward += reward[0]
             episode_reward += reward[0]
-            if(n_itr > batch_size):
+            if(memory.size() > batch_size):
                 loss = agent.train_model(n_itr, memory, batch_size, gamma, use_tensorboard,writer)
                 loss_val = loss.item()
-                if(n_itr%1000==0):
-                    agent.save_model(n_itr)
-                        
-            memory.write_buffer(state, next_state, actions, reward)
-            state = next_state        
 
-            output = "Episode: %r Iteratio:%r reward:%r total_reward:%r episode_reward:%r, loss:%r #items:%r." % (episod, n_itr, reward[0], total_reward, episode_reward, round(loss_val, 2), memory.size())
-            print(output)
-            print("Actions: ", actions)
+            if(confidence):
+                conf += 1
+                memory.write_buffer(state, next_state, actions, reward)
+            else:
+                not_conf +=1
+            state = next_state        
+            if(n_itr%100==0): 
+                output = "Episode: %r Iteratio:%r reward:%r total_reward:%r episode_reward:%r, loss:%r #items:%r conf. ratio:%r." % (episod, n_itr, reward[0], total_reward, episode_reward, round(loss_val, 2), memory.size(), round(conf/((conf+not_conf)*1.0), 2))
+                print(output)
+            if(n_itr%100==0): 
+                print(memory.info())
+        agent.save_model(episod)
         
         
         
