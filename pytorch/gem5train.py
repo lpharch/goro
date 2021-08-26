@@ -71,19 +71,22 @@ memory = ReplayBuffer(10000, action_space, device)
 
 def run():
     fcsvs = os.listdir(csv_paths)
+    counter = 0
     for csv in tqdm(fcsvs):
+        counter +=1
         memory.read(csv_paths+csv)
-    print("reading csv file is done, loading to the buffer..")    
+
+    print("reading csv file is done, loading to the buffer.. ", counter)    
     memory.load()
     total_reward = 0 
-    for episod in range(10):
+    for episod in range(100):
         loss_val = 0
         reward = 0
         conf = 0
         not_conf = 0
         state = memory.init()
         episode_reward = 0 
-        for n_itr in range(10000):
+        for n_itr in range(30000):
             actions = agent.action(state)
             next_state, reward, confidence = memory.step(state, actions)
             total_reward += reward[0]
@@ -101,8 +104,15 @@ def run():
             if(n_itr%100==0): 
                 output = "Episode: %r Iteratio:%r reward:%r total_reward:%r episode_reward:%r, loss:%r #items:%r conf. ratio:%r." % (episod, n_itr, reward[0], total_reward, episode_reward, round(loss_val, 2), memory.size(), round(conf/((conf+not_conf)*1.0), 2))
                 print(output)
-            if(n_itr%100==0): 
+                file1 = open("gem5_out.txt", "a")  # append mode
+                file1.write(output+"\n")
+                file1.close()
+
+            if(n_itr%1000==0): 
                 print(memory.info())
+                file1 = open("gem5_out.txt", "a")  # append mode
+                file1.write(memory.info()+"\n")
+                file1.close()
         agent.save_model(episod)
         
         
