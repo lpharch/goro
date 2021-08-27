@@ -146,6 +146,7 @@ def addNoISAOptions(parser):
     parser.add_option("--mode", type="string", default="baseline",
         help="mode of simulation: baseline, multi, RL, random" )
     parser.add_option("--train", action="store_true")
+    parser.add_option("--inference", action="store_true")
     parser.add_option("--num_sample", type="int", default=10)
     parser.add_option("--sample_length", type="int", default=10000000)
     
