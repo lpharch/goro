@@ -538,10 +538,10 @@ class MultiPrefetcher(BasePrefetcher):
     prefetchers = VectorParam.BasePrefetcher([], "Array of prefetchers")
 
 class L1IPMultiPrefetcher(MultiPrefetcher):
-    prefetchers = VectorParam.BasePrefetcher([IPCPPrefetcher(), TaggedPrefetcher()], "Array of prefetchers")
+    prefetchers = VectorParam.BasePrefetcher([IPCPPrefetcher()], "Array of prefetchers")
      
 class L2IPMultiPrefetcher(MultiPrefetcher):
-    prefetchers = VectorParam.BasePrefetcher([IPCPL2Prefetcher(), TaggedPrefetcher()], "Array of prefetchers")
+    prefetchers = VectorParam.BasePrefetcher([IPCPL2Prefetcher()], "Array of prefetchers")
     
 class L1MultiPrefetcher(MultiPrefetcher):
     prefetchers = VectorParam.BasePrefetcher([DCPTPrefetcher(), TaggedPrefetcher()], "Array of prefetchers")

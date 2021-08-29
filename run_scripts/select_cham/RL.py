@@ -12,7 +12,7 @@ points = "/home/cc/goro/points"
 results = "/home/cc/goro/results/"
 output = "/home/cc/goro/outputs/"
 
-simulation="ipcp2"
+simulation="infer_t5"
 
 dir = results+simulation
 if os.path.exists(dir):
@@ -52,7 +52,7 @@ os.system("ts -S 40")
 for app in (all_mixes):
     cmd = ""
     cmd += (gem5 + "/build/ARM/gem5.opt ")
-    cmd += ("-d " + results + "/" + app + " ")
+    cmd += ("-d " + results + "/" + app + "_t5 ")
     cmd += (gem5 + "/configs/example/fs.py ")
     cmd += ("--caches ")
     cmd += ("--kernel /home/cc/goro/disks/binaries/vmlinux.arm64 ")
@@ -61,13 +61,15 @@ for app in (all_mixes):
     cmd += ("--restore-simpoint-checkpoint -r 1 ")
     cmd += ("--checkpoint-dir " + simpts + "/" + app + " ")
     cmd += ("--restore-with-cpu=AtomicSimpleCPU ")
-    cmd += ("--l3cache  ")
-    cmd += ("--l2-hwp-type=L2IPMultiPrefetcher ")
-    cmd += ("--l1d-hwp-type=L1IPMultiPrefetcher ")
+    cmd += ("--l3cache --l3-hwp-type=L3MultiPrefetcher ")
+    cmd += ("--l2-hwp-type=L2MultiPrefetcher ")
+    cmd += ("--l1d-hwp-type=L1MultiPrefetcher ")
     cmd += ("--mem-size=64GB --mem-type=DDR4_2400_8x8 ")
     cmd += ("-n 4 ")
-    cmd += ("--mode "+ simulation)
-    cmd += (" > " + output + "/" + app + ".out")
+    cmd += ("--mode RL ")
+    cmd += ("--inference ")
+    cmd += ("--model ")
+    cmd += ("--app "+app+".t5 ")
 
     
     

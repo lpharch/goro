@@ -52,7 +52,7 @@ os.system("ts -S 40")
 for app in (all_mixes):
     cmd = ""
     cmd += (gem5 + "/build/ARM/gem5.opt ")
-    cmd += ("-d " + results + "/" + app + "_t11 ")
+    cmd += ("-d " + results + "/" + app + "_t39 ")
     cmd += (gem5 + "/configs/example/fs.py ")
     cmd += ("--caches ")
     cmd += ("--kernel /home/cc/goro/disks/binaries/vmlinux.arm64 ")
@@ -68,7 +68,7 @@ for app in (all_mixes):
     cmd += ("-n 4 ")
     cmd += ("--mode baseline ")
     cmd += ("--train ")
-    cmd += ("--app "+app+".t11 ")
+    cmd += ("--app "+app+".t39 ")
 
     
     

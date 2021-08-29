@@ -408,13 +408,13 @@ def takeSimpointCheckpoints(simpoints, interval_length, cptdir):
     print("%d checkpoints taken" % num_checkpoints)
     sys.exit(code)
 
-def take_action(state):
+def take_action(state, model_name):
     state_space  = 65
     action_space = 19
     action_scale = 6
     acc = []
     q_model = network.QNetwork(state_space, action_space, action_scale)
-    checkpoint = torch.load(("/home/cc/goro/pytorch/gem5model_latest"), map_location=torch.device('cpu'))
+    checkpoint = torch.load((model_name), map_location=torch.device('cpu'))
     q_model.load_state_dict(checkpoint['modelA_state_dict'])
         
     out =  q_model(torch.tensor(state, dtype=torch.float))
@@ -455,7 +455,7 @@ def read_state(testsys, np, app, timestamp):
     df = pd.DataFrame(values, index=keys,  columns =[app+"_"+str(timestamp)])
     return df.T, values
         
-def apply_degree(testsys, mode, np):
+def apply_degree(testsys, mode, np, state, model_name):
     print("*********apply_degree: ", mode)
     degrees = []
     # Order of results, I may make it dynamic
@@ -539,11 +539,27 @@ def apply_degree(testsys, mode, np):
             degrees.append(degree)
             m5.setL3RLDegree(testsys, degree, p)
     elif(mode == "RL"):
-        state_df, state = read_state(testsys, np, "inference", 0)
-        degrees = take_action(state)
+        max_array = [35018699.0, 36287636.0, 45508142.0, 208064412.0, 16531541.0, 17103814.0, 59252458.0, 2.4314418884608044, 0.10537975807082056, 3528337.0, 2.453864773565053, 148622.0, 835720.0, 4348499.0, 37081273.0, 37210706.0, 45508133.0, 208064412.0, 14290398.0, 18717984.0, 114834246.0, 2.7080200695687124, 0.12767532603267875, 7959005.0, 2.708431185624677, 288795.0, 2194487.0, 9397303.0, 24408634.0, 24838210.0, 45508134.0, 208064412.0, 9481207.0, 9683561.0, 135560181.0, 2.710676043985924, 0.1272088730622846, 6786638.0, 2.7109566145096307, 231823.0, 1186091.0, 4407729.0, 33349431.0, 35886839.0, 45508133.0, 208064412.0, 11157480.0, 17121000.0, 124328190.0, 2.7432173421683546, 0.13320870780577965, 3795787.0, 2.743263476450448, 248906.0, 899748.0, 3897481.0, 989689.0, 1914411.0, 82668.0, 12423738600.0, 2191539.0, 2280119.0, 9567633.0, 6444151.0, 1732614.0,]
+        min_array = [0.0, 69.0, 192.0, 940.0, 0.0, 0.0, 435.0, 0.3375381706420798, 0.0, 0.0, 0.34160917841910576, 126.0, 0.0, 0.0, 0.0, 0.0, 0.0, 940.0, 0.0, 0.0, 0.0, 0.08806160848362099, 0.0, 0.0, 0.09129067018546094, 0.0, 0.0, 0.0, 1.0, 62.0, 192.0, 940.0, 0.0, 0.0, 402.0, 0.10012924548056623, 0.0, 0.0, 0.10343202484207434, 130.0, 0.0, 0.0, 0.0, 60.0, 192.0, 940.0, 0.0, 0.0, 489.0, 0.09320681583953208, 0.0, 0.0, 0.09668560344755846, 130.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        # print("state")
+        # print(state)
+        # print(len(state))
+        for i in range(len(state)):
+            if((max_array[i]-min_array[i]) != 0 ):
+                state[i] = (state[i]-min_array[i])/(max_array[i]-min_array[i])
+            else:
+                state[i] = 0
+            if(state[i] > 1):
+                print("A possible messup")
+                state[i] = 1
+            if(state[i] < 0 ):
+                state[i] = 0
+        print("******************state")
+        print(state)
+        degrees = take_action(state, model_name)
     
     actions = (pd.DataFrame(degrees, index=components, columns =['degrees'])).T
-    return actions, state_df
+    return actions
             
 def restoreSimpointCheckpoint():
     exit_event = m5.simulate()
@@ -569,14 +585,15 @@ def restoreSimpointCheckpoint_inference(options, testsys):
     np = options.num_cpus
     name = options.app
     df = pd.DataFrame()
+    model_name = options.model
     
     testsys.switch_cpus[0].setMaxInst(options.sample_length)
     exit_event = m5.simulate()
     exit_cause = exit_event.getCause()
     print("exit_cause", exit_cause)
-    state, _ = read_state(testsys, np, options.app, 0)
-    print("state")
-    print(state)
+    state, state_val = read_state(testsys, np, options.app, 0)
+    # print("state")
+    # print(state)
     print("Warmup done")
     
     
@@ -584,15 +601,14 @@ def restoreSimpointCheckpoint_inference(options, testsys):
         print("***********Sample ", sample)
         m5.simulate(1000)
         testsys.switch_cpus[0].setMaxInst(options.sample_length)
-        actions, state_df = apply_degree(testsys, "RL", np)
-        df.append(state_df)
+        actions = apply_degree(testsys, "RL", np, state_val, model_name)
+        # df = df.append(state_df)
         exit_event = m5.simulate()
+        state, state_val = read_state(testsys, np, options.app, 0)
         exit_cause = exit_event.getCause()
-        print("exit_cause", exit_cause)
-        print("--------ITR DONE-------------")
+        print("--------ITR DONE-------------",  exit_cause)
     
-    print("--------Time to exit-------------")
-    df.to_csv("/home/cc/goro/outputs/"+name+"_inference.csv")
+    # df.to_csv("/home/cc/goro/outputs/"+name+"_inference.csv")
     sys.exit(0)
 
 
@@ -619,7 +635,7 @@ def restoreSimpointCheckpoint_train(options, testsys):
         m5.simulate(1000)
         tic()
         testsys.switch_cpus[0].setMaxInst(options.sample_length)
-        actions, _  = apply_degree(testsys, "random", np)
+        actions  = apply_degree(testsys, "random", np, state, "")
         exit_event = m5.simulate()
         # exit_event = m5.simulate()
         exit_cause = exit_event.getCause()
@@ -978,7 +994,6 @@ def run(options, root, testsys, cpu_class):
         
         else:
             print("--------Inference----")
-            apply_degree(testsys, options.mode, np)
             restoreSimpointCheckpoint()
 
     else:
@@ -993,29 +1008,6 @@ def run(options, root, testsys, cpu_class):
             exit_event = repeatSwitch(testsys, repeat_switch_cpu_list,
                                       maxtick, options.repeat_switch)
         else:
-            print("--------------2")
-            name = options.app
-            actions, _ = apply_degree(testsys, "random", np)
-            testsys.cpu[0].setMaxInst(options.sample_length)
-            m5.simulate()
-            state, _ = read_state(testsys, np, options.app, 0)
-            df = dataset_create(state, state, actions, name+".00")
-            
-            for sample in range(options.num_sample):
-                print("***********Sample ", sample)
-                testsys.cpu[0].setMaxInst(options.sample_length)
-                actions, _ = apply_degree(testsys, "random", np)
-                exit_event = m5.simulate()
-                exit_cause = exit_event.getCause()
-                next_state, _ = read_state(testsys, np, options.app, sample)
-                df = df.append(dataset_create(state, next_state, actions, name+"."+str(sample)))
-                # print(df)
-                state = next_state
-            df.to_csv("test.csv")
-        
-        
-        
-            apply_degree(testsys, "random", np)
             exit_event = benchCheckpoints(options, maxtick, cptdir)
 
     print('Exiting @ tick %i because %s' %

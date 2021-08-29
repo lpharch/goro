@@ -64,7 +64,7 @@ namespace Prefetcher {
 #define MAX_POS_NEG_COUNT 64				    // 6-bit saturating counter
 #define NUM_OF_LINES_IN_REGION 32			    // 32 cache lines in 2KB region
 #define REGION_OFFSET_MASK 0x1F				    // 5-bit offset for 2KB region
-#define NUM_CPUS 1
+#define NUM_CPUS 4
 #define LOG2_PAGE_SIZE 12 //Check this Majid
 #define LOG2_BLOCK_SIZE 6 //Check this Majid
 
