@@ -12,7 +12,7 @@ points = "/home/cc/goro/points"
 results = "/home/cc/goro/results/"
 output = "/home/cc/goro/outputs/"
 
-simulation="infer_t5"
+simulation="s1_s1_l95_471"
 
 dir = results+simulation
 if os.path.exists(dir):
@@ -52,7 +52,7 @@ os.system("ts -S 40")
 for app in (all_mixes):
     cmd = ""
     cmd += (gem5 + "/build/ARM/gem5.opt ")
-    cmd += ("-d " + results + "/" + app + "_t5 ")
+    cmd += ("-d " + results + "/" + app + "_s1_s1_l95_471 ")
     cmd += (gem5 + "/configs/example/fs.py ")
     cmd += ("--caches ")
     cmd += ("--kernel /home/cc/goro/disks/binaries/vmlinux.arm64 ")
@@ -68,8 +68,8 @@ for app in (all_mixes):
     cmd += ("-n 4 ")
     cmd += ("--mode RL ")
     cmd += ("--inference ")
-    cmd += ("--model ")
-    cmd += ("--app "+app+".t5 ")
+    cmd += ("--model /home/cc/models/gem5models1_s1_l95_471 ")
+    cmd += ("--app "+app+".s1_s1_l95_471 ")
 
     
     
