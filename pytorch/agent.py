@@ -9,11 +9,11 @@ from network import QNetwork
 # torch.autograd.set_detect_anomaly(True)
  
 class BQN(nn.Module):
-    def __init__(self,state_space : int, action_num : int,action_scale : int, learning_rate, device : str):
+    def __init__(self,state_space : int, action_num : int,action_scale : int, learning_rate, device : str, s1: int, s2: int, s3: int, leaky: float):
         super(BQN,self).__init__()
         self.device = device
-        self.q = QNetwork(state_space, action_num,action_scale).to(device)
-        self.target_q = QNetwork(state_space, action_num,action_scale).to(device)
+        self.q = QNetwork(state_space, action_num,action_scale, s1, s2, s3, leaky).to(device)
+        self.target_q = QNetwork(state_space, action_num,action_scale, s1, s2, s3, leaky).to(device)
         self.target_q.load_state_dict(self.q.state_dict())
 
         self.optimizer = optim.AdamW([\
@@ -48,11 +48,11 @@ class BQN(nn.Module):
                     'modelB_state_dict': self.target_q.state_dict(),
                     'optimizerA_state_dict': self.optimizer.state_dict()
                     }, "./models/gem5model"+str(name))
-        torch.save({
-                    'modelA_state_dict': self.q.state_dict(),
-                    'modelB_state_dict': self.target_q.state_dict(),
-                    'optimizerA_state_dict': self.optimizer.state_dict()
-                    }, "./gem5model_latest")
+        # torch.save({
+                    # 'modelA_state_dict': self.q.state_dict(),
+                    # 'modelB_state_dict': self.target_q.state_dict(),
+                    # 'optimizerA_state_dict': self.optimizer.state_dict()
+                    # }, "./gem5model_latest")
     
     def load_model(self):
         checkpoint = torch.load(("/home/ml/test/BipedalWalker-BranchingDQN/gem5model"))
