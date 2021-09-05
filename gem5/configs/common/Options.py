@@ -152,6 +152,15 @@ def addNoISAOptions(parser):
     parser.add_option("--model", type="string", default="baseline",
         help="mode of simulation: baseline, multi, RL, random" )
         
+    parser.add_option("-D", "--degrees", action="store", default=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        help="Set of degrees")
+    parser.add_option("--alternate", action="store_true", 
+        help="Alternate between high-degree to low-degree" )
+    parser.add_option("--low", action="store_true", 
+        help="Alternate between high-degree to low-degree" )
+    
+    parser.add_option("--binspath", action="store", type="string")
+    
     # Enable Ruby
     parser.add_option("--ruby", action="store_true")
 
