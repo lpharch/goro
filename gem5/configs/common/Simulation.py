@@ -475,6 +475,21 @@ def read_state(testsys, np, app, timestamp):
         values.append(v)
     df = pd.DataFrame(values, index=keys,  columns =[app+"_"+str(timestamp)])
     return df.T, values
+
+def set_Degree(testsys, degree, np):
+    L1_prefetcher_count = 2
+    L2_prefetcher_count = 2
+    L3_prefetcher_count = 3
+    idx = 0
+    for i in range(np):
+        for p in range(L1_prefetcher_count):
+            m5.setL1RLDegree(testsys, i, degree[idx], p)
+        for p in range(L2_prefetcher_count):
+            m5.setL2RLDegree(testsys, i, degree[idx], p)
+    for p in range(L3_prefetcher_count):
+        m5.setL3RLDegree(testsys, degree[idx], p)
+
+            
         
 def apply_degree(testsys, options, state):
     degrees = []
@@ -491,75 +506,23 @@ def apply_degree(testsys, options, state):
                   "Core3.L2.P0.degree", "Core3.L2.P1.degree",
                   "LLC.P0.degree", "LLC.P1.degree", "LLC.P2.degree"   
                  ]
-    L1_prefetcher_count = 2
-    L2_prefetcher_count = 2
-    L3_prefetcher_count = 3
+    
     if(mode =="baseline"):
-        for i in range(np):
-            # system, core_num, action, index
-            degree = [1, 0]
-            for p in range(L2_prefetcher_count):
-                m5.setL1RLDegree(testsys, i, degree[p], p)
-                degrees.append(degree[p])
-            for p in range(L1_prefetcher_count):
-                m5.setL2RLDegree(testsys, i, degree[p], p)
-                degrees.append(degree[p])
-        for p in range(L1_prefetcher_count):
-            L3_degree = [1,0,0]
-            m5.setL3RLDegree(testsys, L3_degree[p], p)
-            degrees.append(L3_degree[p])
+        degrees = [1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0,0]
+        set_Degree(testsys, degrees, np)
     elif(mode =="multi"):
-        for i in range(np):
-            # system, core_num, action, index
-            for p in range(L2_prefetcher_count):
-                m5.setL1RLDegree(testsys, i, 1, p)
-                degrees.append(1)
-            for p in range(L1_prefetcher_count):
-                m5.setL2RLDegree(testsys, i, 1, p)
-                degrees.append(1)
-        for p in range(L1_prefetcher_count):
-            m5.setL3RLDegree(testsys, 1, p)
-            degrees.append(1)
+        degrees = [1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1,1]
+        set_Degree(testsys, degrees, np)
     elif(mode =="multid4"):
-        for i in range(np):
-            # system, core_num, action, index
-            for p in range(L2_prefetcher_count):
-                m5.setL1RLDegree(testsys, i, 4, p)
-                degrees.append(4)
-            for p in range(L1_prefetcher_count):
-                m5.setL2RLDegree(testsys, i, 4, p)
-                degrees.append(4)
-        for p in range(L1_prefetcher_count):
-            m5.setL3RLDegree(testsys, 4, p)
-            degrees.append(4)
+        degrees = [4,4, 4,4, 4,4, 4,4, 4,4, 4,4, 4,4, 4,4, 4,4,4]
+        set_Degree(testsys, degrees, np)
     elif(mode =="nopf"):
-        for i in range(np):
-            # system, core_num, action, index
-            for p in range(L2_prefetcher_count):
-                m5.setL1RLDegree(testsys, i, 0, p)
-                degrees.append(0)
-            for p in range(L1_prefetcher_count):
-                m5.setL2RLDegree(testsys, i, 0, p)
-                degrees.append(0)
-        for p in range(L1_prefetcher_count):
-            m5.setL3RLDegree(testsys, 0, p)
-            degrees.append(0)
+        degrees = [0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0,0]
+        set_Degree(testsys, degrees, np)
     elif(mode == "random"):
-        for i in range(np):
-            # system, core_num, action, index
-            for p in range(L1_prefetcher_count): # There are 2 prefetchers per level
-                l1_degree = randint(0, 5)
-                degrees.append(l1_degree)
-                m5.setL1RLDegree(testsys, i, l1_degree, p)
-            for p in range(L2_prefetcher_count): # There are 2 prefetchers per level    
-                l2_degree = randint(0, 5)
-                degrees.append(l2_degree)
-                m5.setL2RLDegree(testsys, i, l2_degree, p)
-                
-        for p in range(L3_prefetcher_count): # There are 3 prefetchers per level
-            degree = randint(0, 5)
-            degrees.append(degree)
-            m5.setL3RLDegree(testsys, degree, p)
+        for i in range(19):
+            degrees.append(randint(0, 5))
+        set_Degree(testsys, degrees, np)
     elif(mode == "custom"):
         degree_s = (options.degrees).split(",")
         degrees_custom = []
@@ -569,70 +532,20 @@ def apply_degree(testsys, options, state):
         if(options.alternate):
             global high_degree
             if(high_degree):
-                for i in range(np):
-                    # system, core_num, action, index
-                    for p in range(L1_prefetcher_count): # There are 2 prefetchers per level
-                        l1_degree = 5
-                        degrees.append(l1_degree)
-                        m5.setL1RLDegree(testsys, i, l1_degree, p)
-                    for p in range(L2_prefetcher_count): # There are 2 prefetchers per level    
-                        l2_degree = 5
-                        degrees.append(l2_degree)
-                        m5.setL2RLDegree(testsys, i, l2_degree, p)
-                        
-                for p in range(L3_prefetcher_count): # There are 3 prefetchers per level
-                    degree = 5
-                    degrees.append(degree)
-                    m5.setL3RLDegree(testsys, degree, p)
+                degrees = [4,4, 4,4, 4,4, 4,4, 4,4, 4,4, 4,4, 4,4, 4,4,4]
+                set_Degree(testsys, degrees, np)
             else:
-                idx = 0
-                
-                for i in range(np):
-                    # system, core_num, action, index
-                    for p in range(L1_prefetcher_count): # There are 2 prefetchers per level
-                      
-                        l1_degree = degrees_custom[idx]
-                        degrees.append(l1_degree)
-                        m5.setL1RLDegree(testsys, i, l1_degree, p)
-                        idx += 1
-                        
-                    for p in range(L2_prefetcher_count): # There are 2 prefetchers per level    
-                        
-                        l2_degree = degrees_custom[idx]
-                        degrees.append(l2_degree)
-                        m5.setL2RLDegree(testsys, i, l2_degree, p)
-                        idx += 1
-                        
-                for p in range(L3_prefetcher_count): # There are 3 prefetchers per level
-                    degree = degrees_custom[idx]
-                    degrees.append(degree)
-                    m5.setL3RLDegree(testsys, degree, p)
-                    idx += 1
-                    
+                degrees = degrees_custom
+                set_Degree(testsys, degrees, np)
         else:
-            idx = 0
-            for i in range(np):
-                # system, core_num, action, index
-                for p in range(L1_prefetcher_count): # There are 2 prefetchers per level
-                    l1_degree = degrees_custom[idx]
-                    degrees.append(l1_degree)
-                    m5.setL1RLDegree(testsys, i, l1_degree, p)
-                    idx += 1
-                for p in range(L2_prefetcher_count): # There are 2 prefetchers per level    
-                    l2_degree = degrees_custom[idx]
-                    degrees.append(l2_degree)
-                    m5.setL2RLDegree(testsys, i, l2_degree, p)
-                    idx += 1
-            for p in range(L3_prefetcher_count): # There are 3 prefetchers per level
-                degree = degrees_custom[idx]
-                degrees.append(degree)
-                m5.setL3RLDegree(testsys, degree, p)
-                idx += 1
+            degrees = degrees_custom
+            set_Degree(testsys, degrees, np)
             
     elif(mode == "RL"):
         degrees = take_action(state, options)
+        set_Degree(testsys, degrees, np)
     else:
-        print("No specific action to take")
+        print("No specific optins for actions")
     actions = (pd.DataFrame(degrees, index=components, columns =['degrees'])).T
     return actions
             
@@ -661,8 +574,11 @@ def restoreSimpointCheckpoint_inference(options, testsys):
     name = options.app
     df = pd.DataFrame()
     model_name = options.model
-    
+    degrees = [1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0,0]
+    set_Degree(testsys, degrees, np)
     testsys.switch_cpus[0].setMaxInst(options.sample_length)
+    
+            
     exit_event = m5.simulate()
     exit_cause = exit_event.getCause()
     print("exit_cause", exit_cause)
@@ -676,9 +592,20 @@ def restoreSimpointCheckpoint_inference(options, testsys):
         m5.simulate(1000)
         testsys.switch_cpus[0].setMaxInst(options.sample_length)
         actions = apply_degree(testsys, options, state_val)
-        # df = df.append(state_df)
         exit_event = m5.simulate()
-        state, state_val = read_state(testsys, np, options.app, 0)
+        next_state, next_state_val = read_state(testsys, np, options.app, 0)
+        df1 = dataset_create(state, next_state, actions, name+"."+str(sample))
+        df1["IPC_now"] = (df1["NS_core0.numSimulatedInsts"]/df1["NS_core0.numCycles"]) + (df1["NS_core1.numSimulatedInsts"]/df1["NS_core1.numCycles"]) + \
+                                  (df1["NS_core2.numSimulatedInsts"]/df1["NS_core2.numCycles"]) + (df1["NS_core3.numSimulatedInsts"]/df1["NS_core3.numCycles"])
+      
+        df1["IPC_then"] = (df1["S_core0.numSimulatedInsts"]/df1["S_core0.numCycles"]) + (df1["S_core1.numSimulatedInsts"]/df1["S_core1.numCycles"]) + \
+                                  (df1["S_core2.numSimulatedInsts"]/df1["S_core2.numCycles"]) + (df1["S_core3.numSimulatedInsts"]/df1["S_core3.numCycles"])
+      
+        df1["reward"] = df1["IPC_now"] - df1["IPC_then"]
+        print("Reward: ", df1['reward'].iloc[0])
+        
+        state = next_state
+        state_val = next_state_val
         exit_cause = exit_event.getCause()
         print("--------ITR DONE-------------",  exit_cause)
     
@@ -1047,7 +974,9 @@ def run(options, root, testsys, cpu_class):
             restoreSimpointCheckpoint_inference(options, testsys)
         
         else:
-            print("--------Inference----")
+            print("--------Normal----")
+            actions = apply_degree(testsys, options, NULL)
+            print("actions: ", actions)
             restoreSimpointCheckpoint()
 
     else:
@@ -1063,13 +992,13 @@ def run(options, root, testsys, cpu_class):
                                       maxtick, options.repeat_switch)
         else:
             print("----------Here")
-            m5.simulate(10000000)
-            state, state_val = read_state(testsys, np, options.app, 0)
-            take_action(state_val, options)
-            m5.simulate(10000000)
-            state, state_val = read_state(testsys, np, options.app, 0)
-            take_action(state_val, options)
-            
+            # m5.simulate(10000000)
+            # state, state_val = read_state(testsys, np, options.app, 0)
+            # take_action(state_val, options)
+            # m5.simulate(10000000)
+            # state, state_val = read_state(testsys, np, options.app, 0)
+            # take_action(state_val, options)
+            actions = apply_degree(testsys, options, NULL)
             exit_event = benchCheckpoints(options, maxtick, cptdir)
 
     print('Exiting @ tick %i because %s' %
