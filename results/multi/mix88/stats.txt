@@ -4,13 +4,13 @@ simSeconds                                   0.021791                       # Nu
 simTicks                                  21790813044                       # Number of ticks simulated (Tick)
 finalTick                                8463515229624                       # Number of ticks from beginning of simulation (restored from checkpoints and never reset) (Tick)
 simFreq                                  1000000000000                       # The number of ticks per simulated second ((Tick/Second))
-hostSeconds                                   6304.15                       # Real time elapsed on the host (Second)
-hostTickRate                                  3456581                       # The number of ticks simulated per host second (ticks/s) ((Tick/Second))
-hostMemory                                   67914900                       # Number of bytes of host memory used (Byte)
+hostSeconds                                   6672.44                       # Real time elapsed on the host (Second)
+hostTickRate                                  3265795                       # The number of ticks simulated per host second (ticks/s) ((Tick/Second))
+hostMemory                                   71671736                       # Number of bytes of host memory used (Byte)
 simInsts                                    384745732                       # Number of instructions simulated (Count)
 simOps                                      431120038                       # Number of ops (including micro ops) simulated (Count)
-hostInstRate                                    61031                       # Simulator instruction rate (inst/s) ((Count/Second))
-hostOpRate                                      68387                       # Simulator op (including micro ops) rate (op/s) ((Count/Second))
+hostInstRate                                    57662                       # Simulator instruction rate (inst/s) ((Count/Second))
+hostOpRate                                      64612                       # Simulator op (including micro ops) rate (op/s) ((Count/Second))
 system.bridge.power_state.pwrStateResidencyTicks::UNDEFINED 8463515229624                       # Cumulative time (in ticks) in various power states (Tick)
 system.clk_domain.clock                          1000                       # Clock period in ticks (Tick)
 system.cpu0.numCycles                               0                       # Number of cpu cycles simulated (Cycle)
@@ -5267,39 +5267,39 @@ system.l3.tags.ratioOccsTaskId::1024         0.080471                       # Ra
 system.l3.tags.tagAccesses                  119871509                       # Number of tag accesses (Count)
 system.l3.tags.dataAccesses                 119871509                       # Number of data accesses (Count)
 system.l3.tags.power_state.pwrStateResidencyTicks::UNDEFINED 8463515229624                       # Cumulative time (in ticks) in various power states (Tick)
-system.mem_ctrls.avgPriority_writebacks::samples    829799.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_cpu0.dcache.prefetcher.prefetchers0::samples         4.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_cpu0.dcache.prefetcher.prefetchers1::samples       108.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_cpu0.l2cache.prefetcher.prefetchers0::samples         4.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_cpu0.l2cache.prefetcher.prefetchers1::samples         3.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_cpu1.dcache.prefetcher.prefetchers0::samples    298867.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_cpu1.dcache.prefetcher.prefetchers1::samples     70587.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_cpu1.l2cache.prefetcher.prefetchers0::samples      2510.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_cpu1.l2cache.prefetcher.prefetchers1::samples        80.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_cpu2.dcache.prefetcher.prefetchers0::samples     19994.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_cpu2.dcache.prefetcher.prefetchers1::samples      8436.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_cpu2.l2cache.prefetcher.prefetchers0::samples       665.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_cpu3.dcache.prefetcher.prefetchers0::samples      8906.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_cpu3.dcache.prefetcher.prefetchers1::samples    276142.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_cpu3.l2cache.prefetcher.prefetchers0::samples       655.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_cpu3.l2cache.prefetcher.prefetchers1::samples        10.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_l3.prefetcher.prefetchers0::samples    175567.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_l3.prefetcher.prefetchers1::samples   1073268.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_l3.prefetcher.prefetchers2::samples    463893.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_switch_cpus0.inst::samples        11.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_switch_cpus0.data::samples        11.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_switch_cpus1.inst::samples       145.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_switch_cpus1.data::samples     72511.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_switch_cpus1.mmu.dtb.walker::samples      1854.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_switch_cpus1.mmu.itb.walker::samples         9.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_switch_cpus2.inst::samples        12.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_switch_cpus2.data::samples      2535.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_switch_cpus2.mmu.dtb.walker::samples       145.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_switch_cpus2.mmu.itb.walker::samples         2.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_switch_cpus3.inst::samples      1974.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_switch_cpus3.data::samples    102045.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_switch_cpus3.mmu.dtb.walker::samples     20759.00                       # Average QoS priority value for accepted requests
-system.mem_ctrls.avgPriority_switch_cpus3.mmu.itb.walker::samples       247.00                       # Average QoS priority value for accepted requests
+system.mem_ctrls.avgPriority_writebacks::samples    829799.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_cpu0.dcache.prefetcher.prefetchers0::samples         4.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_cpu0.dcache.prefetcher.prefetchers1::samples       108.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_cpu0.l2cache.prefetcher.prefetchers0::samples         4.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_cpu0.l2cache.prefetcher.prefetchers1::samples         3.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_cpu1.dcache.prefetcher.prefetchers0::samples    298867.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_cpu1.dcache.prefetcher.prefetchers1::samples     70587.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_cpu1.l2cache.prefetcher.prefetchers0::samples      2510.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_cpu1.l2cache.prefetcher.prefetchers1::samples        80.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_cpu2.dcache.prefetcher.prefetchers0::samples     19994.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_cpu2.dcache.prefetcher.prefetchers1::samples      8436.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_cpu2.l2cache.prefetcher.prefetchers0::samples       665.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_cpu3.dcache.prefetcher.prefetchers0::samples      8906.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_cpu3.dcache.prefetcher.prefetchers1::samples    276142.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_cpu3.l2cache.prefetcher.prefetchers0::samples       655.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_cpu3.l2cache.prefetcher.prefetchers1::samples        10.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_l3.prefetcher.prefetchers0::samples    175567.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_l3.prefetcher.prefetchers1::samples   1073268.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_l3.prefetcher.prefetchers2::samples    463893.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_switch_cpus0.inst::samples        11.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_switch_cpus0.data::samples        11.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_switch_cpus1.inst::samples       145.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_switch_cpus1.data::samples     72511.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_switch_cpus1.mmu.dtb.walker::samples      1854.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_switch_cpus1.mmu.itb.walker::samples         9.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_switch_cpus2.inst::samples        12.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_switch_cpus2.data::samples      2535.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_switch_cpus2.mmu.dtb.walker::samples       145.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_switch_cpus2.mmu.itb.walker::samples         2.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_switch_cpus3.inst::samples      1974.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_switch_cpus3.data::samples    102045.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_switch_cpus3.mmu.dtb.walker::samples     20759.00                       # Average QoS priority value for accepted requests (Count)
+system.mem_ctrls.avgPriority_switch_cpus3.mmu.itb.walker::samples       247.00                       # Average QoS priority value for accepted requests (Count)
 system.mem_ctrls.priorityMinLatency      0.000000017492                       # per QoS priority minimum request to response latency (Second)
 system.mem_ctrls.priorityMaxLatency      0.000021105856                       # per QoS priority maximum request to response latency (Second)
 system.mem_ctrls.numReadWriteTurnArounds        44181                       # Number of turnarounds from READ to WRITE (Count)
