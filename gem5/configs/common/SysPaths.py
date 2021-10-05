@@ -48,7 +48,7 @@ class PathSearchFunc(object):
                 try:
                     paths = os.environ[self.environment_variable].split(':')
                 except KeyError:
-                    paths = [ '/dist/m5/system', '/work2/05330/jalili/stampede2/goro/disks' ]
+                    paths = [ '/dist/m5/system', '/home/cc/disks' ]
 
                 # expand '~' and '~user' in paths
                 paths = list(map(os.path.expanduser, paths))
