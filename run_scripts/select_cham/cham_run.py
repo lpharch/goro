@@ -7,10 +7,10 @@ mixes_per_node = 2
 
 simpts = "/home/cc/mixes"
 gem5 = "/home/cc/goro/gem5"
-results = "/home/cc/goro/results/"
-output = "/home/cc/goro/outputs/"
+results = "/home/cc/goro/results"
+output = "/home/cc/goro/outputs"
 
-simulation="baseline"
+simulation="multid4"
 
 dir = results+simulation
 if os.path.exists(dir):

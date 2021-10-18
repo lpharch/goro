@@ -56,8 +56,14 @@ import pandas as pd
 import torch
 import numpy as np
 from common import network
+from multiprocessing.connection import Client
+import time
 
+import pickle
 high_degree = True
+
+
+
 
 def tic():
     #Homemade version of matlab tic and toc functions
@@ -409,11 +415,12 @@ def takeSimpointCheckpoints(simpoints, interval_length, cptdir):
     print("%d checkpoints taken" % num_checkpoints)
     sys.exit(code)
 
-def take_action(state, options):
+def take_action(state1, options):
+    state = [None] * len(state1)
     model_name = options.model
     state_space  = 65
     action_space = 19
-    action_scale = 6
+    action_scale = 2
     acc = []
     # need to quantize the state first
     bins_file = open(options.binspath, 'r')
@@ -424,17 +431,17 @@ def take_action(state, options):
         bins = line.split(" ")
         found_bin = False
         for b in range(1, len(bins)-1):
-            if(state[count] >= float(bins[b]) and state[count] < float(bins[b+1]) ):
+            if(state1[count] >= float(bins[b]) and state1[count] < float(bins[b+1]) ):
                 found_bin = True
                 state[count] = b
                 break
         if(not found_bin):
-            if(state[count] > state[len(bins)-1]):
+            if(state1[count] > state1[len(bins)-1]):
                 state[count] = len(bins) - 1
             else:
                 state[count] = 0
         count += 1
-    q_model = network.QNetwork(state_space, action_space, action_scale)
+    q_model = network.QNetwork(state_space, action_space, action_scale, 1, 1, 1, 0.95)
     checkpoint = torch.load((model_name), map_location=torch.device('cpu'))
     q_model.load_state_dict(checkpoint['modelA_state_dict'])
         
@@ -544,10 +551,13 @@ def apply_degree(testsys, options, state):
     elif(mode == "RL"):
         degrees = take_action(state, options)
         set_Degree(testsys, degrees, np)
+    elif(mode == "Real"):
+        degrees = state
+        set_Degree(testsys, degrees, np)
     else:
         print("No specific optins for actions")
     actions = (pd.DataFrame(degrees, index=components, columns =['degrees'])).T
-    return actions
+    return actions, degrees
             
 def restoreSimpointCheckpoint():
     exit_event = m5.simulate()
@@ -567,6 +577,64 @@ def restoreSimpointCheckpoint():
 
     print('Exiting @ tick %i because %s' % (m5.curTick(), exit_cause))
     sys.exit(exit_event.getCode())
+
+def restoreSimpointCheckpoint_real(options, testsys):
+    print("******Running the model every ", options.sample_length)
+    address_action = ('localhost', 6000)
+    address_entry = ('localhost', 7000)
+
+    np = options.num_cpus
+    name = options.app
+    df = pd.DataFrame()
+    model_name = options.model
+    degrees = [1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0,0]
+    set_Degree(testsys, degrees, np)
+    testsys.switch_cpus[0].setMaxInst(options.sample_length)
+    # testsys.cpu[0].setMaxInst(options.sample_length)
+    
+            
+    exit_event = m5.simulate()
+    exit_cause = exit_event.getCause()
+    print("exit_cause", exit_cause)
+    state, state_val = read_state(testsys, np, options.app, 0)
+    m5.stats.reset()
+    print("Warmup done")
+    
+    
+    for sample in range(0, options.num_sample):
+        print("***********Sample ", sample)
+        m5.simulate(1000)
+        # testsys.switch_cpus[0].setMaxInst(options.sample_length)
+        # testsys.cpu[0].setMaxInst(options.sample_length)
+        # print("Sending state to the server")
+        conn = Client(address_action, authkey=b'secret password')
+        conn.send(pickle.dumps(state_val))
+        data = conn.recv()
+        new_action = pickle.loads(data)
+        print("got action:", new_action)
+        conn.close()
+        
+
+        actions, actions_val = apply_degree(testsys, options, new_action)
+        exit_event = m5.simulate()
+        
+        next_state, next_state_val = read_state(testsys, np, options.app, 0)
+        
+        print("Sending state to the server")
+        entry = []
+        entry.append(state_val)
+        entry.append(next_state_val)
+        entry.append(new_action)
+        conn = Client(address_entry, authkey=b'secret password')
+        conn.send(pickle.dumps(entry))
+        conn.close()
+        state = next_state
+        state_val = next_state_val
+        exit_cause = exit_event.getCause()
+        print("--------ITR DONE-------------",  exit_cause)
+    
+   
+    sys.exit(0)
 
 def restoreSimpointCheckpoint_inference(options, testsys):
     print("******Running the model every ", options.sample_length)
@@ -633,7 +701,7 @@ def restoreSimpointCheckpoint_train(options, testsys):
         print("***********Sample ", sample)
         m5.simulate(1000)
         testsys.switch_cpus[0].setMaxInst(options.sample_length)
-        actions  = apply_degree(testsys, options, NULL)
+        actions, _ = apply_degree(testsys, options, NULL)
         high_degree = not high_degree
         exit_event = m5.simulate()
         exit_cause = exit_event.getCause()
@@ -972,10 +1040,12 @@ def run(options, root, testsys, cpu_class):
         elif(options.inference):
             print("--------inference----")
             restoreSimpointCheckpoint_inference(options, testsys)
-        
+        elif(options.real):
+            print("--------real----")
+            restoreSimpointCheckpoint_real(options, testsys)
         else:
             print("--------Normal----")
-            actions = apply_degree(testsys, options, NULL)
+            actions, _ = apply_degree(testsys, options, NULL)
             print("actions: ", actions)
             restoreSimpointCheckpoint()
 
@@ -991,14 +1061,10 @@ def run(options, root, testsys, cpu_class):
             exit_event = repeatSwitch(testsys, repeat_switch_cpu_list,
                                       maxtick, options.repeat_switch)
         else:
+            # print("--------real----")
+            # restoreSimpointCheckpoint_real(options, testsys)
             print("----------Here")
-            # m5.simulate(10000000)
-            # state, state_val = read_state(testsys, np, options.app, 0)
-            # take_action(state_val, options)
-            # m5.simulate(10000000)
-            # state, state_val = read_state(testsys, np, options.app, 0)
-            # take_action(state_val, options)
-            actions = apply_degree(testsys, options, NULL)
+            actions, _ = apply_degree(testsys, options, NULL)
             exit_event = benchCheckpoints(options, maxtick, cptdir)
 
     print('Exiting @ tick %i because %s' %
