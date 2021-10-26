@@ -1881,7 +1881,7 @@ FullO3CPU<Impl>::state_builder()
 	vector<double > committed_insts;
 	cpuStats.committedInsts.value(committed_insts);
 	tot_inst += std::accumulate(committed_insts.begin(), committed_insts.end(), 0);
-	a.push_back(rob.stats.reads.value() - tmp_loc[1]);
+	a.push_back(tot_inst - tmp_loc[1]);
 	tmp_loc[1] = tot_inst;
 	
 	a.push_back(num_cycles);

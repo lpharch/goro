@@ -164,6 +164,8 @@ Queued::notify(const PacketPtr &pkt, const PrefetchInfo &pfi)
     // Calculate prefetches given this access
     std::vector<AddrPriority> addresses;
 	if(RLdegree > 0 ){
+		// cout<<name()<<" RLdegree:"<<RLdegree<<endl;
+
 		calculatePrefetch(pfi, addresses);	
 		for (AddrPriority& addr_prio : addresses) {
 			for(int d = 1 ; d <= RLdegree; d++){

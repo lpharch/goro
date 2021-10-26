@@ -488,15 +488,19 @@ def set_Degree(testsys, degree, np):
     L2_prefetcher_count = 2
     L3_prefetcher_count = 3
     idx = 0
+    st = ""
     for i in range(np):
         for p in range(L1_prefetcher_count):
             m5.setL1RLDegree(testsys, i, degree[idx], p)
+            st += "L1.P"+str(p)+": "+str(degree[idx])
             idx += 1
         for p in range(L2_prefetcher_count):
             m5.setL2RLDegree(testsys, i, degree[idx], p)
+            st += "L2.P"+str(p)+": "+str(degree[idx])
             idx += 1
     for p in range(L3_prefetcher_count):
         m5.setL3RLDegree(testsys, degree[idx], p)
+        st += "L3.P"+str(p)+": "+str(degree[idx])
         idx += 1
 
             
@@ -631,6 +635,9 @@ def restoreSimpointCheckpoint_real(options, testsys):
         
         next_state, next_state_val = read_state(testsys, np, options.app, 0)
         
+        m5.stats.dump()
+        
+        # if(sample > 2 and state_val[2]>10000 and state_val[3]>10000 and next_state_val[2]>10000 and next_state_val[3]>10000):
         if(sample > 2):
             print("Sending state to the server")
             entry = []
