@@ -36,7 +36,8 @@ output += simulation
 
 all_mixes = os.listdir(simpts)
 
-os.system("ts -S 40")
+os.system("tsp -S 26")
+
 
 for app in (all_mixes):
     cmd = ""
@@ -57,10 +58,12 @@ for app in (all_mixes):
     cmd += ("-n 4 ")
     cmd += ("--mode Real ")
     cmd += ("--real ")
+    cmd += ("--sample_length 500000 ")
+    cmd += ("--num_sample 200 ")
     cmd += ("--binspath /home/cc/bins/bins_levels_32.bins ")
     cmd += ("--app "+app+"."+simulation+" ")
     cmd += (" > " + output + "/" + app + ".out")
     
-    
-    print("cmd", cmd)    
-    os.system("tsp " + cmd)
+    st = 'tsp bash -c "' + cmd+'"'
+    print(st)    
+    os.system(st)

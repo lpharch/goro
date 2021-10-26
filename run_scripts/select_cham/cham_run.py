@@ -45,7 +45,7 @@ all_mixes = os.listdir(simpts)
 chunk_counts = int(len(all_mixes) / mixes_per_node)
 app_idx = 0
 # ts -S 3
-os.system("ts -S 32")
+os.system("tsp -S 32")
 
 for app in (all_mixes):
     cmd = ""

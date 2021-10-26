@@ -62,6 +62,10 @@
 #include "sim/stat_control.hh"
 #include "sim/system.hh"
 
+
+//Majid
+#include <numeric>
+
 struct BaseCPUParams;
 
 BaseO3CPU::BaseO3CPU(const BaseCPUParams &params)
@@ -354,7 +358,7 @@ FullO3CPU<Impl>::FullO3CPU(const DerivO3CPUParams &params)
 		this->thread[tid]->setFuncExeInst(0);
 	}
 	
-	for(int i = 0; i <10; i++){
+	for(int i = 0; i <20; i++){
 		tmp_loc.push_back(0);
 	}
 }
@@ -1850,8 +1854,13 @@ template <class Impl>
 vector<double >
 FullO3CPU<Impl>::state_builder()
 {
+	// std::cout<<name()<<std::endl;
 	// std::cout<<"---state_builder---"<<std::endl;
 	// Core related
+	// (-3)  timesIdled
+	// (-2)  numSimulatedInsts
+	// (-1)  numCycles
+	
 	// (0) rob.reads
 	// (1) fetch.cycles
 	// (2) rename.LQFullEvents
@@ -1860,31 +1869,45 @@ FullO3CPU<Impl>::state_builder()
 	// (5) switch_cpus0.numRate
 	// (6) system.switch_cpus0.issueRate
 	
-	uint64_t num_cycles = (baseStats.numCycles.value() - tmp_loc[7]);
-	tmp_loc[7] = baseStats.numCycles.value();
-	
+	uint64_t num_cycles = (baseStats.numCycles.value() - tmp_loc[10]);
+	uint64_t tot_inst = 0;
+	tmp_loc[10] = baseStats.numCycles.value();
 	vector<double> a;
-	a.push_back(rob.stats.reads.value() - tmp_loc[0]);
-	tmp_loc[0] = rob.stats.reads.value();
-	
-	a.push_back(fetch.fetchStats.cycles.value() - tmp_loc[1]);
-	tmp_loc[1] = fetch.fetchStats.cycles.value();
-	
-	a.push_back(rename.stats.LQFullEvents.value() - tmp_loc[2]);
-	tmp_loc[2] = rename.stats.LQFullEvents.value();
-	
-	a.push_back(decode.stats.blockedCycles.value() - tmp_loc[3]);
-	tmp_loc[3] = decode.stats.blockedCycles.value();
-	
-	a.push_back(rename.stats.unblockCycles.value() - tmp_loc[4]);
-	tmp_loc[4] = rename.stats.unblockCycles.value();
-	
-	a.push_back((iew.iewStats.executedInstStats.numInsts.value() - tmp_loc[5])/(num_cycles*1.0));
-	tmp_loc[5] = iew.iewStats.executedInstStats.numInsts.value();
 	
 	
-	a.push_back((iew.instQueue.iqStats.instsIssued.value() - tmp_loc[6])/(num_cycles*1.0));
-	tmp_loc[6] = iew.instQueue.iqStats.instsIssued.value();
+	a.push_back(cpuStats.timesIdled.value() - tmp_loc[0]);
+	tmp_loc[0] = cpuStats.timesIdled.value();
+	
+	vector<double > committed_insts;
+	cpuStats.committedInsts.value(committed_insts);
+	tot_inst += std::accumulate(committed_insts.begin(), committed_insts.end(), 0);
+	a.push_back(rob.stats.reads.value() - tmp_loc[1]);
+	tmp_loc[1] = tot_inst;
+	
+	a.push_back(num_cycles);
+
+	
+	a.push_back(rob.stats.reads.value() - tmp_loc[3]);
+	tmp_loc[3] = rob.stats.reads.value();
+	
+	a.push_back(fetch.fetchStats.cycles.value() - tmp_loc[4]);
+	tmp_loc[4] = fetch.fetchStats.cycles.value();
+	
+	a.push_back(rename.stats.LQFullEvents.value() - tmp_loc[5]);
+	tmp_loc[5] = rename.stats.LQFullEvents.value();
+	
+	a.push_back(decode.stats.blockedCycles.value() - tmp_loc[6]);
+	tmp_loc[6] = decode.stats.blockedCycles.value();
+	
+	a.push_back(rename.stats.unblockCycles.value() - tmp_loc[7]);
+	tmp_loc[7] = rename.stats.unblockCycles.value();
+	
+	a.push_back((iew.iewStats.executedInstStats.numInsts.value() - tmp_loc[8])/(num_cycles*1.0));
+	tmp_loc[8] = iew.iewStats.executedInstStats.numInsts.value();
+	
+	
+	a.push_back((iew.instQueue.iqStats.instsIssued.value() - tmp_loc[9])/(num_cycles*1.0));
+	tmp_loc[9] = iew.instQueue.iqStats.instsIssued.value();
 	
 	
 	return a;

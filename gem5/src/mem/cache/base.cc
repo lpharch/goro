@@ -2847,26 +2847,31 @@ BaseCache::stateBuilder(int core)
 		// (6) system.switch_cpus0.issueRate
 		
 	
-		string core_features[7] = {"rob.reads", "fetch.cycles", "rename.LQFullEvents", "decode.blockedCycles", "rename.unblockCycles",
+		string core_features[10] = {"timesIdled", "numSimulatedInsts", "numCycles", "rob.reads", "fetch.cycles", "rename.LQFullEvents", "decode.blockedCycles", "rename.unblockCycles",
 								"switch_cpus0.numRate", "system.switch_cpus0.issueRate"};
-		BaseCPU *bcpu = dynamic_cast<BaseCPU * >(system->threads[core]->getCpuPtr());
+		// BaseCPU *bcpu = dynamic_cast<BaseCPU * >(system->threads[core]->getCpuPtr());
         FullO3CPU<O3CPUImpl> *o3cpu = dynamic_cast<FullO3CPU<O3CPUImpl> * >(system->threads[core]->getCpuPtr());
-		// totStates.push_back(o3cpu->cpuStats.timesIdled.value());
-		totStates["timesIdled"] = (o3cpu->cpuStats.timesIdled.value());
+		// totStates["timesIdled"] = (o3cpu->cpuStats.timesIdled.value());
 		
-		// totStates.push_back(bcpu->numSimulatedInsts()-lastInst);
-		totStates["numSimulatedInsts"] = (bcpu->numSimulatedInsts()-lastInst);
-        lastInst = bcpu->numSimulatedInsts();
 		
-		uint64_t num_cycles = bcpu->baseStats.numCycles.value();
-        uint64_t num_cycles_epoch = num_cycles - tmp_loc[3];
-		totStates["numCycles"] = (num_cycles_epoch);
-		tmp_loc[3] = num_cycles;
+		// totStates["numSimulatedInsts"] = (bcpu->numSimulatedInsts()-lastInst);
+        // lastInst = bcpu->numSimulatedInsts();
+		
+		
+		// committedInsts
+		
+		// uint64_t num_cycles = bcpu->baseStats.numCycles.value();
+        // uint64_t num_cycles_epoch = num_cycles - tmp_loc[3];
+		// totStates["numCycles"] = (num_cycles_epoch);
+		// tmp_loc[3] = num_cycles;
 		
 		vector<double > core_related = o3cpu->state_builder();
+		// cout<<"core_related"<<endl;
 		for(int i = 0 ; i < core_related.size(); i++ ){
 			// totStates.push_back(core_related[i]);
 			totStates[core_features[i]] = (core_related[i]);
+			// cout<<core_features[i]<<":"<<core_related[i]<<endl;
+			
 		}
 		// Page Walker
 		// mmu.dtb.writeMisses

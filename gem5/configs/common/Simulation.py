@@ -58,11 +58,11 @@ import numpy as np
 from common import network
 from multiprocessing.connection import Client
 import time
-
+import zmq
 import pickle
 high_degree = True
 
-
+torch.set_num_threads(4)
 
 
 def tic():
@@ -491,10 +491,13 @@ def set_Degree(testsys, degree, np):
     for i in range(np):
         for p in range(L1_prefetcher_count):
             m5.setL1RLDegree(testsys, i, degree[idx], p)
+            idx += 1
         for p in range(L2_prefetcher_count):
             m5.setL2RLDegree(testsys, i, degree[idx], p)
+            idx += 1
     for p in range(L3_prefetcher_count):
         m5.setL3RLDegree(testsys, degree[idx], p)
+        idx += 1
 
             
         
@@ -580,8 +583,15 @@ def restoreSimpointCheckpoint():
 
 def restoreSimpointCheckpoint_real(options, testsys):
     print("******Running the model every ", options.sample_length)
-    address_action = ('localhost', 6000)
-    address_entry = ('localhost', 7000)
+    # address_action = ('localhost', 6000)
+    # address_entry = ('localhost', 7000)
+    context_action = zmq.Context()
+    socket_action = context_action.socket(zmq.REQ)
+    socket_action.connect("tcp://localhost:5555")
+    
+    context_entry = zmq.Context()
+    socket_entry = context_entry.socket(zmq.REQ)
+    socket_entry.connect("tcp://localhost:5556")
 
     np = options.num_cpus
     name = options.app
@@ -604,30 +614,38 @@ def restoreSimpointCheckpoint_real(options, testsys):
     for sample in range(0, options.num_sample):
         print("***********Sample ", sample)
         m5.simulate(1000)
-        # testsys.switch_cpus[0].setMaxInst(options.sample_length)
-        # testsys.cpu[0].setMaxInst(options.sample_length)
-        # print("Sending state to the server")
-        conn = Client(address_action, authkey=b'secret password')
-        conn.send(pickle.dumps(state_val))
-        data = conn.recv()
-        new_action = pickle.loads(data)
+
+
+        socket_action.send(pickle.dumps(state_val))
+        new_action = pickle.loads(socket_action.recv())
+        
         print("got action:", new_action)
-        conn.close()
+
         
 
         actions, actions_val = apply_degree(testsys, options, new_action)
+        print("ITR sim started")
+        testsys.switch_cpus[0].setMaxInst(options.sample_length)
         exit_event = m5.simulate()
+        print("ITR sim ended")
         
         next_state, next_state_val = read_state(testsys, np, options.app, 0)
         
-        print("Sending state to the server")
-        entry = []
-        entry.append(state_val)
-        entry.append(next_state_val)
-        entry.append(new_action)
-        conn = Client(address_entry, authkey=b'secret password')
-        conn.send(pickle.dumps(entry))
-        conn.close()
+        if(sample > 2):
+            print("Sending state to the server")
+            entry = []
+            entry.append(state_val)
+            print("state_val")
+            print(state_val[2:4])
+            entry.append(next_state_val)
+            print("next_state_val")
+            print(next_state_val[2:4])
+            entry.append(new_action)
+            entry.append(name)
+            entry.append(str(sample))
+            socket_entry.send(pickle.dumps(entry))
+            print("gem5: ", socket_entry.recv())
+        
         state = next_state
         state_val = next_state_val
         exit_cause = exit_event.getCause()
@@ -1063,9 +1081,18 @@ def run(options, root, testsys, cpu_class):
         else:
             # print("--------real----")
             # restoreSimpointCheckpoint_real(options, testsys)
-            print("----------Here")
-            actions, _ = apply_degree(testsys, options, NULL)
+            print("----------Here benchCheckpoints")
+            # actions, _ = apply_degree(testsys, options, NULL)
+            m5.simulate(1000000000)
+            read_state(testsys, 4, "aa", 0)
+            m5.simulate(1000000000)
+            read_state(testsys, 4, "aa", 0)
+            m5.simulate(1000000000)
+            read_state(testsys, 4, "aa", 0)
+            
             exit_event = benchCheckpoints(options, maxtick, cptdir)
+            
+            
 
     print('Exiting @ tick %i because %s' %
           (m5.curTick(), exit_event.getCause()))
