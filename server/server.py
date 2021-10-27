@@ -187,6 +187,7 @@ def train():
             loss = agent.train_model(memory, batch_size, gamma)
             loss_itr += 1
             if(loss_itr%1000000 == 0):
+                agent.save_model("model_"+str(loss_itr))
                 print("Loss:", loss.item())
                 loss_itr = 0
 

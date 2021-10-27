@@ -7,10 +7,10 @@ mixes_per_node = 2
 
 simpts = "/home/cc/mixes"
 gem5 = "/home/cc/goro/gem5"
-results = "/home/cc/goro/results"
-output = "/home/cc/goro/outputs"
+results = "/home/cc/goro/results/"
+output = "/home/cc/goro/outputs/"
 
-simulation="multid4"
+simulation="nopf"
 
 dir = results+simulation
 if os.path.exists(dir):
@@ -45,7 +45,7 @@ all_mixes = os.listdir(simpts)
 chunk_counts = int(len(all_mixes) / mixes_per_node)
 app_idx = 0
 # ts -S 3
-os.system("tsp -S 32")
+os.system("tsp -S 28")
 
 for app in (all_mixes):
     cmd = ""

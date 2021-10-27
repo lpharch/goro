@@ -603,7 +603,7 @@ def restoreSimpointCheckpoint_real(options, testsys):
     model_name = options.model
     degrees = [1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0,0]
     set_Degree(testsys, degrees, np)
-    testsys.switch_cpus[0].setMaxInst(options.sample_length)
+    # testsys.switch_cpus[0].setMaxInst(options.sample_length)
     # testsys.cpu[0].setMaxInst(options.sample_length)
     
             
@@ -635,7 +635,7 @@ def restoreSimpointCheckpoint_real(options, testsys):
         
         next_state, next_state_val = read_state(testsys, np, options.app, 0)
         
-        m5.stats.dump()
+        # m5.stats.dump()
         
         # if(sample > 2 and state_val[2]>10000 and state_val[3]>10000 and next_state_val[2]>10000 and next_state_val[3]>10000):
         if(sample > 2):
