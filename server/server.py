@@ -168,7 +168,7 @@ def get_entry():
         S_core3_IPC = (float(entry[0][45]/(0.000001+entry[0][44])))
         S_core_IPC = (S_core0_IPC+S_core1_IPC+S_core2_IPC+S_core3_IPC)/4
         
-        NS_core0_IPC = (float(entry[1][3]/(0.000001+entry[1][3])))
+        NS_core0_IPC = (float(entry[1][3]/(0.000001+entry[1][2])))
         NS_core1_IPC = (float(entry[1][17]/(0.000001+entry[1][16])))
         NS_core2_IPC = (float(entry[1][31]/(0.000001+entry[1][30])))
         NS_core3_IPC = (float(entry[1][45]/(0.000001+entry[1][44])))
