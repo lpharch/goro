@@ -36,7 +36,7 @@ output += simulation
 
 all_mixes = os.listdir(simpts)
 
-os.system("tsp -S 26")
+os.system("tsp -S 40")
 
 
 for app in (all_mixes):

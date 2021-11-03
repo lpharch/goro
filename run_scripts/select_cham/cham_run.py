@@ -10,7 +10,7 @@ gem5 = "/home/cc/goro/gem5"
 results = "/home/cc/goro/results/"
 output = "/home/cc/goro/outputs/"
 
-simulation="nopf"
+simulation="random"
 
 dir = results+simulation
 if os.path.exists(dir):

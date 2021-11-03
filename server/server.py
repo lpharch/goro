@@ -21,10 +21,12 @@ import random
 import zmq
 
 
+
+
 parser = argparse.ArgumentParser('parameters')
 parser.add_argument('--lr_rate', type=float, default=1e-2, help='learning rate (default : 0.0001)')
 parser.add_argument('--batch_size', type=int, default=32, help='batch size(default : 64)')
-parser.add_argument('--gamma', type=float, default=0.95, help='gamma (default : 0.99)')
+parser.add_argument('--gamma', type=float, default=0.99, help='gamma (default : 0.99)')
 parser.add_argument('--action_scale', type=int, default=2, help='action scale between -1 ~ +1')
 parser.add_argument("--s1", type=int, default = 1, help = 'print interval(default : 1)')
 parser.add_argument("--s2", type=int, default = 1, help = 'print interval(default : 1)')
@@ -85,19 +87,27 @@ if os.path.exists(run_name + "_states"):
     shutil.rmtree(run_name + "_states")
     os.mkdir(run_name + "_states")
 
+def discreate_state(state):
+    medians= [37639, 162213, 397811.5, 500009, 762, 4033, 1026427.5, 1.3813181, 0.006052171, 224, 1.397644496, 0, 642, 4831, 94562.5, 208748.5, 397815, 511950.5, 2959, 13990.5, 1004315.5, 1.31750817, 0.007397685, 1283, 1.329929928, 0, 557, 5475, 109446.5, 222500.5, 397819.5, 428355, 1299, 17049, 923246, 1.209189234, 0.007500427, 3189, 1.222953724, 0, 670, 7917, 107328.5, 232875.5, 397816.5, 455611.5, 2647, 15919, 954401, 1.280788027, 0.007309875, 2324, 1.295223665, 0, 768, 6734.5, 3194, 11547, 266, 109994176.5, 10678, 12263.5, 5297, 25256, 7253]
+    new_state = []
+    for i, s in enumerate(state):
+        if(s> medians[i]):
+            new_state.append(1)
+        else:
+            new_state.append(0)
+    return new_state
+
 def action():
     print("action infinite loop")
     while True:
-        # conn = action_listener.accept()
-        # msg = conn.recv()
         msg = socket_action.recv()
         state = pickle.loads(msg)
         state = [float(i) for i in state]
-        action_to_send = pickle.dumps(agent.action(state, False))
+        state = discreate_state(state)
+        action_to_send = pickle.dumps(agent.action(state, True))
         print("sending an action to gem5")
-        # conn.send(action_to_send)
         socket_action.send(action_to_send)
-    # action_listener.close()
+
 
 
 def get_entry():
@@ -123,7 +133,9 @@ def get_entry():
     with open('all.csv','a') as fd:  
        fd.write(lables)    
        
-           
+    file1 = open("reward.txt", "w")
+    file1.close()
+        
     while True:
         # conn = entry_listener.accept()
         msg = socket_entery.recv()
@@ -159,15 +171,22 @@ def get_entry():
         
         diff = NS_core_IPC-S_core_IPC
         if not np.isnan(diff):
-            reward[0] = diff
-        total_reward += diff
+            if(diff > 0):
+                reward[0] = 1
+            else:
+                reward[0] = -1
+                
+        total_reward += reward[0]
         print(str(entry[3])+" reward", reward, total_reward, memory.size())
         file1 = open("reward.txt", "a")
         st = str(entry[3])+" reward:"+str(reward)+" total_reward:"+str(total_reward)
         file1.write(st+"\n")
         file1.close()
         # print(type(reward), type(reward[0]))
-        memory.write_buffer(entry[0], entry[1], entry[2], reward)
+        memory.write_buffer(discreate_state(entry[0]), discreate_state(entry[1]), entry[2], reward)
+        entry[0] = discreate_state(entry[0])
+        entry[1] = discreate_state(entry[1])
+
         with open('all.csv','a') as fd:
             mystring = str(entry[3])+", "+str(entry[4])+", "
             for x in entry[0]+ entry[1]+ entry[2]+ reward:
@@ -186,7 +205,8 @@ def train():
         if(memory.size() > batch_size):
             loss = agent.train_model(memory, batch_size, gamma)
             loss_itr += 1
-            if(loss_itr%1000000 == 0):
+            
+            if(loss_itr%100000 == 0):
                 agent.save_model("model_"+str(loss_itr))
                 print("Loss:", loss.item())
                 loss_itr = 0

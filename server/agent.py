@@ -43,10 +43,13 @@ class BQN(nn.Module):
             
         if(random()< th1):
             rnd = random()
-            if(rnd< 0.2):
+            if(rnd< 0.25):
                 for _ in range(19):
                     acc.append(0)
-            elif (rnd<0.4):
+            elif(rnd< 0.50):
+                for _ in range(19):
+                    acc.append(1)
+            elif (rnd<0.75):
                 for _ in range(19):
                     acc.append(randint(0, 1))
             else:
@@ -57,10 +60,12 @@ class BQN(nn.Module):
                 acc.append(0)
                 acc.append(0)
         else:
+            # print("-4")
             # print("here***********")
             out =  self.q(torch.tensor(x, dtype=torch.float).to(self.device))
             for tor in out:
                 acc.append(torch.argmax(tor, dim=1)[[0]].item() )
+        # print(acc)
         return acc
     
     def save_model(self, name):
