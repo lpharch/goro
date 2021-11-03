@@ -116,6 +116,8 @@ def get_entry():
     state_strings = ["core0.decode.blockedCycles", "core0.fetch.cycles", "core0.numCycles", "core0.numSimulatedInsts", "core0.rename.LQFullEvents", "core0.rename.unblockCycles", "core0.rob.reads", "core0.switch_cpus0.numRate", "core0.system.cpu0.dcache.ReadReq.mshrMissRate::total", "core0.system.cpu0.dcache.prefetcher.prefetchers1.pfIssued", "core0.system.switch_cpus0.issueRate", "core0.timesIdled", "core0.l2cache.ReadReq.hits::total", "core0.l2cache.demandAccesses::total", "core1.decode.blockedCycles", "core1.fetch.cycles", "core1.numCycles", "core1.numSimulatedInsts", "core1.rename.LQFullEvents", "core1.rename.unblockCycles", "core1.rob.reads", "core1.switch_cpus0.numRate", "core1.system.cpu0.dcache.ReadReq.mshrMissRate::total", "core1.system.cpu0.dcache.prefetcher.prefetchers1.pfIssued", "core1.system.switch_cpus0.issueRate", "core1.timesIdled", "core1.l2cache.ReadReq.hits::total", "core1.l2cache.demandAccesses::total", "core2.decode.blockedCycles", "core2.fetch.cycles", "core2.numCycles", "core2.numSimulatedInsts", "core2.rename.LQFullEvents", "core2.rename.unblockCycles", "core2.rob.reads", "core2.switch_cpus0.numRate", "core2.system.cpu0.dcache.ReadReq.mshrMissRate::total", "core2.system.cpu0.dcache.prefetcher.prefetchers1.pfIssued", "core2.system.switch_cpus0.issueRate", "core2.timesIdled", "core2.l2cache.ReadReq.hits::total", "core2.l2cache.demandAccesses::total", "core3.decode.blockedCycles", "core3.fetch.cycles", "core3.numCycles", "core3.numSimulatedInsts", "core3.rename.LQFullEvents", "core3.rename.unblockCycles", "core3.rob.reads", "core3.switch_cpus0.numRate", "core3.system.cpu0.dcache.ReadReq.mshrMissRate::total", "core3.system.cpu0.dcache.prefetcher.prefetchers1.pfIssued", "core3.system.switch_cpus0.issueRate", "core3.timesIdled", "core3.l2cache.ReadReq.hits::total", "core3.l2cache.demandAccesses::total", "core3.ReadSharedReq.mshrMisses::total", "core3.mem_ctrls.numStayReadState", "core3.mem_ctrls.rdQLenPdf::3", "core3.mem_ctrls.totGap", "core3.system.l3.ReadSharedReq.accesses::total", "core3.system.l3.demandAccesses::total", "core3.system.l3.prefetcher.prefetchersx.pfSpanPage", "core3.system.l3.tags.totalRefs", "core3.system.mem_ctrls.requestorReadAccesses::cpu0.dcache.prefetcher.prefetchers1"]
     actions_string = ["Core0.L1.P0.degree", "Core0.L1.P1.degree", "Core0.L2.P0.degree", "Core0.L2.P1.degree", "Core1.L1.P0.degree", "Core1.L1.P1.degree", "Core1.L2.P0.degree", "Core1.L2.P1.degree", "Core2.L1.P0.degree", "Core2.L1.P1.degree", "Core2.L2.P0.degree", "Core2.L2.P1.degree", "Core3.L1.P0.degree", "Core3.L1.P1.degree", "Core3.L2.P0.degree", "Core3.L2.P1.degree" , "LLC.P1.degree", "LLC.P2.degree", "LLC.P0.degree"]
     
+    extra_info = ["S_core0_IPC", "S_core1_IPC", "S_core2_IPC", "S_core3_IPC", "NS_core0_IPC", "NS_core1_IPC", "NS_core2_IPC", "NS_core3_IPC"]
+    
     filePath = "./all.csv"
     if os.path.exists(filePath):
         os.remove(filePath)
@@ -129,7 +131,11 @@ def get_entry():
         lables += "NS_"+s+","
     for s in actions_string :
        lables += s+","
-    lables += "reward\n"
+    lables += "reward,"
+    
+    for s in extra_info :
+       lables += s+","
+    lables += "\n"
     with open('all.csv','a') as fd:  
        fd.write(lables)    
        
@@ -156,16 +162,16 @@ def get_entry():
                 entry[2][idx] = 0        
         
         reward = [0] 
-        S_core0_IPC = (float(entry[0][2]/(0.000001+entry[0][3])))
-        S_core1_IPC = (float(entry[0][16]/(0.000001+entry[0][17])))
-        S_core2_IPC = (float(entry[0][30]/(0.000001+entry[0][31])))
-        S_core3_IPC = (float(entry[0][44]/(0.000001+entry[0][45])))
+        S_core0_IPC = (float(entry[0][3]/(0.000001+entry[0][2])))
+        S_core1_IPC = (float(entry[0][17]/(0.000001+entry[0][16])))
+        S_core2_IPC = (float(entry[0][31]/(0.000001+entry[0][30])))
+        S_core3_IPC = (float(entry[0][45]/(0.000001+entry[0][44])))
         S_core_IPC = (S_core0_IPC+S_core1_IPC+S_core2_IPC+S_core3_IPC)/4
         
-        NS_core0_IPC = (float(entry[1][2]/(0.000001+entry[1][3])))
-        NS_core1_IPC = (float(entry[1][16]/(0.000001+entry[1][17])))
-        NS_core2_IPC = (float(entry[1][30]/(0.000001+entry[1][31])))
-        NS_core3_IPC = (float(entry[1][2]/(0.000001+entry[1][45])))
+        NS_core0_IPC = (float(entry[1][3]/(0.000001+entry[1][3])))
+        NS_core1_IPC = (float(entry[1][17]/(0.000001+entry[1][16])))
+        NS_core2_IPC = (float(entry[1][31]/(0.000001+entry[1][30])))
+        NS_core3_IPC = (float(entry[1][45]/(0.000001+entry[1][44])))
         
         NS_core_IPC = (NS_core0_IPC+NS_core1_IPC+NS_core2_IPC+NS_core3_IPC)/4
         
@@ -177,7 +183,7 @@ def get_entry():
                 reward[0] = -1
                 
         total_reward += reward[0]
-        print(str(entry[3])+" reward", reward, total_reward, memory.size())
+        print(str(entry[3])+" reward", reward, total_reward, memory.size(), S_core0_IPC, S_core1_IPC, S_core2_IPC, S_core3_IPC, " --- ", NS_core0_IPC, NS_core1_IPC, NS_core2_IPC, NS_core3_IPC)
         file1 = open("reward.txt", "a")
         st = str(entry[3])+" reward:"+str(reward)+" total_reward:"+str(total_reward)
         file1.write(st+"\n")
@@ -191,7 +197,18 @@ def get_entry():
             mystring = str(entry[3])+", "+str(entry[4])+", "
             for x in entry[0]+ entry[1]+ entry[2]+ reward:
                 mystring += str(x)+","
-            mystring += "\n"
+            
+            mystring+= str(S_core0_IPC)+","
+            mystring+= str(S_core1_IPC)+","
+            mystring+= str(S_core2_IPC)+","
+            mystring+= str(S_core3_IPC)+","
+            
+            mystring+= str(NS_core0_IPC)+","
+            mystring+= str(NS_core1_IPC)+","
+            mystring+= str(NS_core2_IPC)+","
+            mystring+= str(NS_core3_IPC)+"\n"
+            
+ 
             fd.write(mystring)
         # memory.print_buffer()
         

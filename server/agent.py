@@ -43,13 +43,13 @@ class BQN(nn.Module):
             
         if(random()< th1):
             rnd = random()
-            if(rnd< 0.25):
+            if(rnd< 0.85):
                 for _ in range(19):
                     acc.append(0)
-            elif(rnd< 0.50):
+            elif(rnd< 0.90):
                 for _ in range(19):
                     acc.append(1)
-            elif (rnd<0.75):
+            elif (rnd<0.95):
                 for _ in range(19):
                     acc.append(randint(0, 1))
             else:
