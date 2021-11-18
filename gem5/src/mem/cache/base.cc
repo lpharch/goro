@@ -2663,7 +2663,130 @@ BaseCache::levelFinder()
 	return level;
 }
 
+map<string, double> 
+BaseCache::stateBuilder(int core)
+{
+	// cout<<"name"<<name()<<endl;
+	std::vector<std::unique_ptr<CacheCmdStats>> cmd;
+	int demnads_code[6] = {MemCmd::ReadReq, MemCmd::WriteReq, MemCmd::WriteLineReq, MemCmd::ReadExReq, MemCmd::ReadCleanReq, MemCmd::ReadSharedReq };
+	 
+    map<string, double> totStates;
+	
+	string level = levelFinder();
+	if(level == "NPC"){
+		return totStates;
+	}
+	
+	if(prefetcher && level=="L3Cache"){
+		
+		// Feature 1: demandAccesses
+		uint64_t tot_misses = 0;
+		for(int i =0; i < 6; i++){
+			// hits
+			vector<double > res_miss;
+			stats.cmd[demnads_code[i]]->hits.value(res_miss);
+			tot_misses += std::accumulate(res_miss.begin(), res_miss.end(), 0);
+		}
+		totStates["system.l3.hits::total"] = (tot_misses-tmp_loc[0]);
+		tmp_loc[0] = tot_misses;
+		
+		// Feature 2: mshr_misses::total
+		uint64_t tot_misses_mshr = 0;
+		for(int i =0; i < 6; i++){
+			// // mshrMisses
+			vector<double > res_miss;
+			stats.cmd[demnads_code[i]]->mshrMisses.value(res_miss);
+			tot_misses_mshr += std::accumulate(res_miss.begin(), res_miss.end(), 0);
+		}
+		totStates["system.l3.mshrMisses::total"] = (tot_misses_mshr-tmp_loc[1]);
+		tmp_loc[1] = tot_misses_mshr;
+		
+		// Feature 3 and 4: "mem_ctrls.avgRdBWSys", "mem_ctrls.avgRdBWSys"
+		MemCtrl *aMem = dynamic_cast<MemCtrl * >(system->getMem());
+		string mem_features[2]= {"mem_ctrls.avgRdBWSys", "mem_ctrls.avgRdBWSys"};
+		vector<double > res = aMem->stateBuilder();
+		for(int i = 0 ; i < res.size();i++){
+			totStates[mem_features[i]] = (res[i]);
+		}
+		
+	}else if (prefetcher && level=="L2Cache"){
+		// Feature 1: demandAccesses
+		uint64_t tot_misses = 0;
+		for(int i =0; i < 6; i++){
+			// // hits
+			vector<double > res_miss;
+			stats.cmd[demnads_code[i]]->hits.value(res_miss);
+			tot_misses += std::accumulate(res_miss.begin(), res_miss.end(), 0);
+		}
+		totStates["system.l2.hits::total"] = (tot_misses-tmp_loc[0]);
+		tmp_loc[0] = tot_misses;
+		
+		// Feature 2: mshr_misses::total
+		uint64_t tot_misses_mshr = 0;
+		for(int i =0; i < 6; i++){
+			// // mshrMisses
+			vector<double > res_miss;
+			stats.cmd[demnads_code[i]]->mshrMisses.value(res_miss);
+			tot_misses_mshr += std::accumulate(res_miss.begin(), res_miss.end(), 0);
+		}
+		totStates["system.l2.mshrMisses::total"] = (tot_misses_mshr-tmp_loc[1]);
+		tmp_loc[1] = tot_misses_mshr;
+		
+	}else if(prefetcher &&  level == "L1Cache"){
+		// Feature 1: hits
+		uint64_t tot_misses = 0;
+		for(int i =0; i < 6; i++){
+			// // hits
+			vector<double > res_miss;
+			stats.cmd[demnads_code[i]]->hits.value(res_miss);
+			tot_misses += std::accumulate(res_miss.begin(), res_miss.end(), 0);
+		}
+		totStates["system.l1.hits::total"] = (tot_misses-tmp_loc[0]);
+		tmp_loc[0] = tot_misses;
 
+		// Feature 2: mshr_misses::total
+		uint64_t tot_misses_mshr = 0;
+		for(int i =0; i < 6; i++){
+			// // mshrMisses
+			vector<double > res_miss;
+			stats.cmd[demnads_code[i]]->mshrMisses.value(res_miss);
+			tot_misses_mshr += std::accumulate(res_miss.begin(), res_miss.end(), 0);
+		}
+		totStates["system.l1.mshrMisses::total"] = (tot_misses_mshr-tmp_loc[1]);
+		tmp_loc[1] = tot_misses_mshr;
+	
+		// Core related
+		// (0)  timesIdled
+		// (1)  numSimulatedInsts
+		// (2)  numCycles
+		// (3) rob.reads
+		// (4) fetch.cycles
+		// (5) rename.LQFullEvents
+		// (6) decode.blockedCycles
+		// (7) rename.unblockCycles
+		// (8) switch_cpus0.numRate
+		// (9) system.switch_cpus0.issueRate
+	
+		string core_features[10] = {"timesIdled", "numSimulatedInsts", "numCycles", "rob.reads", "fetch.cycles", "rename.LQFullEvents", "decode.blockedCycles", "rename.unblockCycles", "switch_cpus0.numRate", "system.switch_cpus0.issueRate"};
+        FullO3CPU<O3CPUImpl> *o3cpu = dynamic_cast<FullO3CPU<O3CPUImpl> * >(system->threads[core]->getCpuPtr());
+
+		vector<double > core_related = o3cpu->state_builder();
+
+		int filtered[4] = {1, 2, 3, 5};
+		for(int i = 0 ; i < 4; i++ ){
+			totStates[core_features[filtered[i]]] = (core_related[filtered[i]]);
+		}
+
+		
+	}
+	
+	// for (auto thing: totStates ){
+		// cout<<thing.first<<":"<<thing.second<<endl;
+	// }
+	return totStates;
+}
+
+/*
 map<string, double> 
 BaseCache::stateBuilder(int core)
 {
@@ -2882,6 +3005,7 @@ BaseCache::stateBuilder(int core)
     
     return totStates;
 }
+*/
 
 void
 BaseCache::printState(int core)

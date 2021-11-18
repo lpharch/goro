@@ -108,6 +108,30 @@ MemCtrl::stateBuilder()
 	// mem_ctrls.rdQLenPdf::3
 	// mem_ctrls.numStayReadState
 	// system.mem_ctrls.requestorReadAccesses::cpu0.dcache.prefetcher.prefetchers1
+	
+	std::vector<double > res;
+	
+	uint64_t bytes_write = stats.bytesReadWrQ.value();
+	res.push_back((bytes_write-lastValStats[0])/1024.0);
+	lastValStats[0] = bytes_write;
+	
+	uint64_t bytes_read = stats.bytesReadSys.value();
+	res.push_back((bytes_read-lastValStats[1])/1024.0);
+	lastValStats[1] = bytes_read;
+    
+	return res;
+}
+
+
+/*
+std::vector<double > 
+MemCtrl::stateBuilder()
+{
+	
+	// mem_ctrls.totGap
+	// mem_ctrls.rdQLenPdf::3
+	// mem_ctrls.numStayReadState
+	// system.mem_ctrls.requestorReadAccesses::cpu0.dcache.prefetcher.prefetchers1
 		
     std::vector<double > res;
 	res.push_back(m_tot_gaps-lastValStats[0]);
@@ -140,7 +164,7 @@ MemCtrl::stateBuilder()
 	lastValStats[3] = tot_rd_access;
 	return res;
 }
-
+*/
 
 
 void

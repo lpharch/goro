@@ -115,7 +115,7 @@ class QueuedPrefetcher(BasePrefetcher):
     cxx_class = "Prefetcher::Queued"
     cxx_header = "mem/cache/prefetch/queued.hh"
     latency = Param.Int(1, "Latency for generated prefetches")
-    queue_size = Param.Int(32, "Maximum number of queued prefetches")
+    queue_size = Param.Int(256, "Maximum number of queued prefetches")
     max_prefetch_requests_with_pending_translation = Param.Int(32,
         "Maximum number of queued prefetches that have a missing translation")
     queue_squash = Param.Bool(True, "Squash queued prefetch on demand access")
@@ -208,7 +208,7 @@ class IndirectMemoryPrefetcher(QueuedPrefetcher):
         "Counter threshold to start the indirect prefetching")
     stream_counter_threshold = Param.Unsigned(4,
         "Counter threshold to enable the stream prefetcher")
-    streaming_distance = Param.Unsigned(4,
+    streaming_distance = Param.Unsigned(2,
         "Number of prefetches to generate when using the stream prefetcher")
 
 class SignaturePathPrefetcher(QueuedPrefetcher):
@@ -246,7 +246,7 @@ class SignaturePathPrefetcher(QueuedPrefetcher):
     pattern_table_replacement_policy = Param.BaseReplacementPolicy(LRURP(),
         "Replacement policy of the pattern table")
 
-    prefetch_confidence_threshold = Param.Float(0.5,
+    prefetch_confidence_threshold = Param.Float(0.75,
         "Minimum confidence to issue prefetches")
     lookahead_confidence_threshold = Param.Float(0.75,
         "Minimum confidence to continue exploring lookahead entries")
@@ -284,7 +284,7 @@ class AccessMapPatternMatching(ClockedObject):
 
     limit_stride = Param.Unsigned(0,
         "Limit the strides checked up to -X/X, if 0, disable the limit")
-    start_degree = Param.Unsigned(4,
+    start_degree = Param.Unsigned(2,
         "Initial degree (Maximum number of prefetches generated")
     hot_zone_size = Param.MemorySize("2KiB", "Memory covered by a hot zone")
     access_map_table_entries = Param.MemorySize("256",
@@ -310,7 +310,7 @@ class AccessMapPatternMatching(ClockedObject):
     low_cache_hit_threshold = Param.Float(0.75,
         "A cache hit ratio smaller than this is considered low")
     epoch_cycles = Param.Cycles(256000, "Cycles in an epoch period")
-    offchip_memory_latency = Param.Latency("30ns",
+    offchip_memory_latency = Param.Latency("70ns",
         "Memory latency used to compute the required memory bandwidth")
 
 class AMPMPrefetcher(QueuedPrefetcher):
@@ -544,10 +544,10 @@ class L2IPMultiPrefetcher(MultiPrefetcher):
     prefetchers = VectorParam.BasePrefetcher([IPCPL2Prefetcher()], "Array of prefetchers")
     
 class L1MultiPrefetcher(MultiPrefetcher):
-    prefetchers = VectorParam.BasePrefetcher([DCPTPrefetcher(), TaggedPrefetcher()], "Array of prefetchers")
+    prefetchers = VectorParam.BasePrefetcher([DCPTPrefetcher(), StridePrefetcher()], "Array of prefetchers")
     
 class L2MultiPrefetcher(MultiPrefetcher):
-    prefetchers = VectorParam.BasePrefetcher([StridePrefetcher(), IrregularStreamBufferPrefetcher()], "Array of prefetchers")
+    prefetchers = VectorParam.BasePrefetcher([AMPMPrefetcher(), IrregularStreamBufferPrefetcher()], "Array of prefetchers")
     
 class L3MultiPrefetcher(MultiPrefetcher):
-    prefetchers = VectorParam.BasePrefetcher([BOPPrefetcher(), IndirectMemoryPrefetcher(), AMPMPrefetcher()], "Array of prefetchers")
+    prefetchers = VectorParam.BasePrefetcher([SBOOEPrefetcher(), SignaturePathPrefetcher(), IndirectMemoryPrefetcher()], "Array of prefetchers")

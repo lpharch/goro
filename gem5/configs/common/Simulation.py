@@ -480,8 +480,165 @@ def read_state(testsys, np, app, timestamp):
         keys.append("core"+str(i)+"."+k)
     for v in L3_values:
         values.append(v)
-    df = pd.DataFrame(values, index=keys,  columns =[app+"_"+str(timestamp)])
-    return df.T, values
+    df_all = pd.DataFrame(values, index=keys,  columns =[app+"_"+str(timestamp)])
+    '''
+    0	core0.numCycles
+    1	core0.numSimulatedInsts
+    2	core0.rename.LQFullEvents
+    3	core0.rob.reads
+    4	core0.system.l1.hits::total
+    5	core0.system.l1.mshrMisses::total
+    6	core0.system.l2.hits::total
+    7	core0.system.l2.mshrMisses::total
+    8	core1.numCycles
+    9	core1.numSimulatedInsts
+    10	core1.rename.LQFullEvents
+    11	core1.rob.reads
+    12	core1.system.l1.hits::total
+    13	core1.system.l1.mshrMisses::total
+    14	core1.system.l2.hits::total
+    15	core1.system.l2.mshrMisses::total
+    16	core2.numCycles
+    17	core2.numSimulatedInsts
+    18	core2.rename.LQFullEvents
+    19	core2.rob.reads
+    20	core2.system.l1.hits::total
+    21	core2.system.l1.mshrMisses::total
+    22	core2.system.l2.hits::total
+    23	core2.system.l2.mshrMisses::total
+    24	core3.numCycles
+    25	core3.numSimulatedInsts
+    26	core3.rename.LQFullEvents
+    27	core3.rob.reads
+    28	core3.system.l1.hits::total
+    29	core3.system.l1.mshrMisses::total
+    30	core3.system.l2.hits::total
+    31	core3.system.l2.mshrMisses::total
+    32	core3.mem_ctrls.avgRdBWSys
+    33	core3.system.l3.hits::total
+    34	core3.system.l3.mshrMisses::total
+
+    '''
+    epsilon = 1e-6
+    pruned_values = []
+    keys_values = []
+    core0_inst = values[1]
+    core1_inst = values[9]
+    core2_inst = values[17]
+    core3_inst = values[25]
+    
+    core0_Kinst = values[1]/1000.0
+    core1_Kinst = values[9]/1000.0
+    core2_Kinst = values[17]/1000.0
+    core3_Kinst = values[25]/1000.0
+    
+    # Core 0
+    # IPC0
+    pruned_values.append(values[1]/(epsilon+values[0]*1.0))
+    keys_values.append("core0.IPC")
+    # LQFullEvents
+    pruned_values.append(values[2]/(epsilon+core0_Kinst*1.0))
+    keys_values.append("core0.LQFullEvents")
+    # core0.rob.reads
+    pruned_values.append(values[3]/(epsilon+core0_Kinst*1.0))
+    keys_values.append("core0.rob.reads")
+    # core0.system.l1.hits::total
+    pruned_values.append(values[4]/(epsilon+core0_Kinst*1.0))
+    keys_values.append("core0.system.l1.hits::total")
+    # core0.system.l1.mshrMisses::total
+    pruned_values.append(values[5]/(epsilon+core0_Kinst*1.0))
+    keys_values.append("core0.system.l1.mshrMisses::total")
+    # core0.system.l2.hits::total
+    pruned_values.append(values[6]/(epsilon+core0_Kinst*1.0))
+    keys_values.append("core0.system.l2.hits::total")
+    # core0.system.l2.mshrMisses::total
+    pruned_values.append(values[7]/(epsilon+core0_Kinst*1.0))
+    keys_values.append("core0.system.l2.mshrMisses::total")
+    
+    # Core 1
+    # IPC1
+    pruned_values.append(values[9]/(epsilon+values[8]*1.0))
+    keys_values.append("core1.IPC")
+    # LQFullEvents
+    pruned_values.append(values[10]/(epsilon+core1_Kinst*1.0))
+    keys_values.append("core1.LQFullEvents")
+    # core1.rob.reads
+    pruned_values.append(values[11]/(epsilon+core1_Kinst*1.0))
+    keys_values.append("core0.rob.reads")
+    # core1.system.l1.hits::total
+    pruned_values.append(values[12]/(epsilon+core1_Kinst*1.0))
+    keys_values.append("core1.system.l1.hits::total")
+    # core1.system.l1.mshrMisses::total
+    pruned_values.append(values[13]/(epsilon+core1_Kinst*1.0))
+    keys_values.append("core1.system.l1.mshrMisses::total")
+    # core1.system.l2.hits::total
+    pruned_values.append(values[14]/(epsilon+core1_Kinst*1.0))
+    keys_values.append("core0.system.l2.hits::total")
+    # core1.system.l2.mshrMisses::total
+    pruned_values.append(values[15]/(epsilon+core1_Kinst*1.0))
+    keys_values.append("core1.system.l2.mshrMisses::total")
+
+    # Core 2
+    # IPC2
+    pruned_values.append(values[17]/(epsilon+values[16]*1.0))
+    keys_values.append("core2.IPC")
+    # LQFullEvents
+    pruned_values.append(values[18]/(epsilon+core2_Kinst*1.0))
+    keys_values.append("core2.LQFullEvents")
+    # core2.rob.reads
+    pruned_values.append(values[19]/(epsilon+core2_Kinst*1.0))
+    keys_values.append("core2.rob.reads")
+    # core2.system.l1.hits::total
+    pruned_values.append(values[20]/(epsilon+core2_Kinst*1.0))
+    keys_values.append("core2.system.l1.hits::total")
+    # core2.system.l1.mshrMisses::total
+    pruned_values.append(values[21]/(epsilon+core2_Kinst*1.0))
+    keys_values.append("core2.system.l1.mshrMisses::total")
+    # core2.system.l2.hits::total
+    pruned_values.append(values[22]/(epsilon+core2_Kinst*1.0))
+    keys_values.append("core2.system.l2.hits::total")
+    # core2.system.l2.mshrMisses::total
+    pruned_values.append(values[23]/(epsilon+core2_Kinst*1.0))
+    keys_values.append("core2.system.l2.mshrMisses::total")
+    
+    # Core 3
+    # IPC3
+    pruned_values.append(values[25]/(epsilon+values[24]*1.0))
+    keys_values.append("core3.IPC")
+    # LQFullEvents
+    pruned_values.append(values[26]/(epsilon+core3_Kinst*1.0))
+    keys_values.append("core3.LQFullEvents")
+    # core3.rob.reads
+    pruned_values.append(values[27]/(epsilon+core3_Kinst*1.0))
+    keys_values.append("core3.rob.reads")
+    # core3.system.l1.hits::total
+    pruned_values.append(values[28]/(epsilon+core3_Kinst*1.0))
+    keys_values.append("core3.system.l1.hits::total")
+    # core3.system.l1.mshrMisses::total
+    pruned_values.append(values[29]/(epsilon+core3_Kinst*1.0))
+    keys_values.append("core3.system.l1.mshrMisses::total")
+    # core3.system.l2.hits::total
+    pruned_values.append(values[30]/(epsilon+core3_Kinst*1.0))
+    keys_values.append("core3.system.l2.hits::total")
+    # core3.system.l2.mshrMisses::total
+    pruned_values.append(values[31]/(epsilon+core3_Kinst*1.0))
+    keys_values.append("core3.system.l2.mshrMisses::total")
+    
+    # LLC
+    # core3.mem_ctrls.avgRdBWSys
+    pruned_values.append(values[32]/((epsilon+values[24]*1.0)))
+    keys_values.append("mem_ctrls.avgRdBWSys")
+    
+    # core3.system.l3.hits::total
+    pruned_values.append(values[33]/(epsilon+(core0_Kinst*1.0)+(core1_Kinst*1.0)+(core2_Kinst*1.0)+(core3_Kinst*1.0)) )
+    keys_values.append("core3.system.l3.hits::total")
+    
+    #core3.system.l3.mshrMisses::total
+    pruned_values.append(values[34]/(epsilon+(core0_Kinst*1.0)+(core1_Kinst*1.0)+(core2_Kinst*1.0)+(core3_Kinst*1.0)) )
+    keys_values.append("system.l3.mshrMisses::total")
+    
+    df = pd.DataFrame(pruned_values, index=keys_values,  columns =[app+"_"+str(timestamp)])
+    return df.T, pruned_values, df_all
 
 def set_Degree(testsys, degree, np):
     L1_prefetcher_count = 2
@@ -610,10 +767,10 @@ def restoreSimpointCheckpoint_real(options, testsys):
     exit_event = m5.simulate()
     exit_cause = exit_event.getCause()
     print("exit_cause", exit_cause)
-    state, state_val = read_state(testsys, np, options.app, 0)
+    state, state_val, next_state_all = read_state(testsys, np, options.app, 0)
     m5.stats.reset()
     print("Warmup done")
-    
+ 
     
     for sample in range(0, options.num_sample):
         print("***********Sample ", sample)
@@ -633,23 +790,22 @@ def restoreSimpointCheckpoint_real(options, testsys):
         exit_event = m5.simulate()
         print("ITR sim ended")
         
-        next_state, next_state_val = read_state(testsys, np, options.app, 0)
+        next_state, next_state_val, next_state_all = read_state(testsys, np, options.app, 0)
         
         # m5.stats.dump()
         
         # if(sample > 2 and state_val[2]>10000 and state_val[3]>10000 and next_state_val[2]>10000 and next_state_val[3]>10000):
-        if(sample > 2):
+        if(sample > 3):
             print("Sending state to the server")
             entry = []
+            
             entry.append(state_val)
-            print("state_val")
-            print(state_val[2:4])
             entry.append(next_state_val)
-            print("next_state_val")
-            print(next_state_val[2:4])
             entry.append(new_action)
             entry.append(name)
             entry.append(str(sample))
+            entry.append(next_state_all)
+            
             socket_entry.send(pickle.dumps(entry))
             print("gem5: ", socket_entry.recv())
         
@@ -675,27 +831,26 @@ def restoreSimpointCheckpoint_inference(options, testsys):
     exit_event = m5.simulate()
     exit_cause = exit_event.getCause()
     print("exit_cause", exit_cause)
-    state, state_val = read_state(testsys, np, options.app, 0)
+    state, state_val, _ = read_state(testsys, np, options.app, 0)
     m5.stats.reset()
     print("Warmup done")
     
-    
+
+    state.to_csv("state.csv")
     for sample in range(0, options.num_sample):
         print("***********Sample ", sample)
         m5.simulate(1000)
         testsys.switch_cpus[0].setMaxInst(options.sample_length)
         actions = apply_degree(testsys, options, state_val)
         exit_event = m5.simulate()
-        next_state, next_state_val = read_state(testsys, np, options.app, 0)
-        df1 = dataset_create(state, next_state, actions, name+"."+str(sample))
-        df1["IPC_now"] = (df1["NS_core0.numSimulatedInsts"]/df1["NS_core0.numCycles"]) + (df1["NS_core1.numSimulatedInsts"]/df1["NS_core1.numCycles"]) + \
-                                  (df1["NS_core2.numSimulatedInsts"]/df1["NS_core2.numCycles"]) + (df1["NS_core3.numSimulatedInsts"]/df1["NS_core3.numCycles"])
-      
-        df1["IPC_then"] = (df1["S_core0.numSimulatedInsts"]/df1["S_core0.numCycles"]) + (df1["S_core1.numSimulatedInsts"]/df1["S_core1.numCycles"]) + \
-                                  (df1["S_core2.numSimulatedInsts"]/df1["S_core2.numCycles"]) + (df1["S_core3.numSimulatedInsts"]/df1["S_core3.numCycles"])
-      
-        df1["reward"] = df1["IPC_now"] - df1["IPC_then"]
-        print("Reward: ", df1['reward'].iloc[0])
+        next_state, next_state_val, _ = read_state(testsys, np, options.app, 0)
+        print("next_state")
+        print(next_state)
+        print(len(next_state))
+        with open('state.csv', 'a') as f:
+            state.to_csv(f, header=False)
+        # df1 = dataset_create(state, next_state, actions, name+"."+str(sample))
+        
         
         state = next_state
         state_val = next_state_val
@@ -716,7 +871,7 @@ def restoreSimpointCheckpoint_train(options, testsys):
     exit_event = m5.simulate()
     exit_cause = exit_event.getCause()
     print("exit_cause", exit_cause)
-    state, _ = read_state(testsys, np, options.app, 0)
+    state, _, _ = read_state(testsys, np, options.app, 0)
     print("state")
     print(state)
     print("Warmup done")
@@ -731,7 +886,7 @@ def restoreSimpointCheckpoint_train(options, testsys):
         exit_event = m5.simulate()
         exit_cause = exit_event.getCause()
         print("exit_cause", exit_cause)
-        next_state, _ = read_state(testsys, np, options.app, sample)
+        next_state, _, _ = read_state(testsys, np, options.app, sample)
         df1 = dataset_create(state, next_state, actions, name+"."+str(sample))
         df = df.append(df1)
         state = next_state
@@ -1089,13 +1244,18 @@ def run(options, root, testsys, cpu_class):
             # print("--------real----")
             # restoreSimpointCheckpoint_real(options, testsys)
             print("----------Here benchCheckpoints")
-            # actions, _ = apply_degree(testsys, options, NULL)
-            m5.simulate(1000000000)
-            read_state(testsys, 4, "aa", 0)
-            m5.simulate(1000000000)
-            read_state(testsys, 4, "aa", 0)
-            m5.simulate(1000000000)
-            read_state(testsys, 4, "aa", 0)
+            m5.simulate(100000000)
+            state, state_val, _ = read_state(testsys, np, options.app, 0)
+            print(state)
+            print(state_val)
+            m5.simulate(100000000)
+            state, state_val, _ = read_state(testsys, np, options.app, 0)
+            print(state)
+            print(state_val)
+            m5.simulate(100000000)
+            state, state_val, _ = read_state(testsys, np, options.app, 0)
+            print(state)
+            print(state_val)
             
             exit_event = benchCheckpoints(options, maxtick, cptdir)
             

@@ -36,6 +36,7 @@ class ReplayBuffer():
         next_state = np.array(next_state)
         actions = np.array(actions)
         reward = np.array(reward)[0]
+        # print("Writing to buffer", state, next_state, actions, reward)
         self.put((state, actions, reward, next_state, 0))
         
             

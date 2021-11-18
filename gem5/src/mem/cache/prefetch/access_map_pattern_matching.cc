@@ -92,6 +92,8 @@ AccessMapPatternMatching::processEpochEvent()
         usefulDegree -= 1;
     }
     degree = std::min((unsigned) memory_bandwidth, usefulDegree);
+	if(degree>4)
+		degree = 4;
     // reset epoch stats
     numGoodPrefetches = 0.0;
     numTotalPrefetches = 0.0;

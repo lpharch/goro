@@ -46,7 +46,7 @@ template_dict = {
 all_mixes = os.listdir(simpts)
 app_idx = 0
 # ts -S 3
-os.system("tsp -S 28")
+os.system("tsp -S 44")
 
 for app in (all_mixes):
     cmd = ""

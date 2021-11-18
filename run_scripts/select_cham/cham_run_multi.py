@@ -5,10 +5,8 @@ import shutil
 num_mixes = 4
 mixes_per_node = 2
 
-simpts = "/home/cc/goro/simpoints/allmixes"
+simpts = "/home/cc/mixes"
 gem5 = "/home/cc/goro/gem5"
-scripts = "/home/cc/goro/script"
-points = "/home/cc/goro/points"
 results = "/home/cc/goro/results/"
 output = "/home/cc/goro/outputs/"
 
@@ -47,7 +45,7 @@ all_mixes = os.listdir(simpts)
 chunk_counts = int(len(all_mixes) / mixes_per_node)
 app_idx = 0
 # ts -S 3
-os.system("ts -S 40")
+os.system("tsp -S 44")
 
 for app in (all_mixes):
     cmd = ""
