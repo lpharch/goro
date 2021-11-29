@@ -34,6 +34,8 @@ class BQN(nn.Module):
         self.update_freq = 1000
         self.update_count = 0
         self.action_count = 0
+        print("Loading the model")
+        self.load_model("./models/model")
     
     # config1: 0.1 0.3 0.2 0.4
     def action(self,x, go_low):
@@ -102,6 +104,7 @@ class BQN(nn.Module):
     def load_model(self, name):
         checkpoint = torch.load(name)
         self.q.load_state_dict(checkpoint['modelA_state_dict'])
+        print("model loaded")
         
     def train_model(self, memory, batch_size, gamma):
         state, actions, reward, next_state, done_mask = memory.sample(batch_size)

@@ -58,7 +58,7 @@ action_scale = 2
 total_reward = 0
 
 mins = [100000000] * state_space
-maxs = [0] * state_space
+maxs = [0.00000001] * state_space
 
 print("mins ", mins )
 print("maxs ", maxs )
@@ -236,8 +236,8 @@ def get_entry():
         
 
         
-        # diff = ((NS_core0_IPC/S_core0_IPC)-1)+ ((NS_core1_IPC/S_core1_IPC)-1)+ ((NS_core2_IPC/S_core2_IPC)-1)+ ((NS_core3_IPC/S_core3_IPC)-1)
-        diff = ((NS_core3_IPC/S_core3_IPC)-1)
+        diff = ((NS_core0_IPC/S_core0_IPC)-1)+ ((NS_core1_IPC/S_core1_IPC)-1)+ ((NS_core2_IPC/S_core2_IPC)-1)+ ((NS_core3_IPC/S_core3_IPC)-1)
+        # diff = ((NS_core3_IPC/S_core3_IPC)-1)
         if not np.isnan(diff):
             reward[0] = int(diff*100)
             # if(diff > 0):
