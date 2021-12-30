@@ -76,6 +76,8 @@
 #include "mem/abstract_mem.hh"
 #include "mem/mem_ctrl.hh"
 #include <numeric>
+#include "arch/arm/tlb.hh"
+
 
 using namespace std;
 
@@ -366,6 +368,13 @@ BaseCache::handleTimingReqMiss(PacketPtr pkt, MSHR *mshr, CacheBlk *blk,
 void
 BaseCache::recvTimingReq(PacketPtr pkt)
 {
+	// 
+	
+	// cout<<"wherer: "<<name()<<endl;
+	// for(int i = 0 ; i < aa.size(); i++){
+		// cout<<aa[i]<<" ";
+	// }cout<<endl;
+		
     // anything that is merely forwarded pays for the forward latency and
     // the delay provided by the crossbar
     Tick forward_time = clockEdge(forwardLatency) + pkt->headerDelay;
@@ -549,6 +558,7 @@ BaseCache::recvTimingResp(PacketPtr pkt)
         // Request the bus for a prefetch if this deallocation freed enough
         // MSHRs for a prefetch to take place
         if (prefetcher && mshrQueue.canPrefetch() && !isBlocked()) {
+			stats.pfdelayedrecvTimingResp++;
             Tick next_pf_time = std::max(prefetcher->nextPrefetchReadyTime(),
                                          clockEdge());
             if (next_pf_time != MaxTick)
@@ -835,7 +845,14 @@ BaseCache::getNextQueueEntry()
     }
 
     // fall through... no pending requests.  Try a prefetch.
-    assert(!miss_mshr && !wq_entry);
+	assert(!miss_mshr && !wq_entry);
+	stats.pftotalChances++;
+	if(mshrQueue.canPrefetch()){
+		stats.pfCanPrefetch++;
+	}
+	if(!isBlocked()){
+		stats.pfisNotBlocked++;
+	}
     if (prefetcher && mshrQueue.canPrefetch() && !isBlocked()) {
         // If we have a miss queue slot, we can try a prefetch
         PacketPtr pkt = prefetcher->getPacket();
@@ -852,9 +869,22 @@ BaseCache::getNextQueueEntry()
                 // allocate an MSHR and return it, note
                 // that we send the packet straight away, so do not
                 // schedule the send
+				stats.pfallocated++;
                 return allocateMissBuffer(pkt, curTick(), false);
             } else {
                 // free the request and packet
+				stats.pfdeleted++;
+				
+				if(tags->findBlock(pf_addr, pkt->isSecure()) ){
+					stats.pfinCache++;
+				}
+				if(!mshrQueue.findMatch(pf_addr, pkt->isSecure()) ){
+					stats.pfinMSHR++;
+				}
+				if(!writeBuffer.findMatch(pf_addr, pkt->isSecure() )){
+					stats.pfinWriteBuffer++;
+				}
+				
                 delete pkt;
             }
         }
@@ -1774,7 +1804,7 @@ BaseCache::invalidateVisitor(CacheBlk &blk)
 }
 
 Tick
-BaseCache::nextQueueReadyTime() const
+BaseCache::nextQueueReadyTime()
 {
     Tick nextReady = std::min(mshrQueue.nextReadyTime(),
                               writeBuffer.nextReadyTime());
@@ -1782,6 +1812,7 @@ BaseCache::nextQueueReadyTime() const
     // Don't signal prefetch ready time if no MSHRs available
     // Will signal once enoguh MSHRs are deallocated
     if (prefetcher && mshrQueue.canPrefetch() && !isBlocked()) {
+		stats.pfdelayednextQueueReadyTime++;
         nextReady = std::min(nextReady,
                              prefetcher->nextPrefetchReadyTime());
     }
@@ -2169,7 +2200,17 @@ BaseCache::CacheStats::CacheStats(BaseCache &c)
     ADD_STAT(replacements, UNIT_COUNT, "number of replacements"),
     ADD_STAT(dataExpansions, UNIT_COUNT,"number of data expansions"),
     ADD_STAT(dataContractions, UNIT_COUNT, "number of data contractions"),
-    cmd(MemCmd::NUM_MEM_CMDS)
+    cmd(MemCmd::NUM_MEM_CMDS),
+	ADD_STAT(pftotalChances, UNIT_COUNT, "number of chances given to Queue Prefetcher"),
+	ADD_STAT(pfCanPrefetch, UNIT_COUNT, "number of times MSHR is not blocking"),
+	ADD_STAT(pfisNotBlocked, UNIT_COUNT, "number of times cache is not blocking"),
+	ADD_STAT(pfallocated, UNIT_COUNT, "number of times a prefetch is acutlaly issued"),
+	ADD_STAT(pfdeleted, UNIT_COUNT, "number of times a prefetch request is deleted"),
+	ADD_STAT(pfinCache, UNIT_COUNT, "pf deleted bc it is already in the cache"),
+	ADD_STAT(pfinMSHR, UNIT_COUNT, "pf deleted bc it is in MSHR"),
+	ADD_STAT(pfinWriteBuffer, UNIT_COUNT, "pf deleted bc it is Write Buffer "),
+	ADD_STAT(pfdelayednextQueueReadyTime, UNIT_COUNT, "prefetch delayed 1"),
+	ADD_STAT(pfdelayedrecvTimingResp, UNIT_COUNT, "prefetch delayed 2")
 {
     for (int idx = 0; idx < MemCmd::NUM_MEM_CMDS; ++idx)
         cmd[idx].reset(new CacheCmdStats(c, MemCmd(idx).toString()));
@@ -2708,6 +2749,20 @@ BaseCache::stateBuilder(int core)
 		for(int i = 0 ; i < res.size();i++){
 			totStates[mem_features[i]] = (res[i]);
 		}
+		vector<double> tags_vector = tags->stateBuilder();
+		totStates["system.l3.occupanciesTaskId"] = tags_vector[0];
+		totStates["system.l3.ageTaskId"] = tags_vector[1];
+		
+
+		int index = 0;
+		Prefetcher::Multi *mpf = dynamic_cast<Prefetcher::Multi * >(prefetcher);
+        for (auto pf : mpf->prefetchers) {
+            Prefetcher::Queued *qpf = dynamic_cast<Prefetcher::Queued * >(pf);
+			totStates["system.l3.prefetcher"+std::to_string(index)] = qpf->prefetchStats.pfIssued.value();
+			index += 1;
+        }
+		
+		
 		
 	}else if (prefetcher && level=="L2Cache"){
 		// Feature 1: demandAccesses
@@ -2718,7 +2773,7 @@ BaseCache::stateBuilder(int core)
 			stats.cmd[demnads_code[i]]->hits.value(res_miss);
 			tot_misses += std::accumulate(res_miss.begin(), res_miss.end(), 0);
 		}
-		totStates["system.l2.hits::total"] = (tot_misses-tmp_loc[0]);
+		totStates["l2.hits::total"] = (tot_misses-tmp_loc[0]);
 		tmp_loc[0] = tot_misses;
 		
 		// Feature 2: mshr_misses::total
@@ -2729,8 +2784,20 @@ BaseCache::stateBuilder(int core)
 			stats.cmd[demnads_code[i]]->mshrMisses.value(res_miss);
 			tot_misses_mshr += std::accumulate(res_miss.begin(), res_miss.end(), 0);
 		}
-		totStates["system.l2.mshrMisses::total"] = (tot_misses_mshr-tmp_loc[1]);
+		totStates["l2.mshrMisses::total"] = (tot_misses_mshr-tmp_loc[1]);
 		tmp_loc[1] = tot_misses_mshr;
+		
+		vector<double> tags_vector = tags->stateBuilder();
+		totStates["l2.occupanciesTaskId"] = tags_vector[0];
+		totStates["l2.ageTaskId"] = tags_vector[1];
+		
+		int index = 0;
+		Prefetcher::Multi *mpf = dynamic_cast<Prefetcher::Multi * >(prefetcher);
+        for (auto pf : mpf->prefetchers) {
+            Prefetcher::Queued *qpf = dynamic_cast<Prefetcher::Queued * >(pf);
+			totStates["l2.prefetcher"+std::to_string(index)] = qpf->prefetchStats.pfIssued.value();
+			index += 1;
+        }
 		
 	}else if(prefetcher &&  level == "L1Cache"){
 		// Feature 1: hits
@@ -2741,7 +2808,7 @@ BaseCache::stateBuilder(int core)
 			stats.cmd[demnads_code[i]]->hits.value(res_miss);
 			tot_misses += std::accumulate(res_miss.begin(), res_miss.end(), 0);
 		}
-		totStates["system.l1.hits::total"] = (tot_misses-tmp_loc[0]);
+		totStates["l1.hits::total"] = (tot_misses-tmp_loc[0]);
 		tmp_loc[0] = tot_misses;
 
 		// Feature 2: mshr_misses::total
@@ -2752,8 +2819,12 @@ BaseCache::stateBuilder(int core)
 			stats.cmd[demnads_code[i]]->mshrMisses.value(res_miss);
 			tot_misses_mshr += std::accumulate(res_miss.begin(), res_miss.end(), 0);
 		}
-		totStates["system.l1.mshrMisses::total"] = (tot_misses_mshr-tmp_loc[1]);
+		totStates["l1.mshrMisses::total"] = (tot_misses_mshr-tmp_loc[1]);
 		tmp_loc[1] = tot_misses_mshr;
+		
+		vector<double> tags_vector = tags->stateBuilder();
+		totStates["l1.occupanciesTaskId"] = tags_vector[0];
+		totStates["l1.ageTaskId"] = tags_vector[1];
 	
 		// Core related
 		// (0)  timesIdled
@@ -2771,11 +2842,26 @@ BaseCache::stateBuilder(int core)
         FullO3CPU<O3CPUImpl> *o3cpu = dynamic_cast<FullO3CPU<O3CPUImpl> * >(system->threads[core]->getCpuPtr());
 
 		vector<double > core_related = o3cpu->state_builder();
-
 		int filtered[4] = {1, 2, 3, 5};
 		for(int i = 0 ; i < 4; i++ ){
 			totStates[core_features[filtered[i]]] = (core_related[filtered[i]]);
 		}
+		
+		vector<double > dtb_related = (dynamic_cast<ArmISA::TLB * >(o3cpu->mmu->dtb))->get_state_builder();
+		totStates["dtb.mmu.service_time"] = dtb_related[0];
+		totStates["dtb.mmu.wait_time"] = dtb_related[1];
+		
+		vector<double > itb_related = (dynamic_cast<ArmISA::TLB * >(o3cpu->mmu->itb))->get_state_builder();
+		totStates["itb.mmu.service_time"] = itb_related[0];
+		totStates["itb.mmu.wait_time"] = itb_related[1];
+		
+		int index = 0;
+		Prefetcher::Multi *mpf = dynamic_cast<Prefetcher::Multi * >(prefetcher);
+        for (auto pf : mpf->prefetchers) {
+            Prefetcher::Queued *qpf = dynamic_cast<Prefetcher::Queued * >(pf);
+			totStates["l2.prefetcher"+std::to_string(index)] = qpf->prefetchStats.pfIssued.value();
+			index += 1;
+        }
 
 		
 	}

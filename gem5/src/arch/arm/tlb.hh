@@ -204,6 +204,8 @@ class TLB : public BaseTLB
     int rangeMRU; //On lookup, only move entries ahead when outside rangeMRU
 
   public:
+    //Majid
+	std::vector<double > get_state_builder();
     using Params = ArmTLBParams;
     TLB(const Params &p);
     TLB(const Params &p, int _size, TableWalker *_walker);

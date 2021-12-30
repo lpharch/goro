@@ -163,17 +163,11 @@ Queued::notify(const PacketPtr &pkt, const PrefetchInfo &pfi)
 
     // Calculate prefetches given this access
     std::vector<AddrPriority> addresses;
-	if(RLdegree > 0 ){
-		// cout<<name()<<" RLdegree:"<<RLdegree<<endl;
-
-		calculatePrefetch(pfi, addresses);	
-		for (AddrPriority& addr_prio : addresses) {
-			for(int d = 1 ; d <= RLdegree; d++){
-				Addr blkAddr = blockAddress(addr_prio.first);
-				Addr newAddr = blkAddr + d*(blkSize);
-				addresses.push_back(AddrPriority(newAddr,0));
-			}	
-		}
+	calculatePrefetch(pfi, addresses);	
+	statsQueued.pfTotGenerated += addresses.size();
+	
+	if(RLdegree == 0 ){
+		addresses.clear();
 	}
     
 
@@ -251,7 +245,10 @@ Queued::QueuedStats::QueuedStats(Stats::Group *parent)
     ADD_STAT(pfRemovedFull, UNIT_COUNT,
              "number of prefetches dropped due to prefetch queue size"),
     ADD_STAT(pfSpanPage, UNIT_COUNT,
-             "number of prefetches that crossed the page")
+             "number of prefetches that crossed the page"),
+	ADD_STAT(pfTotGenerated, UNIT_COUNT,
+             "number of totoal prefetches generated") 
+			 
 {
 }
 

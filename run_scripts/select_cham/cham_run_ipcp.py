@@ -12,6 +12,7 @@ output = "/home/cc/goro/outputs/"
 
 
 
+
 simulation="ipcp"
 
 dir = results+simulation
@@ -46,7 +47,7 @@ template_dict = {
 all_mixes = os.listdir(simpts)
 app_idx = 0
 # ts -S 3
-os.system("tsp -S 44")
+os.system("tsp -S 60")
 
 for app in (all_mixes):
     cmd = ""
@@ -56,14 +57,14 @@ for app in (all_mixes):
     cmd += ("--caches ")
     cmd += ("--kernel /home/cc/disks/binaries/vmlinux.arm64 ")
     cmd += ("--disk-image /home/cc/disks/disks/ubuntu-18.04-arm64-docker_big.img ")
-    cmd += ("--cpu-type=DerivO3CPU ")
+    cmd += ("--cpu-type=DerivO3CPU --bp-typ=TAGE ")
     cmd += ("--restore-simpoint-checkpoint -r 1 ")
     cmd += ("--checkpoint-dir " + simpts + "/" + app + " ")
     cmd += ("--restore-with-cpu=AtomicSimpleCPU ")
     cmd += ("--l3cache  ")
     cmd += ("--l2-hwp-type=L2IPMultiPrefetcher ")
     cmd += ("--l1d-hwp-type=L1IPMultiPrefetcher ")
-    cmd += ("--mem-size=64GB --mem-type=DDR4_2400_8x8 ")
+    cmd += ("--mem-size=64GB --mem-type=DDR4_2400_16x4 ")
     cmd += ("-n 4 ")
     cmd += ("--mode baseline")
     cmd += (" > " + output + "/" + app + ".out")

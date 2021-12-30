@@ -59,6 +59,19 @@ class BaseMMU : public SimObject
         else
             return dtb;
     }
+	
+	BaseTLB*
+    getiTlb() const
+    {
+        return itb;
+    }
+	
+	BaseTLB*
+    getdTlb() const
+    {
+        return dtb;
+    }
+	
 
   public:
     void

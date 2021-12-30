@@ -358,9 +358,11 @@ FullO3CPU<Impl>::FullO3CPU(const DerivO3CPUParams &params)
 		this->thread[tid]->setFuncExeInst(0);
 	}
 	
+	//Majid
 	for(int i = 0; i <20; i++){
 		tmp_loc.push_back(0);
 	}
+	
 }
 
 template <class Impl>
@@ -407,7 +409,7 @@ FullO3CPUStats::FullO3CPUStats(FullO3CPU *cpu)
                "IPC: Instructions Per Cycle"),
       ADD_STAT(totalIpc, UNIT_RATE(Stats::Units::Count, Stats::Units::Cycle),
                "IPC: Total IPC of All Threads"),
-      ADD_STAT(intRegfileReads, UNIT_COUNT, "Number of integer regfile reads"),
+	  ADD_STAT(intRegfileReads, UNIT_COUNT, "Number of integer regfile reads"),
       ADD_STAT(intRegfileWrites, UNIT_COUNT,
                "Number of integer regfile writes"),
       ADD_STAT(fpRegfileReads, UNIT_COUNT, "Number of floating regfile reads"),
@@ -459,6 +461,9 @@ FullO3CPUStats::FullO3CPUStats(FullO3CPU *cpu)
         .precision(6);
     ipc = committedInsts / cpu->baseStats.numCycles;
 
+	
+
+	
     totalIpc
         .precision(6);
     totalIpc = sum(committedInsts) / cpu->baseStats.numCycles;

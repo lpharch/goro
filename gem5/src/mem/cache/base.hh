@@ -879,7 +879,7 @@ class BaseCache : public ClockedObject
     /**
      * Find next request ready time from among possible sources.
      */
-    Tick nextQueueReadyTime() const;
+    Tick nextQueueReadyTime();
 
     /** Block size of this cache */
     const unsigned blkSize;
@@ -1136,6 +1136,18 @@ class BaseCache : public ClockedObject
 
         /** Per-command statistics */
         std::vector<std::unique_ptr<CacheCmdStats>> cmd;
+		
+		//Majid
+		Stats::Scalar pftotalChances;
+		Stats::Scalar pfCanPrefetch;
+		Stats::Scalar pfisNotBlocked;
+		Stats::Scalar pfallocated;
+		Stats::Scalar pfdeleted;
+		Stats::Scalar pfinCache;
+		Stats::Scalar pfinMSHR;
+		Stats::Scalar pfinWriteBuffer;
+		Stats::Scalar pfdelayednextQueueReadyTime;
+		Stats::Scalar pfdelayedrecvTimingResp;
     } stats;
 
     /** Registers probes. */

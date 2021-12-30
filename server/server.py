@@ -24,8 +24,8 @@ import zmq
 
 
 parser = argparse.ArgumentParser('parameters')
-parser.add_argument('--lr_rate', type=float, default=1e-4, help='learning rate (default : 0.0001)')
-parser.add_argument('--batch_size', type=int, default=64, help='batch size(default : 64)')
+parser.add_argument('--lr_rate', type=float, default=1e-2, help='learning rate (default : 0.0001)')
+parser.add_argument('--batch_size', type=int, default=128, help='batch size(default : 64)')
 parser.add_argument('--gamma', type=float, default=0.99, help='gamma (default : 0.99)')
 parser.add_argument('--action_scale', type=int, default=2, help='action scale between -1 ~ +1')
 parser.add_argument("--s1", type=int, default = 1, help = 'print interval(default : 1)')
@@ -34,6 +34,7 @@ parser.add_argument("--s3", type=int, default = 1, help = 'print interval(defaul
 parser.add_argument("--levels", type=int, default = 32, help = 'print interval(default : 1)')
 parser.add_argument("--leaky", type=float, default = 0.99, help = 'print interval(default : 1)')
 parser.add_argument("--name", type=str, default = 'unknown')
+parser.add_argument("--mlmode", type=str, default = 'training')
 
 args = parser.parse_args()
 
@@ -47,12 +48,12 @@ s2 = args.s2
 s3 = args.s3
 leaky = args.leaky
 levels = args.levels
-
+mlmode = args.mlmode
 
 os.makedirs('./model_weights', exist_ok=True)
 
 
-state_space  = 31
+state_space  = 88
 action_space = 19
 action_scale = 2
 total_reward = 0
@@ -80,7 +81,7 @@ socket_entery.bind("tcp://*:5556")
 
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-memory = ReplayBuffer(2000, action_space, device, levels)
+memory = ReplayBuffer(5000, action_space, device, levels)
 
 agent = BQN(state_space, action_space, action_scale, learning_rate, device, s1, s2, s3, leaky)
 
@@ -129,7 +130,20 @@ def action():
 def get_entry():
     global total_reward
     print("train infinite loop")
-    state_strings = ["core0.IPC", "core0.LQFullEvents", "core0.rob.reads", "core0.system.l1.hits::total", "core0.system.l1.mshrMisses::total", "core0.system.l2.hits::total", "core0.system.l2.mshrMisses::total", "core1.IPC", "core1.LQFullEvents", "core0.rob.reads", "core1.system.l1.hits::total", "core1.system.l1.mshrMisses::total", "core0.system.l2.hits::total", "core1.system.l2.mshrMisses::total", "core2.IPC", "core2.LQFullEvents", "core2.rob.reads", "core2.system.l1.hits::total", "core2.system.l1.mshrMisses::total", "core2.system.l2.hits::total", "core2.system.l2.mshrMisses::total", "core3.IPC", "core3.LQFullEvents", "core3.rob.reads", "core3.system.l1.hits::total", "core3.system.l1.mshrMisses::total", "core3.system.l2.hits::total", "core3.system.l2.mshrMisses::total", "mem_ctrls.avgRdBWSys", "core3.system.l3.hits::total", "system.l3.mshrMisses::total"]
+    
+    state_strings = [
+        "core0.dtb.mmu.service_time", "core0.dtb.mmu.wait_time", "core0.itb.mmu.service_time", "core0.itb.mmu.wait_time", "core0.l1.ageTaskId", "core0.l1.hits::total", "core0.l1.mshrMisses::total", "core0.l1.occupanciesTaskId", "core0.l2.prefetcher0", "core0.l2.prefetcher1", "core0.numCycles", "core0.numSimulatedInsts", "core0.rename.LQFullEvents", "core0.rob.reads", "core0.l2.ageTaskId", "core0.l2.hits::total", "core0.l2.mshrMisses::total", "core0.l2.occupanciesTaskId", "core0.l2.prefetcher0", "core0.l2.prefetcher1",
+
+        "core1.dtb.mmu.service_time", "core1.dtb.mmu.wait_time", "core1.itb.mmu.service_time", "core1.itb.mmu.wait_time", "core1.l1.ageTaskId", "core1.l1.hits::total", "core1.l1.mshrMisses::total", "core1.l1.occupanciesTaskId", "core1.l2.prefetcher0", "core1.l2.prefetcher1", "core1.numCycles", "core1.numSimulatedInsts", "core1.rename.LQFullEvents", "core1.rob.reads", "core1.l2.ageTaskId", "core1.l2.hits::total", "core1.l2.mshrMisses::total", "core1.l2.occupanciesTaskId", "core1.l2.prefetcher0", "core1.l2.prefetcher1", 
+        
+        "core2.dtb.mmu.service_time", "core2.dtb.mmu.wait_time", "core2.itb.mmu.service_time", "core2.itb.mmu.wait_time", "core2.l1.ageTaskId", "core2.l1.hits::total", "core2.l1.mshrMisses::total", "core2.l1.occupanciesTaskId", "core2.l2.prefetcher0", "core2.l2.prefetcher1", "core2.numCycles", "core2.numSimulatedInsts", "core2.rename.LQFullEvents", "core2.rob.reads", "core2.l2.ageTaskId", "core2.l2.hits::total", "core2.l2.mshrMisses::total", "core2.l2.occupanciesTaskId", "core2.l2.prefetcher0", "core2.l2.prefetcher1",
+
+        "core3.dtb.mmu.service_time", "core3.dtb.mmu.wait_time", "core3.itb.mmu.service_time", "core3.itb.mmu.wait_time", "core3.l1.ageTaskId", "core3.l1.hits::total", "core3.l1.mshrMisses::total", "core3.l1.occupanciesTaskId", "core3.l2.prefetcher0", "core3.l2.prefetcher1", "core3.numCycles", "core3.numSimulatedInsts", "core3.rename.LQFullEvents", "core3.rob.reads", "core3.l2.ageTaskId", "core3.l2.hits::total", "core3.l2.mshrMisses::total", "core3.l2.occupanciesTaskId", "core3.l2.prefetcher0", "core3.l2.prefetcher1", 
+        
+        "core3.mem_ctrls.avgRdBWSys", 
+        
+        "core3.system.l3.ageTaskId", "core3.system.l3.hits::total", "core3.system.l3.mshrMisses::total", "core3.system.l3.occupanciesTaskId", "core3.system.l3.prefetcher0", "core3.system.l3.prefetcher1", "core3.system.l3.prefetcher2"]
+    
     actions_string = ["Core0.L1.P0.degree", "Core0.L1.P1.degree", "Core0.L2.P0.degree", "Core0.L2.P1.degree", "Core1.L1.P0.degree", "Core1.L1.P1.degree", "Core1.L2.P0.degree", "Core1.L2.P1.degree", "Core2.L1.P0.degree", "Core2.L1.P1.degree", "Core2.L2.P0.degree", "Core2.L2.P1.degree", "Core3.L1.P0.degree", "Core3.L1.P1.degree", "Core3.L2.P0.degree", "Core3.L2.P1.degree" , "LLC.P1.degree", "LLC.P2.degree", "LLC.P0.degree"]
     
     extra_info = ["S_core0_IPC", "S_core1_IPC", "S_core2_IPC", "S_core3_IPC", "NS_core0_IPC", "NS_core1_IPC", "NS_core2_IPC", "NS_core3_IPC", "total_reward"]
@@ -156,11 +170,7 @@ def get_entry():
     with open('./csv/all_0.csv','a') as fd:  
        fd.write(lables)    
     
-       
-    # file1 = open("reward.txt", "w")
-    # file1.close()
-    
-    
+        
     itrs = 0
     tot_rnd = 0    
     while True:
@@ -174,41 +184,99 @@ def get_entry():
         # 2 entry.append(new_action)
         # 3 entry.append(name)
         # 4 entry.append(str(sample))
-        # 5 entry.append(next_state_all)
+
+        '''
+        0	core0.dtb.mmu.service_time
+        1	core0.dtb.mmu.wait_time
+        2	core0.itb.mmu.service_time
+        3	core0.itb.mmu.wait_time
+        4	core0.l1.ageTaskId
+        5	core0.l1.hits::total
+        6	core0.l1.mshrMisses::total
+        7	core0.l1.occupanciesTaskId
+        8	core0.l2.prefetcher0
+        9	core0.l2.prefetcher1
+        10	core0.numCycles
+        11	core0.numSimulatedInsts
+        12	core0.rename.LQFullEvents
+        13	core0.rob.reads
+        14	core0.l2.ageTaskId
+        15	core0.l2.hits::total
+        16	core0.l2.mshrMisses::total
+        17	core0.l2.occupanciesTaskId
+        18	core0.l2.prefetcher0
+        19	core0.l2.prefetcher1
+        20	core1.dtb.mmu.service_time
+        21	core1.dtb.mmu.wait_time
+        22	core1.itb.mmu.service_time
+        23	core1.itb.mmu.wait_time
+        24	core1.l1.ageTaskId
+        25	core1.l1.hits::total
+        26	core1.l1.mshrMisses::total
+        27	core1.l1.occupanciesTaskId
+        28	core1.l2.prefetcher0
+        29	core1.l2.prefetcher1
+        30	core1.numCycles
+        31	core1.numSimulatedInsts
+        32	core1.rename.LQFullEvents
+        33	core1.rob.reads
+        34	core1.l2.ageTaskId
+        35	core1.l2.hits::total
+        36	core1.l2.mshrMisses::total
+        37	core1.l2.occupanciesTaskId
+        38	core1.l2.prefetcher0
+        39	core1.l2.prefetcher1
+        40	core2.dtb.mmu.service_time
+        41	core2.dtb.mmu.wait_time
+        42	core2.itb.mmu.service_time
+        43	core2.itb.mmu.wait_time
+        44	core2.l1.ageTaskId
+        45	core2.l1.hits::total
+        46	core2.l1.mshrMisses::total
+        47	core2.l1.occupanciesTaskId
+        48	core2.l2.prefetcher0
+        49	core2.l2.prefetcher1
+        50	core2.numCycles
+        51	core2.numSimulatedInsts
+        52	core2.rename.LQFullEvents
+        53	core2.rob.reads
+        54	core2.l2.ageTaskId
+        55	core2.l2.hits::total
+        56	core2.l2.mshrMisses::total
+        57	core2.l2.occupanciesTaskId
+        58	core2.l2.prefetcher0
+        59	core2.l2.prefetcher1
+        60	core3.dtb.mmu.service_time
+        61	core3.dtb.mmu.wait_time
+        62	core3.itb.mmu.service_time
+        63	core3.itb.mmu.wait_time
+        64	core3.l1.ageTaskId
+        65	core3.l1.hits::total
+        66	core3.l1.mshrMisses::total
+        67	core3.l1.occupanciesTaskId
+        68	core3.l2.prefetcher0
+        69	core3.l2.prefetcher1
+        70	core3.numCycles
+        71	core3.numSimulatedInsts
+        72	core3.rename.LQFullEvents
+        73	core3.rob.reads
+        74	core3.l2.ageTaskId
+        75	core3.l2.hits::total
+        76	core3.l2.mshrMisses::total
+        77	core3.l2.occupanciesTaskId
+        78	core3.l2.prefetcher0
+        79	core3.l2.prefetcher1
+        80	core3.mem_ctrls.avgRdBWSys
+        81	core3.system.l3.ageTaskId
+        82	core3.system.l3.hits::total
+        83	core3.system.l3.mshrMisses::total
+        84	core3.system.l3.occupanciesTaskId
+        85	core3.system.l3.prefetcher0
+        86	core3.system.l3.prefetcher1
+        87	core3.system.l3.prefetcher2
+        '''
         
-        # S_core0.IPC	0
-        # S_core0.LQFullEvents	1
-        # S_core0.rob.reads	2
-        # S_core0.system.l1.hits::total	3
-        # S_core0.system.l1.mshrMisses::total	4
-        # S_core0.system.l2.hits::total	5
-        # S_core0.system.l2.mshrMisses::total	6
-        # S_core1.IPC	7
-        # S_core1.LQFullEvents	8
-        # S_core0.rob.reads	9
-        # S_core1.system.l1.hits::total	10
-        # S_core1.system.l1.mshrMisses::total	11
-        # S_core0.system.l2.hits::total	12
-        # S_core1.system.l2.mshrMisses::total	13
-        # S_core2.IPC	14
-        # S_core2.LQFullEvents	15
-        # S_core2.rob.reads	16
-        # S_core2.system.l1.hits::total	17
-        # S_core2.system.l1.mshrMisses::total	18
-        # S_core2.system.l2.hits::total	19
-        # S_core2.system.l2.mshrMisses::total	20
-        # S_core3.IPC	21
-        # S_core3.LQFullEvents	22
-        # S_core3.rob.reads	23
-        # S_core3.system.l1.hits::total	24
-        # S_core3.system.l1.mshrMisses::total	25
-        # S_core3.system.l2.hits::total	26
-        # S_core3.system.l2.mshrMisses::total	27
-        # S_mem_ctrls.avgRdBWSys	28
-        # S_core3.system.l3.hits::total	29
-        # S_system.l3.mshrMisses::total	30
-    
-            
+                
         entry[0] = [float(i) for i in entry[0]]
         entry[1] = [float(i) for i in entry[1]]
         entry[2] = [float(i) for i in entry[2]]
@@ -224,38 +292,28 @@ def get_entry():
                 entry[2][idx] = 0        
         
         reward = [0] 
-        S_core0_IPC = entry[0][0]
-        S_core1_IPC = entry[0][7]
-        S_core2_IPC = entry[0][14]
-        S_core3_IPC = entry[0][21]
+        S_core0_IPC = entry[0][11]/entry[0][10]*1.0
+        S_core1_IPC = entry[0][31]/entry[0][30]*1.0
+        S_core2_IPC = entry[0][51]/entry[0][50]*1.0
+        S_core3_IPC = entry[0][71]/entry[0][70]*1.0
         
-        NS_core0_IPC =  entry[1][0]
-        NS_core1_IPC =  entry[1][7]
-        NS_core2_IPC =  entry[1][14]
-        NS_core3_IPC =  entry[1][21]
+        NS_core0_IPC =  entry[1][11]/entry[1][10]*1.0
+        NS_core1_IPC =  entry[1][31]/entry[1][30]*1.0
+        NS_core2_IPC =  entry[1][51]/entry[1][50]*1.0
+        NS_core3_IPC =  entry[1][71]/entry[1][70]*1.0
         
 
         
         diff = ((NS_core0_IPC/S_core0_IPC)-1)+ ((NS_core1_IPC/S_core1_IPC)-1)+ ((NS_core2_IPC/S_core2_IPC)-1)+ ((NS_core3_IPC/S_core3_IPC)-1)
-        # diff = ((NS_core3_IPC/S_core3_IPC)-1)
         if not np.isnan(diff):
             reward[0] = int(diff*100)
-            # if(diff > 0):
-                # reward[0] = 1
-            # else:
-                # reward[0] = -1
                 
         total_reward += reward[0]
-        # print(str(entry[3])+" reward", reward[0], total_reward, memory.size(), S_core0_IPC, S_core1_IPC, S_core2_IPC, S_core3_IPC, " --- ", NS_core0_IPC, NS_core1_IPC, NS_core2_IPC, NS_core3_IPC)
-        # file1 = open("reward.txt", "a")
-        # st = str(entry[3])+" reward:"+str(reward)+" total_reward:"+str(total_reward)
-        # file1.write(st+"\n")
-        # file1.close()
-        # print(type(reward), type(reward[0]))
+
         memory.write_buffer(discreate_state(entry[0]), discreate_state(entry[1]), entry[2], reward)
         entry[0] = discreate_state(entry[0])
         entry[1] = discreate_state(entry[1])
-
+        # print("here")
         with open('./csv/all_'+str(tot_rnd)+'.csv','a') as fd:
             mystring = str(entry[3])+", "+str(entry[4])+", "
             for x in entry[0]+ entry[1]+ entry[2]+ reward:
@@ -272,7 +330,7 @@ def get_entry():
             mystring+= str(NS_core3_IPC)+","
             mystring+= str(total_reward)+"\n"
             
- 
+            # print("mystring", mystring)
             fd.write(mystring)
         
         
@@ -284,8 +342,8 @@ def get_entry():
             tot_rnd += 1
             total_reward = 0
         # memory.print_buffer()
-        
-    # entry_listener.close()
+    
+# entry_listener.close()
 
 
 def train():
@@ -296,8 +354,8 @@ def train():
             loss = agent.train_model(memory, batch_size, gamma)
             loss_itr += 1
             # 
-            if(loss_itr == 1000):
-                print("Loss:", loss.item(), loss_itr)
+            if(loss_itr == 5000):
+                print("Loss:", loss.item())
                 agent.save_model("model")
                 loss_itr = 0
 
@@ -310,11 +368,15 @@ if __name__ == "__main__":
 
     t1.start()
     t2.start()
-    t3.start()
+    if(mlmode == "train"):
+        print("-----train")
+        t3.start()
 
     t1.join()
     t2.join()
-    t3.join()
+    if(mlmode == "train"):
+        print("-----train")
+        t3.join()
 
     # both threads completely executed
     print("Done!")

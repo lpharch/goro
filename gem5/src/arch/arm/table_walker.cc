@@ -488,6 +488,8 @@ TableWalker::processWalk()
                                                       32 - currState->ttbcr.n));
 
     stats.walkWaitTime.sample(curTick() - currState->startTime);
+	//Majid
+	wait_time.push_back(curTick() - currState->startTime);
 
     if (currState->ttbcr.n == 0 || !mbits(currState->vaddr, 31,
                                           32 - currState->ttbcr.n)) {
@@ -585,6 +587,8 @@ TableWalker::processWalkLPAE()
             currState->vaddr_tainted, currState->ttbcr);
 
     stats.walkWaitTime.sample(curTick() - currState->startTime);
+	//Majid
+	wait_time.push_back(curTick() - currState->startTime);
 
     Request::Flags flag = Request::PT_WALK;
     if (currState->isSecure)
@@ -784,6 +788,8 @@ TableWalker::processWalkAArch64()
       { ReservedGrain, Grain16KB, Grain4KB, Grain64KB };
 
     stats.walkWaitTime.sample(curTick() - currState->startTime);
+	//Majid
+	wait_time.push_back(curTick() - currState->startTime);
 
     // Determine TTBR, table size, granule size and phys. address range
     Addr ttbr = 0;
@@ -1955,6 +1961,9 @@ TableWalker::doL1DescriptorWrapper()
         // delay is not set so there is no L2 to do
         // Don't finish the translation if a stage 2 look up is underway
         stats.walkServiceTime.sample(curTick() - currState->startTime);
+		//Majid
+		service_time.push_back(curTick() - currState->startTime);
+		
         DPRINTF(TLBVerbose, "calling translateTiming again\n");
         tlb->translateTiming(currState->req, currState->tc,
                              currState->transState, currState->mode);
@@ -1996,6 +2005,9 @@ TableWalker::doL2DescriptorWrapper()
         stats.walksShortTerminatedAtLevel[1]++;
     } else {
         stats.walkServiceTime.sample(curTick() - currState->startTime);
+		//Majid
+		service_time.push_back(curTick() - currState->startTime);
+		
         DPRINTF(TLBVerbose, "calling translateTiming again\n");
         tlb->translateTiming(currState->req, currState->tc,
                              currState->transState, currState->mode);
@@ -2074,6 +2086,9 @@ TableWalker::doLongDescriptorWrapper(LookupLevel curr_lookup_level)
         // No additional lookups required
         DPRINTF(TLBVerbose, "calling translateTiming again\n");
         stats.walkServiceTime.sample(curTick() - currState->startTime);
+		//Majid
+		service_time.push_back(curTick() - currState->startTime);
+		
         tlb->translateTiming(currState->req, currState->tc,
                              currState->transState, currState->mode);
         stats.walksLongTerminatedAtLevel[(unsigned) curr_lookup_level]++;
@@ -2314,6 +2329,39 @@ TableWalker::pageSizeNtoStatBin(uint8_t N)
     }
 }
 
+std::vector<double >
+TableWalker::state_builder()
+{
+	std::vector<double > tot_stats;
+	
+	
+	if(service_time.size()+wait_time.size()>0){
+		// std::cout<<"state_builder "<<name()<<" service_time.size(): "<<service_time.size()<<" wait_time.size():"<<wait_time.size() <<std::endl;
+		double wait = 0;
+		double service = 0;
+		
+		
+		for(int i = 0 ; i < service_time.size(); i++)
+			service += service_time[i];
+		for(int i = 0 ; i < wait_time.size(); i++)
+			wait += wait_time[i];
+		if(service_time.size())
+			service /= service_time.size();
+		if(wait_time.size())
+			wait /= wait_time.size();
+		
+		service_time.clear();
+		wait_time.clear();
+		
+		tot_stats.push_back(service);
+		tot_stats.push_back(wait);
+	}else{
+		tot_stats.push_back(0);
+		tot_stats.push_back(0);
+	}
+	
+	return tot_stats;
+}
 
 TableWalker::TableWalkerStats::TableWalkerStats(Stats::Group *parent)
     : Stats::Group(parent),

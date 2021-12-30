@@ -108,6 +108,13 @@ TLB::init()
         stage2Tlb = stage2Mmu->stage2Tlb();
 }
 
+std::vector<double >
+TLB::get_state_builder()
+{
+    return tableWalker->state_builder();
+}
+
+
 void
 TLB::setMMU(Stage2MMU *m, RequestorID requestor_id)
 {

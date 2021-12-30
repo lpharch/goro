@@ -65,6 +65,9 @@ BaseTags::BaseTags(const Params &p)
       stats(*this)
 {
     registerExitCallback([this]() { cleanupRefs(); });
+	//Majid
+	for (int i = 0; i< 10; i++)
+		tmp_loc.push_back(0);
 }
 
 ReplaceableEntry*
@@ -151,6 +154,21 @@ BaseTags::cleanupRefsVisitor(CacheBlk &blk)
     }
 }
 
+//Majid
+vector<double>
+BaseTags::stateBuilder()
+{
+	vector<double> totStates;
+	forEachBlk([this](CacheBlk &blk) { computeStatsVisitor(blk); });
+	
+	totStates.push_back(stats.occupanciesTaskId.total());
+	totStates.push_back(stats.ageTaskId.total());
+	// if(totStates[0]+totStates[1]>0)
+		// std::cout<<"totStates[0] "<<totStates[0]<<" totStates[1] "<<totStates[1]<<std::endl;	
+	
+	return totStates;
+}
+
 void
 BaseTags::cleanupRefs()
 {
@@ -185,6 +203,7 @@ BaseTags::computeStatsVisitor(CacheBlk &blk)
 void
 BaseTags::computeStats()
 {
+   //std::cout<<"computeStats was called"<<std::endl;
     for (unsigned i = 0; i < ContextSwitchTaskId::NumTaskId; ++i) {
         stats.occupanciesTaskId[i] = 0;
         for (unsigned j = 0; j < 5; ++j) {

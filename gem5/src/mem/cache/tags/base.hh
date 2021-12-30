@@ -50,6 +50,9 @@
 #include <cstdint>
 #include <functional>
 #include <string>
+#include <vector>
+#include <algorithm>
+#include <numeric>
 
 #include "base/callback.hh"
 #include "base/logging.hh"
@@ -64,6 +67,7 @@ class System;
 class IndexingPolicy;
 class ReplaceableEntry;
 
+using namespace std;
 /**
  * A common base class of Cache tagstore objects.
  */
@@ -103,6 +107,9 @@ class BaseTags : public ClockedObject
      * TODO: It would be good if these stats were acquired after warmup.
      */
 	 public:
+	 //Majid 
+	 vector<double> stateBuilder(); 
+	 vector<double>  tmp_loc;
     struct BaseTagStats : public Stats::Group
     {
         BaseTagStats(BaseTags &tags);

@@ -120,6 +120,7 @@ class FullO3CPU : public BaseO3CPU
     Status _status;
 	//Majid
 	vector<double> tmp_loc;
+	
   private:
 
     /** The tick event used for scheduling CPU ticks. */
@@ -755,6 +756,7 @@ class FullO3CPU : public BaseO3CPU
         /** Stat for the total IPC. */
         Stats::Formula totalIpc;
 
+        
         //number of integer register file accesses
         Stats::Scalar intRegfileReads;
         Stats::Scalar intRegfileWrites;

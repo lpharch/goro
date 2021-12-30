@@ -913,6 +913,11 @@ class TableWalker : public ClockedObject
     static const unsigned COMPLETED = 1;
 
   public:
+  //Majid
+    std::vector<double > state_builder();
+	std::vector<Tick > service_time;
+	std::vector<Tick > wait_time;
+	
     PARAMS(ArmTableWalker);
     TableWalker(const Params &p);
     virtual ~TableWalker();

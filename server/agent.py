@@ -44,7 +44,7 @@ class BQN(nn.Module):
             # acc.append(0)
         # return acc
          
-        th1 = 0.25
+        th1 = 0.15
         # if(go_low and self.action_count < 10000):
             # th1 = 0.3
         # elif(go_low and  self.action_count < 20000):
@@ -59,14 +59,23 @@ class BQN(nn.Module):
             
             
         if(random()< th1):
-            for _ in range(19):
-                acc.append(0)
+            # for _ in range(19):
+                # acc.append(0)
                     
-            # rnd = random()
-            # if(rnd< 0.3):
+            rnd = random()
+            if(rnd< 0.25):
+                for _ in range(19):
+                    acc.append(0)
+            elif(rnd< 0.50):
+                for _ in range(19):
+                    acc.append(1)
+            elif(rnd< 0.75):
+                acc = [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,0]
+            else:
+                acc = [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0]
                 # for _ in range(19):
-                    # acc.append(0)
-            # elif (rnd<0.6):
+                    # acc.append(randint(0, 1))
+                    
                 # for _ in range(19):
                     # acc.append(randint(0, 1))
                 # acc[15] = 0
