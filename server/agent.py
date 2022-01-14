@@ -12,15 +12,17 @@ class BQN(nn.Module):
     def __init__(self,state_space : int, action_num : int,action_scale : int, learning_rate, device : str, s1: int, s2: int, s3: int, leaky: float):
         super(BQN,self).__init__()
         self.device = device
-        self.q = QNetwork(state_space, action_num,action_scale, s1, s2, s3, leaky).to(device)
-        self.target_q = QNetwork(state_space, action_num,action_scale, s1, s2, s3, leaky).to(device)
+        # self.q = QNetwork(state_space, action_num,action_scale, s1, s2, s3, leaky).to(device)
+        self.q = QNetwork(state_space, action_num, action_scale).to(device)
+        # self.target_q = QNetwork(state_space, action_num,action_scale, s1, s2, s3, leaky).to(device)
+        self.target_q = QNetwork(state_space, action_num, action_scale).to(device)
         self.target_q.load_state_dict(self.q.state_dict())
             
         self.optimizer = optim.AdamW([\
-                                    {'params' : self.q.linear_1.parameters(), 'weight_decay':0.01 ,'lr': learning_rate / (action_num+2)},\
-                                    # {'params' : self.q.linear_2.parameters(), 'weight_decay':0.00001,'lr': learning_rate / (action_num+2)},\
-                                    {'params' : self.q.value.parameters(), 'weight_decay':0.01, 'lr' : learning_rate/ (action_num+2)},\
-                                    {'params' : self.q.actions.parameters(), 'weight_decay':0.01, 'lr' : learning_rate},\
+                                    {'params' : self.q.linear_1.parameters(), 'weight_decay':0.001 ,'lr': learning_rate / (action_num+2)},\
+                                    {'params' : self.q.linear_2.parameters(), 'weight_decay':0.001,'lr': learning_rate / (action_num+2)},\
+                                    {'params' : self.q.value.parameters(), 'weight_decay':0.001, 'lr' : learning_rate/ (action_num+2)},\
+                                    {'params' : self.q.actions.parameters(), 'weight_decay':0.001, 'lr' : learning_rate},\
                                     ])  
         '''
         
@@ -35,33 +37,13 @@ class BQN(nn.Module):
         self.update_count = 0
         self.action_count = 0
         print("Loading the model")
-        self.load_model("./models/model")
+        # self.load_model("./models/model")
     
     # config1: 0.1 0.3 0.2 0.4
     def action(self,x, go_low):
         acc = []
-        # for _ in range(19):
-            # acc.append(0)
-        # return acc
-         
         th1 = 0.15
-        # if(go_low and self.action_count < 10000):
-            # th1 = 0.3
-        # elif(go_low and  self.action_count < 20000):
-            # th1 = 0.2
-        # elif(go_low and  self.action_count < 30000):
-            # th1 = 0.1
-        # elif(go_low and  self.action_count < 50000):
-            # th1 = 0.01
-        # self.action_count += 1
-        # if(self.action_count >= 50000):
-            # self.action_count = 0
-            
-            
         if(random()< th1):
-            # for _ in range(19):
-                # acc.append(0)
-                    
             rnd = random()
             if(rnd< 0.25):
                 for _ in range(19):
@@ -73,29 +55,10 @@ class BQN(nn.Module):
                 acc = [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,0]
             else:
                 acc = [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0]
-                # for _ in range(19):
-                    # acc.append(randint(0, 1))
-                    
-                # for _ in range(19):
-                    # acc.append(randint(0, 1))
-                # acc[15] = 0
-                # acc[14] = 0
-                # acc[13] = 0
-                # acc[12] = 0
-            # else:
-                # for _ in range(8):
-                    # acc.append(0)
-                    # acc.append(1)
-                # acc.append(1)
-                # acc.append(0)
-                # acc.append(0)
         else:
-            # print("-4")
-            # print("here***********")
             out =  self.q(torch.tensor(x, dtype=torch.float).to(self.device))
             for tor in out:
                 acc.append(torch.argmax(tor, dim=1)[[0]].item() )
-        # print(acc)
         return acc
     
     def save_model(self, name):
