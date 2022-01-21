@@ -20,7 +20,7 @@ class BQN(nn.Module):
             
         self.optimizer = optim.AdamW([\
                                     {'params' : self.q.linear_1.parameters(), 'weight_decay':0.001 ,'lr': learning_rate / (action_num+2)},\
-                                    {'params' : self.q.linear_2.parameters(), 'weight_decay':0.001,'lr': learning_rate / (action_num+2)},\
+                                    # {'params' : self.q.linear_2.parameters(), 'weight_decay':0.001,'lr': learning_rate / (action_num+2)},\
                                     {'params' : self.q.value.parameters(), 'weight_decay':0.001, 'lr' : learning_rate/ (action_num+2)},\
                                     {'params' : self.q.actions.parameters(), 'weight_decay':0.001, 'lr' : learning_rate},\
                                     ])  
@@ -33,7 +33,7 @@ class BQN(nn.Module):
                                     {'params' : self.q.actions.parameters(), 'lr' : learning_rate},\
                                     ])
         '''
-        self.update_freq = 1000
+        self.update_freq = 10000
         self.update_count = 0
         self.action_count = 0
         print("Loading the model")
@@ -41,24 +41,18 @@ class BQN(nn.Module):
     
     # config1: 0.1 0.3 0.2 0.4
     def action(self,x, go_low):
-        acc = []
+        acc = [1,1, 1,1, 1,1, 1,1]
         th1 = 0.15
         if(random()< th1):
-            rnd = random()
-            if(rnd< 0.25):
-                for _ in range(19):
-                    acc.append(0)
-            elif(rnd< 0.50):
-                for _ in range(19):
-                    acc.append(1)
-            elif(rnd< 0.75):
-                acc = [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,0]
-            else:
-                acc = [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0]
+            for i in range(4):
+                acc.append(randint(0, 2))
+            # print("random", len(acc), acc)
         else:
+            # print("Q State", len(x), x)
             out =  self.q(torch.tensor(x, dtype=torch.float).to(self.device))
             for tor in out:
                 acc.append(torch.argmax(tor, dim=1)[[0]].item() )
+            # print("Q", len(acc), acc)
         return acc
     
     def save_model(self, name):
@@ -103,7 +97,7 @@ class BQN(nn.Module):
 
         target_action = (done_mask * gamma * target_cur_actions.mean(1).float() + reward.float())
 
-        loss = F.smooth_l1_loss(cur_actions, target_action.repeat(1,19))
+        loss = F.smooth_l1_loss(cur_actions, target_action.repeat(1, 4))
        
         self.optimizer.zero_grad()
         loss.backward()
@@ -112,7 +106,7 @@ class BQN(nn.Module):
         if (self.update_count % self.update_freq == 0) and (self.update_count > 0):
             self.update_count = 0
             self.target_q.load_state_dict(self.q.state_dict())
-            print("q copied to target_q")
+            # print("q copied to target_q")
             
   
         return loss

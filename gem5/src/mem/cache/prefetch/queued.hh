@@ -199,6 +199,7 @@ class Queued : public Base
     {
         return pfq.empty() ? MaxTick : pfq.front().tick;
     }
+	virtual void aggressiveness(bool increase);
 
   private:
 

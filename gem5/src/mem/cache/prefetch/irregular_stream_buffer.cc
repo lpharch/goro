@@ -39,7 +39,6 @@ IrregularStreamBuffer::IrregularStreamBuffer(
   : Queued(p),
     chunkSize(p.chunk_size),
     prefetchCandidatesPerEntry(p.prefetch_candidates_per_entry),
-    degree(p.degree),
     trainingUnit(p.training_unit_assoc, p.training_unit_entries,
                  p.training_unit_indexing_policy,
                  p.training_unit_replacement_policy),
@@ -55,7 +54,8 @@ IrregularStreamBuffer::IrregularStreamBuffer(
                           p.sp_address_map_cache_replacement_policy,
                           AddressMappingEntry(prefetchCandidatesPerEntry,
                                               p.num_counter_bits)),
-    structuralAddressCounter(0)
+    structuralAddressCounter(0),
+	degree(p.degree)
 {
     assert(isPowerOf2(prefetchCandidatesPerEntry));
 }
@@ -206,6 +206,16 @@ IrregularStreamBuffer::addStructuralToPhysicalEntry(
     mapping.address = physical_address;
     mapping.counter.reset();
     mapping.counter++;
+}
+
+void
+IrregularStreamBuffer::aggressiveness(bool increase)
+{
+	if(increase){
+		degree = 16;
+	}else{
+		degree = 4;
+	}
 }
 
 } // namespace Prefetcher

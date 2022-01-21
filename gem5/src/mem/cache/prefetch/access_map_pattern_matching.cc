@@ -77,9 +77,11 @@ AccessMapPatternMatching::processEpochEvent()
         ((double) (numRawCacheHits + numRawCacheMisses));
     double num_requests = (double) (numRawCacheMisses - numGoodPrefetches +
         numTotalPrefetches);
-    double memory_bandwidth = num_requests * offChipMemoryLatency /
-        clockEdge(epochCycles);
-
+    // double memory_bandwidth = num_requests * offChipMemoryLatency /
+        // clockEdge(epochCycles);
+	double memory_bandwidth = num_requests * (offChipMemoryLatency*3.66/1000) /
+        epochCycles;
+		
     if (prefetch_coverage > highCoverageThreshold &&
         (prefetch_accuracy > highAccuracyThreshold ||
         cache_hit_ratio < lowCacheHitThreshold)) {
@@ -89,11 +91,52 @@ AccessMapPatternMatching::processEpochEvent()
                 cache_hit_ratio > highCacheHitThreshold)) ||
                (prefetch_accuracy < lowAccuracyThreshold &&
                 cache_hit_ratio > highCacheHitThreshold)) {
-        usefulDegree -= 1;
+        if(usefulDegree > 1){
+			usefulDegree -= 1;
+		}
+		
     }
+	
     degree = std::min((unsigned) memory_bandwidth, usefulDegree);
-	if(degree>4)
-		degree = 4;
+	// cout<<"prefetch_coverage "<<prefetch_coverage<<endl;
+	// cout<<"highCoverageThreshold "<<highCoverageThreshold<<endl;
+	// cout<<"prefetch_accuracy "<<prefetch_accuracy<<endl;
+	// cout<<"highAccuracyThreshold "<<highAccuracyThreshold<<endl;
+	// cout<<"cache_hit_ratio "<<cache_hit_ratio<<endl;
+	// cout<<"lowCacheHitThreshold "<<lowCacheHitThreshold<<endl;
+	// cout<<"prefetch_coverage "<<prefetch_coverage<<endl;
+	// cout<<"numGoodPrefetches "<<numGoodPrefetches<<endl;
+	// cout<<"numTotalPrefetches "<<numTotalPrefetches<<endl;
+	// cout<<"numRawCacheMisses "<<numRawCacheMisses<<endl;
+	// cout<<"numRawCacheHits "<<numRawCacheHits<<endl;
+	// cout<<"(unsigned) memory_bandwidth "<<(unsigned) memory_bandwidth<<endl;
+	// cout<<"usefulDegree "<<usefulDegree<<endl;
+	// cout<<"num_requests "<<num_requests<<endl;
+	// cout<<"offChipMemoryLatency "<<offChipMemoryLatency<<endl;
+	// cout<<"epochCycles "<<epochCycles<<endl;
+	// cout<<"clockEdge(epochCycles) "<<clockEdge(epochCycles)<<endl;
+	// cout<<"degree) "<<degree<<endl;
+	// cout<<"-----"<<endl;
+	// prefetch_coverage 0.241699
+	// highCoverageThreshold 0.25
+	// prefetch_accuracy 0.33979
+	// highAccuracyThreshold 0.5
+	// cache_hit_ratio 0
+	// lowCacheHitThreshold 0.75
+	// prefetch_coverage 0.241699
+	// numGoodPrefetches 1070
+	// numTotalPrefetches 3149
+	// numRawCacheMisses 4427
+	// numRawCacheHits 0
+	// (unsigned) memory_bandwidth 0
+	// usefulDegree 3
+	// num_requests 6506
+	// offChipMemoryLatency 70000
+	// epochCycles 256000
+	// clockEdge(epochCycles) 8032860572919
+
+	if(degree > 8)
+		degree = 8;
     // reset epoch stats
     numGoodPrefetches = 0.0;
     numTotalPrefetches = 0.0;
@@ -203,6 +246,9 @@ AccessMapPatternMatching::calculatePrefetch(const Base::PrefetchInfo &pfi,
     // consider strides 1..lines_per_zone/2
     int max_stride = limitStride == 0 ? lines_per_zone / 2 : limitStride + 1;
     for (int stride = 1; stride < max_stride; stride += 1) {
+		if((stride-1) >= degree){
+			break;
+		}
         // Test accessed positive strides
         if (checkCandidate(states, states_current_block, stride)) {
             // candidate found, current_block - stride
@@ -222,6 +268,7 @@ AccessMapPatternMatching::calculatePrefetch(const Base::PrefetchInfo &pfi,
                 setEntryState(*am_entry_curr, blk, AM_PREFETCH);
             }
             addresses.push_back(Queued::AddrPriority(pf_addr, 0));
+			
             if (addresses.size() == degree) {
                 break;
             }
@@ -251,6 +298,7 @@ AccessMapPatternMatching::calculatePrefetch(const Base::PrefetchInfo &pfi,
             }
         }
     }
+	// cout<<"addresses.size() "<<addresses.size() <<" degree "<<degree<<endl;
 }
 
 AMPM::AMPM(const AMPMPrefetcherParams &p)
@@ -263,6 +311,50 @@ AMPM::calculatePrefetch(const PrefetchInfo &pfi,
     std::vector<AddrPriority> &addresses)
 {
     ampm.calculatePrefetch(pfi, addresses);
+}
+
+void
+AccessMapPatternMatching::agressiveness_ampm(bool increase)
+{
+	/*
+	if (prefetch_coverage > highCoverageThreshold &&
+        (prefetch_accuracy > highAccuracyThreshold ||
+        cache_hit_ratio < lowCacheHitThreshold)) {
+        usefulDegree += 1;
+    } else if ((prefetch_coverage < lowCoverageThreshold &&
+               (prefetch_accuracy < lowAccuracyThreshold ||
+                cache_hit_ratio > highCacheHitThreshold)) ||
+               (prefetch_accuracy < lowAccuracyThreshold &&
+                cache_hit_ratio > highCacheHitThreshold)) {
+        usefulDegree -= 1;
+    }
+    degree = std::min((unsigned) memory_bandwidth, usefulDegree);
+	*/
+	
+	if(increase){
+		highCoverageThreshold = 0.10;
+		lowCoverageThreshold = 0.125;
+		
+		highAccuracyThreshold = 0.3;
+		lowAccuracyThreshold = 0.25;
+		
+		highCacheHitThreshold = 0.900;
+		lowCacheHitThreshold =  0.900;
+	}else{
+		highCoverageThreshold = 0.25;
+		lowCoverageThreshold = 0.125;
+		
+		highAccuracyThreshold = 0.5;
+		lowAccuracyThreshold = 0.25;
+		
+		highCacheHitThreshold = 0.875;
+		lowCacheHitThreshold =  0.75;
+	}
+}
+void
+AMPM::aggressiveness(bool increase)
+{
+	ampm.agressiveness_ampm(increase);
 }
 
 } // namespace Prefetcher

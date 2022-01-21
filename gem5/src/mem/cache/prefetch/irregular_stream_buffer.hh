@@ -53,8 +53,7 @@ class IrregularStreamBuffer : public Queued
     const size_t chunkSize;
     /** Number of prefetch candidates per Physical-to-Structural entry */
     const unsigned prefetchCandidatesPerEntry;
-    /** Number of maximum prefetches requests created when predicting */
-    const unsigned degree;
+    
 
     /**
      * Training Unit Entry datatype, it holds the last accessed address and
@@ -127,11 +126,14 @@ class IrregularStreamBuffer : public Queued
      */
     AddressMapping& getPSMapping(Addr paddr, bool is_secure);
   public:
+	/** Number of maximum prefetches requests created when predicting */
+    unsigned degree;
     IrregularStreamBuffer(const IrregularStreamBufferPrefetcherParams &p);
     ~IrregularStreamBuffer() = default;
 
     void calculatePrefetch(const PrefetchInfo &pfi,
                            std::vector<AddrPriority> &addresses) override;
+    void aggressiveness(bool increase) override;
 };
 
 } // namespace Prefetcher

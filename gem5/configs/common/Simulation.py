@@ -491,7 +491,6 @@ def read_state(testsys, np, app, timestamp):
     6	core0.l1.mshrMisses::total
     7	core0.l1.occupanciesTaskId
     8	core0.l2.prefetcher0
-    9	core0.l2.prefetcher1
     10	core0.numCycles
     11	core0.numSimulatedInsts
     12	core0.rename.LQFullEvents
@@ -501,7 +500,7 @@ def read_state(testsys, np, app, timestamp):
     16	core0.l2.mshrMisses::total
     17	core0.l2.occupanciesTaskId
     18	core0.l2.prefetcher0
-    19	core0.l2.prefetcher1
+    ---> 19	core0.l2.prefetcher1
     20	core1.dtb.mmu.service_time
     21	core1.dtb.mmu.wait_time
     22	core1.itb.mmu.service_time
@@ -511,7 +510,7 @@ def read_state(testsys, np, app, timestamp):
     26	core1.l1.mshrMisses::total
     27	core1.l1.occupanciesTaskId
     28	core1.l2.prefetcher0
-    29	core1.l2.prefetcher1
+    ---> 29	core1.l2.prefetcher1
     30	core1.numCycles
     31	core1.numSimulatedInsts
     32	core1.rename.LQFullEvents
@@ -521,7 +520,7 @@ def read_state(testsys, np, app, timestamp):
     36	core1.l2.mshrMisses::total
     37	core1.l2.occupanciesTaskId
     38	core1.l2.prefetcher0
-    39	core1.l2.prefetcher1
+    ---> 39	core1.l2.prefetcher1
     40	core2.dtb.mmu.service_time
     41	core2.dtb.mmu.wait_time
     42	core2.itb.mmu.service_time
@@ -531,7 +530,7 @@ def read_state(testsys, np, app, timestamp):
     46	core2.l1.mshrMisses::total
     47	core2.l1.occupanciesTaskId
     48	core2.l2.prefetcher0
-    49	core2.l2.prefetcher1
+    ---> 49	core2.l2.prefetcher1
     50	core2.numCycles
     51	core2.numSimulatedInsts
     52	core2.rename.LQFullEvents
@@ -541,7 +540,7 @@ def read_state(testsys, np, app, timestamp):
     56	core2.l2.mshrMisses::total
     57	core2.l2.occupanciesTaskId
     58	core2.l2.prefetcher0
-    59	core2.l2.prefetcher1
+    ---> 59	core2.l2.prefetcher1
     60	core3.dtb.mmu.service_time
     61	core3.dtb.mmu.wait_time
     62	core3.itb.mmu.service_time
@@ -551,7 +550,7 @@ def read_state(testsys, np, app, timestamp):
     66	core3.l1.mshrMisses::total
     67	core3.l1.occupanciesTaskId
     68	core3.l2.prefetcher0
-    69	core3.l2.prefetcher1
+    ---> 69	core3.l2.prefetcher1
     70	core3.numCycles
     71	core3.numSimulatedInsts
     72	core3.rename.LQFullEvents
@@ -561,7 +560,7 @@ def read_state(testsys, np, app, timestamp):
     76	core3.l2.mshrMisses::total
     77	core3.l2.occupanciesTaskId
     78	core3.l2.prefetcher0
-    79	core3.l2.prefetcher1
+    ---> 79	core3.l2.prefetcher1
     80	core3.mem_ctrls.avgRdBWSys
     81	core3.system.l3.ageTaskId
     82	core3.system.l3.hits::total
@@ -570,14 +569,15 @@ def read_state(testsys, np, app, timestamp):
     85	core3.system.l3.prefetcher0
     86	core3.system.l3.prefetcher1
     87	core3.system.l3.prefetcher2
+    <--- 88	core3.system.l3.prefetcher3
     '''
     
     return df_all.T, values
 
 def set_Degree(testsys, degree, np):
-    L1_prefetcher_count = 2
-    L2_prefetcher_count = 2
-    L3_prefetcher_count = 3
+    L1_prefetcher_count = 1
+    L2_prefetcher_count = 1
+    L3_prefetcher_count = 4
     idx = 0
     st = ""
     for i in range(np):
@@ -600,33 +600,42 @@ def apply_degree(testsys, options, state):
     degrees = []
     np = options.num_cpus
     mode = options.mode
-    # Order of results, I may make it dynamic
-    components = ["Core0.L1.P0.degree", "Core0.L1.P1.degree",
-                  "Core0.L2.P0.degree", "Core0.L2.P1.degree",
-                  "Core1.L1.P0.degree", "Core1.L1.P1.degree",
-                  "Core1.L2.P0.degree", "Core1.L2.P1.degree",
-                  "Core2.L1.P0.degree", "Core2.L1.P1.degree",
-                  "Core2.L2.P0.degree", "Core2.L2.P1.degree",
-                  "Core3.L1.P0.degree", "Core3.L1.P1.degree",
-                  "Core3.L2.P0.degree", "Core3.L2.P1.degree",
-                  "LLC.P0.degree", "LLC.P1.degree", "LLC.P2.degree"   
+    # Order of results, I may make it 
+    components = ["Core0.L1.P.degree",
+                  "Core0.L2.P.degree",
+                  "Core1.L1.P.degree",
+                  "Core1.L2.P.degree",
+                  "Core2.L1.P.degree",
+                  "Core2.L2.P.degree",
+                  "Core3.L1.P.degree",
+                  "Core3.L2.P.degree",
+                  "LLC.P0.degree", "LLC.P1.degree", "LLC.P2.degree", "LLC.P3.degree"    
                  ]
     
     if(mode =="baseline"):
-        degrees = [1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0,0]
+        degrees = [1,1, 1,1, 1,1, 1,1, 1,0,0,0]
         set_Degree(testsys, degrees, np)
     elif(mode =="multi"):
-        degrees = [1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1, 1,1,1]
+        degrees = [1,1, 1,1, 1,1, 1,1, 1,1,1,1]
+        set_Degree(testsys, degrees, np)
+    elif(mode =="multid2"):
+        degrees = [1,1, 1,1, 1,1, 1,1, 2,2,2,2]
+        set_Degree(testsys, degrees, np)
+    elif(mode =="noLLCpf"):
+        degrees = [1,1, 1,1, 1,1, 1,1, 0,0,0,0]
+        set_Degree(testsys, degrees, np)
+    elif(mode =="onlyLLCpf"):
+        degrees = [0,0, 0,0, 0,0, 0,0, 1,1,1,1]
         set_Degree(testsys, degrees, np)
     elif(mode =="multid4"):
-        degrees = [4,4, 4,4, 4,4, 4,4, 4,4, 4,4, 4,4, 4,4, 4,4,4]
+        degrees = [1,1, 1,1, 1,1, 1,1, 4,4,4,4]
         set_Degree(testsys, degrees, np)
     elif(mode =="nopf"):
-        degrees = [0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0,0]
+        degrees = [0,0, 0,0, 0,0, 0,0, 0,0,0,0]
         set_Degree(testsys, degrees, np)
     elif(mode == "random"):
-        for i in range(19):
-            degrees.append(randint(0, 5))
+        for i in range(12):
+            degrees.append(randint(0, 4))
         set_Degree(testsys, degrees, np)
     elif(mode == "custom"):
         degree_s = (options.degrees).split(",")
@@ -637,7 +646,7 @@ def apply_degree(testsys, options, state):
         if(options.alternate):
             global high_degree
             if(high_degree):
-                degrees = [4,4, 4,4, 4,4, 4,4, 4,4, 4,4, 4,4, 4,4, 4,4,4]
+                degrees = [4,4, 4,4, 4,4, 4,4, 4,4,4,4]
                 set_Degree(testsys, degrees, np)
             else:
                 degrees = degrees_custom
@@ -700,9 +709,7 @@ def restoreSimpointCheckpoint_real(options, testsys):
             
     exit_event = m5.simulate()
     exit_cause = exit_event.getCause()
-    print("exit_cause", exit_cause)
     state, state_val = read_state(testsys, np, options.app, 0)
-    m5.stats.reset()
     print("Warmup done")
  
     
@@ -728,7 +735,6 @@ def restoreSimpointCheckpoint_real(options, testsys):
         
         # m5.stats.dump()
         
-        # if(sample > 2 and state_val[2]>10000 and state_val[3]>10000 and next_state_val[2]>10000 and next_state_val[3]>10000):
         if(sample > 3):
             print("Sending state to the server")
             entry = []
@@ -738,8 +744,6 @@ def restoreSimpointCheckpoint_real(options, testsys):
             entry.append(new_action)
             entry.append(name)
             entry.append(str(sample))
-            # entry.append(next_state_all)
-            
             socket_entry.send(pickle.dumps(entry))
             print("gem5: ", socket_entry.recv())
         

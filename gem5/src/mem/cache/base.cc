@@ -78,6 +78,11 @@
 #include <numeric>
 #include "arch/arm/tlb.hh"
 
+//Majid Prefetcher
+#include "mem/cache/prefetch/irregular_stream_buffer.hh"
+#include "mem/cache/prefetch/access_map_pattern_matching.hh"
+#include "mem/cache/prefetch/signature_path.hh"
+#include "mem/cache/prefetch/indirect_memory.hh"
 
 using namespace std;
 
@@ -2674,8 +2679,22 @@ BaseCache::setActionPytorch(int action, int index)
                 cout<<name()<<" Prefetcher "<<i<<" "<< qpf->PrintDegree()<<endl;
            }else{
                 if(i==index){
-                    // cout<<"name "<<qpf->name()<<endl;
                     qpf->SetDegree(action);
+					//(0) IrregularStreamBufferPrefetcher 
+					//(1) AMPMPrefetcher 
+					//(2) SignaturePathPrefetcher 
+					//(3) IndirectMemoryPrefetcher 
+					string level = levelFinder();
+					if(level=="L3Cache"){
+						// Prefetcher::IrregularStreamBuffer *isb = dynamic_cast<Prefetcher::IrregularStreamBuffer * >(pf);
+						// Prefetcher::AMPM *ampm = dynamic_cast<Prefetcher::AMPM * >(pf);
+						// Prefetcher::SignaturePath *spp = dynamic_cast<Prefetcher::SignaturePath * >(pf);
+						// Prefetcher::IndirectMemory *im = dynamic_cast<Prefetcher::IndirectMemory * >(pf);
+						qpf->aggressiveness(action > 1 ? true: false);
+							
+					}
+					
+					
                 }
            }
          

@@ -252,6 +252,12 @@ Queued::QueuedStats::QueuedStats(Stats::Group *parent)
 {
 }
 
+void
+Queued::aggressiveness(bool increase)
+{
+	std::cout<<"Bad call"<<std::endl;
+	assert(false);
+}
 
 void
 Queued::processMissingTranslations(unsigned max)

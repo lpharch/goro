@@ -64,9 +64,9 @@ class SignaturePath : public Queued
     /** Size of the signature, in bits */
     const signature_t signatureBits;
     /** Minimum confidence to issue a prefetch */
-    const double prefetchConfidenceThreshold;
+    double prefetchConfidenceThreshold;
     /** Minimum confidence to keep navigating lookahead entries */
-    const double lookaheadConfidenceThreshold;
+    double lookaheadConfidenceThreshold;
 
     /** Signature entry data type */
     struct SignatureEntry : public TaggedEntry
@@ -281,7 +281,7 @@ class SignaturePath : public Queued
   public:
     SignaturePath(const SignaturePathPrefetcherParams &p);
     ~SignaturePath() = default;
-
+	void aggressiveness(bool increase) override;
     void calculatePrefetch(const PrefetchInfo &pfi,
                            std::vector<AddrPriority> &addresses) override;
 };

@@ -254,4 +254,16 @@ IndirectMemory::checkAccessMatchOnActiveEntries(Addr addr)
     }
 }
 
+void
+IndirectMemory::aggressiveness(bool increase) 
+{
+	if(increase){
+		streamingDistance = 4;	
+	}else{
+		streamingDistance = 2;
+	}
+	
+}
+
+
 } // namespace Prefetcher

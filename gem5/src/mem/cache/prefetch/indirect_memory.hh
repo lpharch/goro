@@ -60,7 +60,7 @@ class IndirectMemory : public Queued
     /** streamCounter value to trigger the streaming prefetcher */
     const int streamCounterThreshold;
     /** Number of prefetches generated when using the streaming prefetcher */
-    const int streamingDistance;
+    int streamingDistance;
 
     /** Prefetch Table Entry */
     struct PrefetchTableEntry : public TaggedEntry
@@ -198,6 +198,7 @@ class IndirectMemory : public Queued
 
     void calculatePrefetch(const PrefetchInfo &pfi,
                            std::vector<AddrPriority> &addresses) override;
+	void aggressiveness(bool increase) override;
 };
 
 } // namespace Prefetcher

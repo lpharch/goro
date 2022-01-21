@@ -59,17 +59,17 @@ class AccessMapPatternMatching : public ClockedObject
     /** Amount of memory covered by a hot zone */
     const uint64_t hotZoneSize;
     /** A prefetch coverage factor bigger than this is considered high */
-    const double highCoverageThreshold;
+    double highCoverageThreshold;
     /** A prefetch coverage factor smaller than this is considered low */
-    const double lowCoverageThreshold;
+    double lowCoverageThreshold;
     /** A prefetch accuracy factor bigger than this is considered high */
-    const double highAccuracyThreshold;
+    double highAccuracyThreshold;
     /** A prefetch accuracy factor smaller than this is considered low */
-    const double lowAccuracyThreshold;
+    double lowAccuracyThreshold;
     /** A cache hit ratio bigger than this is considered high */
-    const double highCacheHitThreshold;
+    double highCacheHitThreshold;
     /** A cache hit ratio smaller than this is considered low */
-    const double lowCacheHitThreshold;
+    double lowCacheHitThreshold;
     /** Cycles in an epoch period */
     const Cycles epochCycles;
     /** Off chip memory latency to use for the epoch bandwidth calculation */
@@ -187,14 +187,17 @@ class AccessMapPatternMatching : public ClockedObject
     void startup() override;
     void calculatePrefetch(const Base::PrefetchInfo &pfi,
         std::vector<Queued::AddrPriority> &addresses);
+	void agressiveness_ampm(bool increase);
 };
 
 class AMPM : public Queued
 {
     AccessMapPatternMatching &ampm;
   public:
+	void aggressiveness(bool increase) override;
     AMPM(const AMPMPrefetcherParams &p);
     ~AMPM() = default;
+	void aggressivness();
 
     void calculatePrefetch(const PrefetchInfo &pfi,
                            std::vector<AddrPriority> &addresses) override;

@@ -316,4 +316,18 @@ SignaturePath::auxiliaryPrefetcher(Addr ppn, stride_t current_block,
     }
 }
 
+void
+SignaturePath::aggressiveness(bool increase)
+{
+	if(increase){
+		prefetchConfidenceThreshold = 0.15;
+		lookaheadConfidenceThreshold = 0.15;	
+	}else{
+		prefetchConfidenceThreshold = 0.75;
+		lookaheadConfidenceThreshold = 0.75;	
+	}
+    
+	
+}
+
 } // namespace Prefetcher
