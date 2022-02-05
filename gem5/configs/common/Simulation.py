@@ -61,6 +61,7 @@ import time
 import zmq
 import pickle
 high_degree = True
+from statistics import median
 
 torch.set_num_threads(4)
 
@@ -418,36 +419,19 @@ def takeSimpointCheckpoints(simpoints, interval_length, cptdir):
 def take_action(state1, options):
     state = [None] * len(state1)
     model_name = options.model
-    state_space  = 65
-    action_space = 19
-    action_scale = 2
-    acc = []
-    # need to quantize the state first
-    bins_file = open(options.binspath, 'r')
-    Lines = bins_file.readlines()
-    count = 0
-    for line in Lines:
-        line = line.replace('\n','')
-        bins = line.split(" ")
-        found_bin = False
-        for b in range(1, len(bins)-1):
-            if(state1[count] >= float(bins[b]) and state1[count] < float(bins[b+1]) ):
-                found_bin = True
-                state[count] = b
-                break
-        if(not found_bin):
-            if(state1[count] > state1[len(bins)-1]):
-                state[count] = len(bins) - 1
-            else:
-                state[count] = 0
-        count += 1
-    q_model = network.QNetwork(state_space, action_space, action_scale, 1, 1, 1, 0.95)
+    state_space  = 81
+    action_space = 4
+    action_scale = 3
+    acc = [1,1, 1,1, 1,1, 1,1]
+  
+    q_model = network.QNetwork(state_space, action_space, action_scale)
     checkpoint = torch.load((model_name), map_location=torch.device('cpu'))
     q_model.load_state_dict(checkpoint['modelA_state_dict'])
         
     out =  q_model(torch.tensor(state, dtype=torch.float))
     for tor in out:
         acc.append(torch.argmax(tor, dim=1)[[0]].item() )
+        
     print("Actions suggested by the model ", acc)
     return acc
  
@@ -480,98 +464,7 @@ def read_state(testsys, np, app, timestamp):
     for v in L3_values:
         values.append(v)
     df_all = pd.DataFrame(values, index=keys,  columns =[app+"_"+str(timestamp)])
-    
-    '''
-    0	core0.dtb.mmu.service_time
-    1	core0.dtb.mmu.wait_time
-    2	core0.itb.mmu.service_time
-    3	core0.itb.mmu.wait_time
-    4	core0.l1.ageTaskId
-    5	core0.l1.hits::total
-    6	core0.l1.mshrMisses::total
-    7	core0.l1.occupanciesTaskId
-    8	core0.l2.prefetcher0
-    10	core0.numCycles
-    11	core0.numSimulatedInsts
-    12	core0.rename.LQFullEvents
-    13	core0.rob.reads
-    14	core0.l2.ageTaskId
-    15	core0.l2.hits::total
-    16	core0.l2.mshrMisses::total
-    17	core0.l2.occupanciesTaskId
-    18	core0.l2.prefetcher0
-    ---> 19	core0.l2.prefetcher1
-    20	core1.dtb.mmu.service_time
-    21	core1.dtb.mmu.wait_time
-    22	core1.itb.mmu.service_time
-    23	core1.itb.mmu.wait_time
-    24	core1.l1.ageTaskId
-    25	core1.l1.hits::total
-    26	core1.l1.mshrMisses::total
-    27	core1.l1.occupanciesTaskId
-    28	core1.l2.prefetcher0
-    ---> 29	core1.l2.prefetcher1
-    30	core1.numCycles
-    31	core1.numSimulatedInsts
-    32	core1.rename.LQFullEvents
-    33	core1.rob.reads
-    34	core1.l2.ageTaskId
-    35	core1.l2.hits::total
-    36	core1.l2.mshrMisses::total
-    37	core1.l2.occupanciesTaskId
-    38	core1.l2.prefetcher0
-    ---> 39	core1.l2.prefetcher1
-    40	core2.dtb.mmu.service_time
-    41	core2.dtb.mmu.wait_time
-    42	core2.itb.mmu.service_time
-    43	core2.itb.mmu.wait_time
-    44	core2.l1.ageTaskId
-    45	core2.l1.hits::total
-    46	core2.l1.mshrMisses::total
-    47	core2.l1.occupanciesTaskId
-    48	core2.l2.prefetcher0
-    ---> 49	core2.l2.prefetcher1
-    50	core2.numCycles
-    51	core2.numSimulatedInsts
-    52	core2.rename.LQFullEvents
-    53	core2.rob.reads
-    54	core2.l2.ageTaskId
-    55	core2.l2.hits::total
-    56	core2.l2.mshrMisses::total
-    57	core2.l2.occupanciesTaskId
-    58	core2.l2.prefetcher0
-    ---> 59	core2.l2.prefetcher1
-    60	core3.dtb.mmu.service_time
-    61	core3.dtb.mmu.wait_time
-    62	core3.itb.mmu.service_time
-    63	core3.itb.mmu.wait_time
-    64	core3.l1.ageTaskId
-    65	core3.l1.hits::total
-    66	core3.l1.mshrMisses::total
-    67	core3.l1.occupanciesTaskId
-    68	core3.l2.prefetcher0
-    ---> 69	core3.l2.prefetcher1
-    70	core3.numCycles
-    71	core3.numSimulatedInsts
-    72	core3.rename.LQFullEvents
-    73	core3.rob.reads
-    74	core3.l2.ageTaskId
-    75	core3.l2.hits::total
-    76	core3.l2.mshrMisses::total
-    77	core3.l2.occupanciesTaskId
-    78	core3.l2.prefetcher0
-    ---> 79	core3.l2.prefetcher1
-    80	core3.mem_ctrls.avgRdBWSys
-    81	core3.system.l3.ageTaskId
-    82	core3.system.l3.hits::total
-    83	core3.system.l3.mshrMisses::total
-    84	core3.system.l3.occupanciesTaskId
-    85	core3.system.l3.prefetcher0
-    86	core3.system.l3.prefetcher1
-    87	core3.system.l3.prefetcher2
-    <--- 88	core3.system.l3.prefetcher3
-    '''
-    
+
     return df_all.T, values
 
 def set_Degree(testsys, degree, np):
@@ -685,6 +578,92 @@ def restoreSimpointCheckpoint():
     print('Exiting @ tick %i because %s' % (m5.curTick(), exit_cause))
     sys.exit(exit_event.getCode())
 
+big_arry = np.empty([1, 1])
+def find_median(state, cnt):
+    npstate = np.random.randint(5, size=(1, 81))
+    for i, s in enumerate(state):
+        npstate[0, i] = s
+    # print("npstate", npstate)
+    # print("npstate.shape", npstate.shape)
+    global big_arry
+    if (cnt == 0):
+        big_arry = npstate
+    else:
+        big_arry = np.append(big_arry, npstate, axis=0)
+    # print("big_arry", big_arry)
+    if(cnt < 3):
+        # print("returning empty")
+        return[0.00000001] * 81
+    else:
+        # print("returning full",  np.median(big_arry, axis=0).tolist())
+        return  np.median(big_arry, axis=0).tolist()
+
+def discreate(state, cnt):
+    new_state = []
+    medians = find_median(state, cnt)
+    # print("medians", medians)
+    # print("state", state)
+    for i, s in enumerate(state):
+        if(s>medians[i]):
+            new_state.append(1)
+        else:
+            new_state.append(0)
+    return new_state
+
+def get_reward(state, next_state):
+    reward = [0] 
+    S_core0_IPC = state[10]/state[9]*1.0
+    S_core1_IPC = state[28]/state[27]*1.0
+    S_core2_IPC = state[46]/state[45]*1.0
+    S_core3_IPC = state[64]/state[63]*1.0
+    
+    NS_core0_IPC =  next_state[10]/next_state[9]*1.0
+    NS_core1_IPC =  next_state[28]/next_state[27]*1.0
+    NS_core2_IPC =  next_state[46]/next_state[45]*1.0
+    NS_core3_IPC =  next_state[64]/next_state[63]*1.0
+  
+    diff = ((NS_core0_IPC/S_core0_IPC)-1)+ ((NS_core1_IPC/S_core1_IPC)-1)+ ((NS_core2_IPC/S_core2_IPC)-1)+ ((NS_core3_IPC/S_core3_IPC)-1)
+    if not np.isnan(diff):
+        reward[0] = int(diff*100)
+        if(reward[0] > 100):
+            reward[0] = 3
+        elif (reward[0] > 10):
+            reward[0] = 2
+        elif (reward[0] > 0):
+            reward[0] = 1
+        else:
+            reward[0] = -1
+    
+    # print("state[10]", state[10])
+    # print("state[9]", state[9])
+    # print("state[28]", state[28])
+    # print("state[27]", state[27])
+    # print("state[46]", state[46])
+    # print("state[45]", state[45])
+    # print("state[64]", state[64])
+    # print("state[63]", state[63])
+    
+    # print("next_state[10]", next_state[10])
+    # print("next_state[9]", next_state[9])
+    # print("next_state[28]", next_state[28])
+    # print("next_state[27]", next_state[27])
+    # print("next_state[46]", next_state[46])
+    # print("next_state[45]", next_state[45])
+    # print("next_state[64]", next_state[64])
+    # print("next_state[63]", next_state[63])
+    
+    # print("S_core0_IPC", S_core0_IPC)
+    # print("S_core1_IPC", S_core1_IPC)
+    # print("S_core2_IPC", S_core2_IPC)
+    # print("S_core3_IPC", S_core3_IPC)
+    # print("NS_core0_IPC", NS_core0_IPC)
+    # print("NS_core1_IPC", NS_core1_IPC)
+    # print("NS_core2_IPC", NS_core2_IPC)
+    # print("NS_core3_IPC", NS_core3_IPC)
+    # print("diff", diff)
+    # print("reward", reward[0])
+    return reward
+
 def restoreSimpointCheckpoint_real(options, testsys):
     print("******Running the model every ", options.sample_length)
     # address_action = ('localhost', 6000)
@@ -709,21 +688,19 @@ def restoreSimpointCheckpoint_real(options, testsys):
             
     exit_event = m5.simulate()
     exit_cause = exit_event.getCause()
-    state, state_val = read_state(testsys, np, options.app, 0)
+    _, state_val = read_state(testsys, np, options.app, 0)
+    state_val_disc = discreate(state_val, 0)
     print("Warmup done")
- 
+    total_reward = 0
     
     for sample in range(0, options.num_sample):
         print("***********Sample ", sample)
         m5.simulate(1000)
 
 
-        socket_action.send(pickle.dumps(state_val))
+        socket_action.send(pickle.dumps((state_val_disc)))
         new_action = pickle.loads(socket_action.recv())
-        
         print("got action:", new_action)
-
-        
 
         actions, actions_val = apply_degree(testsys, options, new_action)
         print("ITR sim started")
@@ -731,24 +708,27 @@ def restoreSimpointCheckpoint_real(options, testsys):
         exit_event = m5.simulate()
         print("ITR sim ended")
         
-        next_state, next_state_val = read_state(testsys, np, options.app, 0)
-        
-        # m5.stats.dump()
+        _, next_state_val = read_state(testsys, np, options.app, 0)
+        reward = get_reward(state_val, next_state_val)
+        total_reward += reward[0]
+        state_val = next_state_val
+        next_state_val = discreate(next_state_val, sample+1)
         
         if(sample > 3):
             print("Sending state to the server")
             entry = []
-            
-            entry.append(state_val)
+            entry.append(state_val_disc)
             entry.append(next_state_val)
             entry.append(new_action)
+            entry.append(reward)
+            entry.append(total_reward)
             entry.append(name)
             entry.append(str(sample))
             socket_entry.send(pickle.dumps(entry))
             print("gem5: ", socket_entry.recv())
         
-        state = next_state
-        state_val = next_state_val
+
+        state_val_disc = next_state_val
         exit_cause = exit_event.getCause()
         print("--------ITR DONE-------------",  exit_cause)
     

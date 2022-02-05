@@ -320,8 +320,8 @@ void
 SignaturePath::aggressiveness(bool increase)
 {
 	if(increase){
-		prefetchConfidenceThreshold = 0.15;
-		lookaheadConfidenceThreshold = 0.15;	
+		prefetchConfidenceThreshold = 0.5;
+		lookaheadConfidenceThreshold = 0.5;	
 	}else{
 		prefetchConfidenceThreshold = 0.75;
 		lookaheadConfidenceThreshold = 0.75;	

@@ -65,8 +65,9 @@ class Multi : public Base
 
   public:
     /** List of sub-prefetchers ordered by priority. */
-    std::list<Base*> prefetchers;
+    std::vector<Base*> prefetchers;
 	std::vector<bool > mask;
+	uint8_t last_chosen_pf;
     void changeMask(int code);
 };
 

@@ -63,7 +63,7 @@ for app in (all_mixes):
         cmd += ("--sample_length 100000 ")
         cmd += ("--num_sample 1000 ")
         cmd += ("--binspath /home/cc/bins/bins_levels_32.bins ")
-        cmd += ("--app "+app+"."+simulation+".RL"  " ")
+        cmd += ("--app "+app+"."+simulation+".try"+str(tryapp)+" ")
         cmd += (" > " + output + "/" + app +".try."+str(tryapp)+".RL.out " )
         
         st = 'tsp bash -c "' + cmd+'"'

@@ -97,7 +97,7 @@ AccessMapPatternMatching::processEpochEvent()
 		
     }
 	
-    degree = std::min((unsigned) memory_bandwidth, usefulDegree);
+    // degree = std::min((unsigned) memory_bandwidth, usefulDegree);
 	// cout<<"prefetch_coverage "<<prefetch_coverage<<endl;
 	// cout<<"highCoverageThreshold "<<highCoverageThreshold<<endl;
 	// cout<<"prefetch_accuracy "<<prefetch_accuracy<<endl;
@@ -332,15 +332,17 @@ AccessMapPatternMatching::agressiveness_ampm(bool increase)
 	*/
 	
 	if(increase){
-		highCoverageThreshold = 0.10;
+		degree = 4;
+		highCoverageThreshold = 0.5;
 		lowCoverageThreshold = 0.125;
 		
-		highAccuracyThreshold = 0.3;
+		highAccuracyThreshold = 0.2;
 		lowAccuracyThreshold = 0.25;
 		
-		highCacheHitThreshold = 0.900;
-		lowCacheHitThreshold =  0.900;
+		highCacheHitThreshold = 0.950;
+		lowCacheHitThreshold =  0.950;
 	}else{
+		degree = 2;
 		highCoverageThreshold = 0.25;
 		lowCoverageThreshold = 0.125;
 		

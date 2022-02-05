@@ -24,7 +24,7 @@ import zmq
 
 
 parser = argparse.ArgumentParser('parameters')
-parser.add_argument('--lr_rate', type=float, default=1e-6, help='learning rate (default : 0.0001)')
+parser.add_argument('--lr_rate', type=float, default=1e-4, help='learning rate (default : 0.0001)')
 parser.add_argument('--batch_size', type=int, default=64, help='batch size(default : 64)')
 parser.add_argument('--gamma', type=float, default=0.90, help='gamma (default : 0.99)')
 parser.add_argument('--action_scale', type=int, default=2, help='action scale between -1 ~ +1')
@@ -60,17 +60,8 @@ total_reward = 0
 
 mins = [100000000] * state_space
 maxs = [0.00000001] * state_space
+median=[0.04376947, 0.000939148, 0, 0, 0.573222676, 0.004596508, 0.005033913, 0.573222676, 0.036177055, 0.003903586, 0.001786599, 0.002638476, 0.002692573, 0.572481961, 0.001725929, 0.00517933, 0.572481961, 0.036754426, 0.01906055, 0.007932051, 0, 0, 0.594389009, 0.004370042, 0.001534195, 0.594389009, 0.005953031, 0.003903659, 0.003114485, 0.00268387, 0.004796958, 0.594535598, 0.000863969, 0.003060934, 0.594535598, 0.009397682, 0.030532507, 0.001989525, 0, 0, 0.594396814, 0.004063846, 0.00171645, 0.594396814, 0.01038609, 0.003903586, 0.004932507, 0, 0.004818531, 0.594014323, 0.000805707, 0.000519048, 0.594014323, 0.017739491, 0.014891342, 0, 0, 0, 0.594033408, 0.004625809, 0.002147624, 0.594033408, 0.061157953, 0.003903584, 0.004536878, 1.0643E-06, 0.005245891, 0.562137691, 0.002172376, 0.000590727, 0.562137691, 0.01732658, 0.004186702, 0.594146099, 0.002368213, 0.004026875, 0.594146099, 0.190257677, 0.046966049, 0.194642454, 0.053211177]
 
-
-# print("mins ", mins )
-# print("maxs ", maxs )
-
-
-# action_address = ('localhost', 6000)
-# action_listener = Listener(action_address, authkey=b'secret password')
-
-# entry_address = ('localhost', 7000)
-# entry_listener = Listener(entry_address, authkey=b'secret password')
 
 context_action = zmq.Context()
 socket_action = context_action.socket(zmq.REP)
@@ -103,12 +94,14 @@ def discreate_state(state):
             maxs[i] = s
         if(s < mins[i]):
             mins[i] = s
-
-    
-    
     new_state = []
+    # for i, s in enumerate(state):
+        # new_state.append((s-mins[i])/(maxs[i]*1.0))
     for i, s in enumerate(state):
-        new_state.append((s-mins[i])/(maxs[i]*1.0))
+        if(s>median[i]):
+            new_state.append(1)
+        else:
+            new_state.append(0)
     return new_state
 
 def action():
@@ -117,8 +110,9 @@ def action():
     while True:
         msg = socket_action.recv()
         state = pickle.loads(msg)
+        # print("Server state", state)
         state = [float(i) for i in state]
-        state = discreate_state(state)
+        # state = discreate_state(state)
         action_to_send = pickle.dumps(agent.action(state, True))
         idx_rnd += 1
         if(idx_rnd == 1000):
@@ -145,7 +139,8 @@ def get_entry():
     
     actions_string = ["Core0.L1.degree", "Core0.L2.degree", "Core1.L1.degree",  "Core1.L2.degree", "Core2.L1.degree", "Core2.L2.degree", "Core3.L1.degree", "Core3.L2.degree", "LLC.P0.degree", "LLC.P1.degree", "LLC.P2.degree", "LLC.P3.degree"]
     
-    extra_info = ["S_core0_IPC", "S_core1_IPC", "S_core2_IPC", "S_core3_IPC", "NS_core0_IPC", "NS_core1_IPC", "NS_core2_IPC", "NS_core3_IPC", "total_reward"]
+    # extra_info = ["S_core0_IPC", "S_core1_IPC", "S_core2_IPC", "S_core3_IPC", "NS_core0_IPC", "NS_core1_IPC", "NS_core2_IPC", "NS_core3_IPC", "total_reward"]
+    extra_info = [ "total_reward"]
     
     filePath = "./all.csv"
     if os.path.exists(filePath):
@@ -178,12 +173,7 @@ def get_entry():
         entry= pickle.loads(msg)
         socket_entery.send(b"Done")
         
-        # 0 entry.append(state_val)
-        # 1 entry.append(next_state_val)
-        # 2 entry.append(new_action)
-        # 3 entry.append(name)
-        # 4 entry.append(str(sample))
-
+       
         '''
         0	core0.dtb.mmu.service_time
         1	core0.dtb.mmu.wait_time
@@ -267,15 +257,20 @@ def get_entry():
         79	core3.system.l3.prefetcher2
         80	core3.system.l3.prefetcher3
         '''
-        
+        # 0 entry.append(state_val_disc)
+        # 1 entry.append(next_state_val)
+        # 2 entry.append(new_action)
+        # 3 entry.append(reward)
+        # 4 entry.append(total_reward)
+        # 5 entry.append(name)
+        # 6 entry.append(str(sample))
+
                 
         entry[0] = [float(i) for i in entry[0]]
         entry[1] = [float(i) for i in entry[1]]
         entry[2] = [float(i) for i in entry[2]]
-        
-        # print("State size ", len(entry[0]))
-        # print("Next State size ", len(entry[1]))
-        # print("new_action size ", len(entry[2]))
+        entry[3] = [float(i) for i in entry[3]]
+        reward = entry[3]
         
         for idx, x in enumerate(entry[0]):
             if np.isnan(x):
@@ -287,56 +282,23 @@ def get_entry():
             if np.isnan(x):
                 entry[2][idx] = 0        
         
-        reward = [0] 
-        S_core0_IPC = entry[0][10]/entry[0][9]*1.0
-        S_core1_IPC = entry[0][28]/entry[0][27]*1.0
-        S_core2_IPC = entry[0][46]/entry[0][45]*1.0
-        S_core3_IPC = entry[0][64]/entry[0][63]*1.0
-        
-        NS_core0_IPC =  entry[1][10]/entry[1][9]*1.0
-        NS_core1_IPC =  entry[1][28]/entry[1][27]*1.0
-        NS_core2_IPC =  entry[1][46]/entry[1][45]*1.0
-        NS_core3_IPC =  entry[1][64]/entry[1][63]*1.0
-        
-
-        
-        diff = ((NS_core0_IPC/S_core0_IPC)-1)+ ((NS_core1_IPC/S_core1_IPC)-1)+ ((NS_core2_IPC/S_core2_IPC)-1)+ ((NS_core3_IPC/S_core3_IPC)-1)
-        if not np.isnan(diff):
-            reward[0] = int(diff*100)
+       
                 
-        total_reward += reward[0]
-
-        memory.write_buffer(discreate_state(entry[0]), discreate_state(entry[1]), entry[2], reward)
-        entry[0] = discreate_state(entry[0])
-        entry[1] = discreate_state(entry[1])
+        memory.write_buffer(entry[0], entry[1], entry[2], reward)
+        
         
         with open('./csv/all_'+str(tot_rnd)+'.csv','a') as fd:
-            mystring = str(entry[3])+", "+str(entry[4])+", "
+            mystring = str(entry[5])+", "+str(entry[6])+", "
             for x in entry[0]+ entry[1]+ entry[2]+ reward:
                 mystring += str(x)+","
-            
-            mystring+= str(S_core0_IPC)+","
-            mystring+= str(S_core1_IPC)+","
-            mystring+= str(S_core2_IPC)+","
-            mystring+= str(S_core3_IPC)+","
-            
-            mystring+= str(NS_core0_IPC)+","
-            mystring+= str(NS_core1_IPC)+","
-            mystring+= str(NS_core2_IPC)+","
-            mystring+= str(NS_core3_IPC)+","
-            mystring+= str(total_reward)+"\n"
-            
-            
+            mystring+= str(entry[4])+"\n"
             fd.write(mystring)
-        
-        
-        # entry[5].to_csv('my_csv.csv', mode='a')
-        
+     
         itrs += 1
         if(itrs == 100*1000):
             itrs = 0
             tot_rnd += 1
-            total_reward = 0
+        
         
     
 

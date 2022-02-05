@@ -73,6 +73,7 @@ for app in (all_mixes):
     cmd += ("--l1d-hwp-type=L1MultiPrefetcher ")
     cmd += ("--mem-size=64GB --mem-type=DDR4_2400_16x4 ")
     cmd += ("-n 4 ")
+    cmd += ("--model /home/cc/goro/server/models/model ")
     cmd += ("--mode "+ simulation)
     cmd += (" > " + output + "/" + app + ".out")
 
