@@ -95,7 +95,7 @@ class DeltaCorrelatingPredictionTables : public SimObject
          *        (ignored) when comparing deltas
          */
         void getCandidates(std::vector<Queued::AddrPriority> &pfs,
-                           unsigned int mask_bits) const;
+                           unsigned int mask_bits, int degree) const;
 
     };
     /** The main table */
@@ -113,7 +113,8 @@ class DeltaCorrelatingPredictionTables : public SimObject
      */
     void calculatePrefetch(const Base::PrefetchInfo &pfi,
         std::vector<Queued::AddrPriority> &addresses);
-
+	void aggressiveness(bool increase);
+	int degree;
 };
 
 /** The prefetcher object using the DCPT */
@@ -127,6 +128,7 @@ class DCPT : public Queued
 
     void calculatePrefetch(const PrefetchInfo &pfi,
         std::vector<AddrPriority> &addresses) override;
+	void aggressiveness(bool increase) override;
 };
 
 } // namespace Prefetcher

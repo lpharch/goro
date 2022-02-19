@@ -98,7 +98,7 @@ class Stride : public Queued
 
     const bool useRequestorId;
 
-    const int degree;
+    int degree;
 
     /**
      * Information used to create a new PC table. All of them behave equally.
@@ -157,6 +157,7 @@ class Stride : public Queued
 
     void calculatePrefetch(const PrefetchInfo &pfi,
                            std::vector<AddrPriority> &addresses) override;
+	void aggressiveness(bool increase) override;
 };
 
 } // namespace Prefetcher

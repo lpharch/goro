@@ -51,8 +51,8 @@ mlmode = args.mlmode
 
 
 
-state_space  = 31
-action_space = 19
+state_space  = 88
+action_space = 20
 action_scale = 2
 total_reward = 0
 
@@ -64,7 +64,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 
-agent = BQN(state_space, action_space, action_scale, learning_rate, device, s1, s2, s3, leaky)
+agent = BQN(state_space, action_space, action_scale, learning_rate, device)
 
 
 
@@ -73,12 +73,9 @@ if __name__ == "__main__":
     tot_degree = 0
     for i in range(100000000000):
         state = []
-        for _ in range(31):
-            state.append(random())       
+        for _ in range(state_space):
+            state.append(randint(0, 1))    
         action = agent.action(state, True)
-        tot_itr = 0
-        for a in action:
-            tot_itr += a
-        tot_degree += tot_itr
-        print(action, (i+1)*19, tot_degree, tot_itr, (i+1)*19 - tot_degree)
+        print(action)
+        print("----")
     

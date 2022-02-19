@@ -38,9 +38,8 @@ all_mixes = os.listdir(simpts)
 
 os.system("tsp -S 60")
 
-  
-for app in (all_mixes):
-    for tryapp in range(10):
+for tryapp in range(5):  
+    for app in (all_mixes):
         cmd = ""
         cmd += (gem5 + "/build/ARM/gem5.opt ")
         cmd += ("-d " + results + "/" + app+ "_try_"+str(tryapp)+" ")

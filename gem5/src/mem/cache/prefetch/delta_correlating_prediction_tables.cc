@@ -41,6 +41,7 @@ DeltaCorrelatingPredictionTables::DeltaCorrelatingPredictionTables(
    table(p.table_assoc, p.table_entries, p.table_indexing_policy,
          p.table_replacement_policy, DCPTEntry(p.deltas_per_entry))
 {
+	degree = 0;
 }
 
 void
@@ -81,7 +82,7 @@ DeltaCorrelatingPredictionTables::DCPTEntry::addAddress(Addr address,
 
 void
 DeltaCorrelatingPredictionTables::DCPTEntry::getCandidates(
-    std::vector<Queued::AddrPriority> &pfs, unsigned int mask) const
+    std::vector<Queued::AddrPriority> &pfs, unsigned int mask, int degree) const
 {
     assert(deltas.full());
 
@@ -112,6 +113,10 @@ DeltaCorrelatingPredictionTables::DCPTEntry::getCandidates(
                 const int pf_delta = *(it++);
                 addr += pf_delta;
                 pfs.push_back(Queued::AddrPriority(addr, 0));
+				for (int d = 1 ; d <= degree; d++){
+					Addr newAddr = addr + d*(64);
+					pfs.push_back(Queued::AddrPriority(newAddr, 0));
+				}
             }
             break;
         }
@@ -135,7 +140,7 @@ DeltaCorrelatingPredictionTables::calculatePrefetch(
     if (entry != nullptr) {
         entry->addAddress(address, deltaBits);
         //Delta correlating
-        entry->getCandidates(addresses, deltaMaskBits);
+        entry->getCandidates(addresses, deltaMaskBits, degree);
     } else {
         entry = table.findVictim(pc);
 
@@ -155,6 +160,22 @@ DCPT::calculatePrefetch(const PrefetchInfo &pfi,
     std::vector<AddrPriority> &addresses)
 {
     dcpt.calculatePrefetch(pfi, addresses);
+}
+
+void
+DeltaCorrelatingPredictionTables::aggressiveness(bool increase)
+{
+	if(increase){
+		degree = 16;
+	}else{
+		degree = 4;
+	}
+}
+
+void
+DCPT::aggressiveness(bool increase)
+{
+	dcpt.aggressiveness(increase);
 }
 
 } // namespace Prefetcher

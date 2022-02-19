@@ -182,7 +182,7 @@ BaseCPU::BaseCPU(const Params &p, bool is_checker)
 void 
 BaseCPU::setMaxInst(uint64_t inst)
 {
-	if (inst!= 0) {
+    if (inst!= 0) {
         std::cout<<"Setting parm.max_insts_any_thread: "<<params().max_insts_any_thread<<" parm.inst: "<<inst <<std::endl;
         const char *cause = "a thread reached the max instruction count";
         for (ThreadID tid = 0; tid < numThreads; ++tid)

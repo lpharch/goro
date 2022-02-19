@@ -264,9 +264,10 @@ Base::addTLB(BaseTLB *t)
 void 
 Base::SetDegree(int d)
 {
+	
     RLdegree = d;
     RLDegreeHist[RLdegree]++;
-    // printRLDegreeHist();
+	// std::cout<<name()<<" RLdegree "<<RLdegree <<std::endl;
 }
 
 

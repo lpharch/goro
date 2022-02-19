@@ -132,4 +132,14 @@ SBOOE::calculatePrefetch(const PrefetchInfo &pfi,
     }
 }
 
+void
+SBOOE::aggressiveness(bool increase)
+{
+	if(increase){
+		sequentialPrefetchers = 18;
+	}else{
+		sequentialPrefetchers = 9;
+	}
+}
+
 } // namespace Prefetcher

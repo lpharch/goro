@@ -170,6 +170,7 @@ Queued::notify(const PacketPtr &pkt, const PrefetchInfo &pfi)
 		addresses.clear();
 	}
     
+	// std::cout<<name()<<" RLdegree "<<RLdegree<<" size "<<addresses.size()<<endl;
 
     // Get the maximu number of prefetches that we are allowed to generate
     size_t max_pfs = getMaxPermittedPrefetches(addresses.size());

@@ -545,10 +545,10 @@ class L2IPMultiPrefetcher(MultiPrefetcher):
 
     
 class L1MultiPrefetcher(MultiPrefetcher):
-    prefetchers = VectorParam.BasePrefetcher( [DCPTPrefetcher()], "Array of prefetchers")
+    prefetchers = VectorParam.BasePrefetcher( [DCPTPrefetcher(), STeMSPrefetcher()], "Array of prefetchers")
     
 class L2MultiPrefetcher(MultiPrefetcher):
-    prefetchers = VectorParam.BasePrefetcher( [StridePrefetcher()], "Array of prefetchers")
+    prefetchers = VectorParam.BasePrefetcher( [StridePrefetcher(), SBOOEPrefetcher()], "Array of prefetchers")
     
 class L3MultiPrefetcher(MultiPrefetcher):
-    prefetchers = VectorParam.BasePrefetcher([IrregularStreamBufferPrefetcher(), AMPMPrefetcher(), SignaturePathPrefetcher(), IndirectMemoryPrefetcher()], "Array of prefetchers")
+    prefetchers = VectorParam.BasePrefetcher([AMPMPrefetcher(), SignaturePathPrefetcher(), IndirectMemoryPrefetcher()], "Array of prefetchers")

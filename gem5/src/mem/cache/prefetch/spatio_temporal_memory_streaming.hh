@@ -169,6 +169,7 @@ class STeMS : public Queued
 
     /** Counter to keep the count of accesses between trigger accesses */
     unsigned int lastTriggerCounter;
+    unsigned int degree;
 
     /** Checks if the active generations have ended */
     void checkForActiveGenerationsEnd();
@@ -197,6 +198,7 @@ class STeMS : public Queued
 
     void calculatePrefetch(const PrefetchInfo &pfi,
                            std::vector<AddrPriority> &addresses) override;
+	void aggressiveness(bool increase) override;
 };
 
 } // namespace Prefetcher

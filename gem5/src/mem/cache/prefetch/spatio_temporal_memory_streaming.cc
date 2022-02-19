@@ -52,6 +52,7 @@ STeMS::STeMS(const STeMSPrefetcherParams &p)
                              spatialRegionSize / blkSize)),
     rmob(p.region_miss_order_buffer_entries)
 {
+	degree = 1;
     fatal_if(!isPowerOf2(spatialRegionSize),
         "The spatial region size must be a power of 2.");
 }
@@ -183,6 +184,17 @@ STeMS::calculatePrefetch(const PrefetchInfo &pfi,
 }
 
 void
+STeMS::aggressiveness(bool increase)
+{
+	if(increase){
+		degree = 16;
+	}else{
+		degree = 4;
+	}
+}
+
+
+void
 STeMS::reconstructSequence(
     CircularQueue<RegionMissOrderBufferEntry>::iterator rmob_it,
     std::vector<AddrPriority> &addresses)
@@ -242,6 +254,10 @@ STeMS::reconstructSequence(
     for (Addr pf_addr : reconstruction) {
         if (pf_addr != MaxAddr) {
             addresses.push_back(AddrPriority(pf_addr, 0));
+			for (int d = 1 ; d <= degree; d++){
+				Addr newAddr = pf_addr + d*(blkSize);
+				addresses.push_back(AddrPriority(newAddr,0));
+			}
         }
     }
 }

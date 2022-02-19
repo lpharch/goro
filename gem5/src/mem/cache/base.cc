@@ -2667,8 +2667,6 @@ WriteAllocator::updateMode(Addr write_addr, unsigned write_size,
 void 
 BaseCache::setActionPytorch(int action, int index)
 {
-	// std::cout<<name()<<" action:"<<action<<" index:"<<index<<std::endl;
-	
     if(prefetcher){
         Prefetcher::Multi *mpf = dynamic_cast<Prefetcher::Multi * >(prefetcher);
         int i = 0;
@@ -2680,24 +2678,10 @@ BaseCache::setActionPytorch(int action, int index)
            }else{
                 if(i==index){
                     qpf->SetDegree(action);
-					//(0) IrregularStreamBufferPrefetcher 
-					//(1) AMPMPrefetcher 
-					//(2) SignaturePathPrefetcher 
-					//(3) IndirectMemoryPrefetcher 
-					string level = levelFinder();
-					if(level=="L3Cache"){
-						// Prefetcher::IrregularStreamBuffer *isb = dynamic_cast<Prefetcher::IrregularStreamBuffer * >(pf);
-						// Prefetcher::AMPM *ampm = dynamic_cast<Prefetcher::AMPM * >(pf);
-						// Prefetcher::SignaturePath *spp = dynamic_cast<Prefetcher::SignaturePath * >(pf);
-						// Prefetcher::IndirectMemory *im = dynamic_cast<Prefetcher::IndirectMemory * >(pf);
-						qpf->aggressiveness(action > 1 ? true: false);
-							
-					}
-					
-					
-                }
-           }
-         
+					qpf->aggressiveness(action > 1 ? true: false);
+					// std::cout<<name()<<" i:"<<i<<" index "<<index<<" action "<<action<<std::endl; 
+				}
+	       }
            i++;
         }
     }

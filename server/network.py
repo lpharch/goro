@@ -8,7 +8,7 @@ class QNetwork(nn.Module):
         super(QNetwork,self).__init__()
         # self.linear_1 = nn.Linear(state_space, state_space*s1)
         self.linear_1 = nn.Linear(state_space, 64)
-        # self.linear_2 = nn.Linear(state_space*s1, state_space*s2)
+        # self.linear_2 = nn.Linear(256, 64)
         
         # self.actions = [nn.Sequential(nn.Linear(state_space*s2, state_space*s3),
               # nn.LeakyReLU(leaky),
@@ -36,6 +36,7 @@ class QNetwork(nn.Module):
               
     def forward(self, x):
         x = F.relu(self.linear_1(x))
+        # encoded = F.relu(self.linear_2(x))
         encoded = x
         actions = [x(encoded) for x in self.actions]
         value = self.value(encoded)

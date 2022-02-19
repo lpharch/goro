@@ -51,7 +51,7 @@ class SBOOE : public Queued
     private:
 
         /** Prefetcher parameters */
-        const int sequentialPrefetchers;
+        int sequentialPrefetchers;
 
         /** Threshold used to issue prefetchers */
         const unsigned int scoreThreshold;
@@ -155,6 +155,7 @@ class SBOOE : public Queued
 
         void calculatePrefetch(const PrefetchInfo &pfi,
                                std::vector<AddrPriority> &addresses) override;
+		void aggressiveness(bool increase) override;
 };
 
 } // namespace Prefetcher

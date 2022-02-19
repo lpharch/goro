@@ -416,22 +416,28 @@ def takeSimpointCheckpoints(simpoints, interval_length, cptdir):
     print("%d checkpoints taken" % num_checkpoints)
     sys.exit(code)
 
-def take_action(state1, options):
-    state = [None] * len(state1)
+def take_action(state, options):
     model_name = options.model
-    state_space  = 81
-    action_space = 4
-    action_scale = 3
-    acc = [1,1, 1,1, 1,1, 1,1]
-  
-    q_model = network.QNetwork(state_space, action_space, action_scale)
-    checkpoint = torch.load((model_name), map_location=torch.device('cpu'))
-    q_model.load_state_dict(checkpoint['modelA_state_dict'])
+    state_space  = 28
+    action_space = 20
+    action_scale = 2
+    acc = []
+    
+    acc = []
+    th1 = 0.05
+    toss = random()
+    if(toss< th1):
+        for pf in range(20):
+            acc.append(randint(0, 1))
+    else:
+        q_model = network.QNetwork(state_space, action_space, action_scale)
+        checkpoint = torch.load((model_name), map_location=torch.device('cpu'))
+        q_model.load_state_dict(checkpoint['modelA_state_dict'])
+        out =  q_model(torch.tensor(state, dtype=torch.float))
+        for tor in out:
+            acc.append(torch.argmax(tor, dim=1)[[0]].item() )
         
-    out =  q_model(torch.tensor(state, dtype=torch.float))
-    for tor in out:
-        acc.append(torch.argmax(tor, dim=1)[[0]].item() )
-        
+    print("state provided for the model ", state)
     print("Actions suggested by the model ", acc)
     return acc
  
@@ -464,12 +470,12 @@ def read_state(testsys, np, app, timestamp):
     for v in L3_values:
         values.append(v)
     df_all = pd.DataFrame(values, index=keys,  columns =[app+"_"+str(timestamp)])
-
+    df_all.T.to_csv("/home/cc/state.csv")
     return df_all.T, values
 
 def set_Degree(testsys, degree, np):
-    L1_prefetcher_count = 1
-    L2_prefetcher_count = 1
+    L1_prefetcher_count = 2
+    L2_prefetcher_count = 2
     L3_prefetcher_count = 4
     idx = 0
     st = ""
@@ -494,41 +500,32 @@ def apply_degree(testsys, options, state):
     np = options.num_cpus
     mode = options.mode
     # Order of results, I may make it 
-    components = ["Core0.L1.P.degree",
-                  "Core0.L2.P.degree",
-                  "Core1.L1.P.degree",
-                  "Core1.L2.P.degree",
-                  "Core2.L1.P.degree",
-                  "Core2.L2.P.degree",
-                  "Core3.L1.P.degree",
-                  "Core3.L2.P.degree",
-                  "LLC.P0.degree", "LLC.P1.degree", "LLC.P2.degree", "LLC.P3.degree"    
-                 ]
     
     if(mode =="baseline"):
-        degrees = [1,1, 1,1, 1,1, 1,1, 1,0,0,0]
+        degrees = [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,0,0]
         set_Degree(testsys, degrees, np)
     elif(mode =="multi"):
-        degrees = [1,1, 1,1, 1,1, 1,1, 1,1,1,1]
+        degrees = [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1]
         set_Degree(testsys, degrees, np)
     elif(mode =="multid2"):
-        degrees = [1,1, 1,1, 1,1, 1,1, 2,2,2,2]
+        degrees = [2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2, 2,2,2,2]
         set_Degree(testsys, degrees, np)
     elif(mode =="noLLCpf"):
-        degrees = [1,1, 1,1, 1,1, 1,1, 0,0,0,0]
+        degrees = [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 0,0,0,0]
         set_Degree(testsys, degrees, np)
     elif(mode =="onlyLLCpf"):
-        degrees = [0,0, 0,0, 0,0, 0,0, 1,1,1,1]
+        degrees = [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 1,1,1,1]
         set_Degree(testsys, degrees, np)
     elif(mode =="multid4"):
-        degrees = [1,1, 1,1, 1,1, 1,1, 4,4,4,4]
+        degrees = [4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4, 4,4,4,4]
         set_Degree(testsys, degrees, np)
     elif(mode =="nopf"):
-        degrees = [0,0, 0,0, 0,0, 0,0, 0,0,0,0]
+        degrees = [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0]
         set_Degree(testsys, degrees, np)
     elif(mode == "random"):
-        for i in range(12):
-            degrees.append(randint(0, 4))
+        for i in range(20):
+            degrees.append(randint(0, 1))
+        print("Random action", degrees)
         set_Degree(testsys, degrees, np)
     elif(mode == "custom"):
         degree_s = (options.degrees).split(",")
@@ -556,7 +553,7 @@ def apply_degree(testsys, options, state):
         set_Degree(testsys, degrees, np)
     else:
         print("No specific optins for actions")
-    actions = (pd.DataFrame(degrees, index=components, columns =['degrees'])).T
+    actions = (pd.DataFrame(degrees, columns =['degrees'])).T
     return actions, degrees
             
 def restoreSimpointCheckpoint():
@@ -580,29 +577,25 @@ def restoreSimpointCheckpoint():
 
 big_arry = np.empty([1, 1])
 def find_median(state, cnt):
-    npstate = np.random.randint(5, size=(1, 81))
+    npstate = np.random.randint(5, size=(1, 88))
     for i, s in enumerate(state):
-        npstate[0, i] = s
-    # print("npstate", npstate)
-    # print("npstate.shape", npstate.shape)
+        if(s < 100000000):
+            npstate[0, i] = s
+        else:
+            npstate[0, i] = 100000000
     global big_arry
     if (cnt == 0):
         big_arry = npstate
     else:
         big_arry = np.append(big_arry, npstate, axis=0)
-    # print("big_arry", big_arry)
     if(cnt < 3):
-        # print("returning empty")
-        return[0.00000001] * 81
+        return[0.00000001] * 88
     else:
-        # print("returning full",  np.median(big_arry, axis=0).tolist())
         return  np.median(big_arry, axis=0).tolist()
 
 def discreate(state, cnt):
     new_state = []
     medians = find_median(state, cnt)
-    # print("medians", medians)
-    # print("state", state)
     for i, s in enumerate(state):
         if(s>medians[i]):
             new_state.append(1)
@@ -611,57 +604,38 @@ def discreate(state, cnt):
     return new_state
 
 def get_reward(state, next_state):
-    reward = [0] 
-    S_core0_IPC = state[10]/state[9]*1.0
-    S_core1_IPC = state[28]/state[27]*1.0
-    S_core2_IPC = state[46]/state[45]*1.0
-    S_core3_IPC = state[64]/state[63]*1.0
+    reward = [-10] 
+    if(next_state[10] == 0 or next_state[30] == 0 or next_state[50] == 0 or next_state[70] == 0):
+        return reward
+    if(next_state[11] == 0 or next_state[31] == 0 or next_state[51] == 0 or next_state[71] == 0):
+        return reward
     
-    NS_core0_IPC =  next_state[10]/next_state[9]*1.0
-    NS_core1_IPC =  next_state[28]/next_state[27]*1.0
-    NS_core2_IPC =  next_state[46]/next_state[45]*1.0
-    NS_core3_IPC =  next_state[64]/next_state[63]*1.0
+    reward = [1]
+    if(state[11] == 0 or state[31] == 0 or state[51] == 0 or state[71] == 0):
+        return reward
+    if(state[10] == 0 or state[30] == 0 or state[50] == 0 or state[70] == 0):
+        return reward
+        
+    reward = [0]
+        
+    S_core0_IPC = state[11]/state[10]*1.0
+    S_core1_IPC = state[31]/state[30]*1.0
+    S_core2_IPC = state[51]/state[50]*1.0
+    S_core3_IPC = state[71]/state[70]*1.0
+    
+    NS_core0_IPC =  next_state[11]/next_state[10]*1.0
+    NS_core1_IPC =  next_state[31]/next_state[30]*1.0
+    NS_core2_IPC =  next_state[51]/next_state[50]*1.0
+    NS_core3_IPC =  next_state[71]/next_state[70]*1.0
   
+    print("IPC", S_core0_IPC, S_core1_IPC, S_core2_IPC, S_core3_IPC)
+    print("NS IPC", NS_core0_IPC, NS_core1_IPC, NS_core2_IPC, NS_core3_IPC)
+        
+    diff = 0
     diff = ((NS_core0_IPC/S_core0_IPC)-1)+ ((NS_core1_IPC/S_core1_IPC)-1)+ ((NS_core2_IPC/S_core2_IPC)-1)+ ((NS_core3_IPC/S_core3_IPC)-1)
     if not np.isnan(diff):
         reward[0] = int(diff*100)
-        if(reward[0] > 100):
-            reward[0] = 3
-        elif (reward[0] > 10):
-            reward[0] = 2
-        elif (reward[0] > 0):
-            reward[0] = 1
-        else:
-            reward[0] = -1
-    
-    # print("state[10]", state[10])
-    # print("state[9]", state[9])
-    # print("state[28]", state[28])
-    # print("state[27]", state[27])
-    # print("state[46]", state[46])
-    # print("state[45]", state[45])
-    # print("state[64]", state[64])
-    # print("state[63]", state[63])
-    
-    # print("next_state[10]", next_state[10])
-    # print("next_state[9]", next_state[9])
-    # print("next_state[28]", next_state[28])
-    # print("next_state[27]", next_state[27])
-    # print("next_state[46]", next_state[46])
-    # print("next_state[45]", next_state[45])
-    # print("next_state[64]", next_state[64])
-    # print("next_state[63]", next_state[63])
-    
-    # print("S_core0_IPC", S_core0_IPC)
-    # print("S_core1_IPC", S_core1_IPC)
-    # print("S_core2_IPC", S_core2_IPC)
-    # print("S_core3_IPC", S_core3_IPC)
-    # print("NS_core0_IPC", NS_core0_IPC)
-    # print("NS_core1_IPC", NS_core1_IPC)
-    # print("NS_core2_IPC", NS_core2_IPC)
-    # print("NS_core3_IPC", NS_core3_IPC)
-    # print("diff", diff)
-    # print("reward", reward[0])
+   
     return reward
 
 def restoreSimpointCheckpoint_real(options, testsys):
@@ -680,9 +654,9 @@ def restoreSimpointCheckpoint_real(options, testsys):
     name = options.app
     df = pd.DataFrame()
     model_name = options.model
-    degrees = [1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0,0]
+    degrees = [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,0,0,0]
     set_Degree(testsys, degrees, np)
-    # testsys.switch_cpus[0].setMaxInst(options.sample_length)
+    testsys.switch_cpus[0].setMaxInst(options.sample_length)
     # testsys.cpu[0].setMaxInst(options.sample_length)
     
             
@@ -741,17 +715,18 @@ def restoreSimpointCheckpoint_inference(options, testsys):
     name = options.app
     df = pd.DataFrame()
     model_name = options.model
-    degrees = [1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0,0]
+    degrees = [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,0,0,0]
     set_Degree(testsys, degrees, np)
-    # testsys.switch_cpus[0].setMaxInst(options.sample_length)
-    testsys.cpu[0].setMaxInst(options.sample_length)
+    testsys.switch_cpus[0].setMaxInst(options.sample_length)
+    # testsys.cpu[0].setMaxInst(options.sample_length)
     
             
     exit_event = m5.simulate()
     exit_cause = exit_event.getCause()
     print("exit_cause", exit_cause)
     state, state_val = read_state(testsys, np, options.app, 0)
- 
+    state_val = discreate(state_val, 0)
+    
     m5.stats.reset()
     print("Warmup done")
     state.to_csv("state.csv")
@@ -759,13 +734,14 @@ def restoreSimpointCheckpoint_inference(options, testsys):
     for sample in range(0, options.num_sample):
         print("***********Sample ", sample)
         m5.simulate(1000)
-        # testsys.switch_cpus[0].setMaxInst(options.sample_length)
-        testsys.cpu[0].setMaxInst(options.sample_length)
+        testsys.switch_cpus[0].setMaxInst(options.sample_length)
+        
+        
         actions = apply_degree(testsys, options, state_val)
         exit_event = m5.simulate()
-        next_state, next_state_val = read_state(testsys, np, options.app, 0)
-        state = next_state
-        state_val = next_state_val
+        next_state, state_val = read_state(testsys, np, options.app, 0)
+        state_val = discreate(state_val, sample+1)
+        
         exit_cause = exit_event.getCause()
         print("--------ITR DONE-------------",  exit_cause)
     
@@ -1154,6 +1130,7 @@ def run(options, root, testsys, cpu_class):
                                       maxtick, options.repeat_switch)
         else:
             print("--------No checkpoints----")
+            read_state(testsys, 4, "a", 0)
             restoreSimpointCheckpoint_inference(options, testsys)
             
             

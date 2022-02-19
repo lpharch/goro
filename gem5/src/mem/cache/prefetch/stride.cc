@@ -201,4 +201,14 @@ StridePrefetcherHashedSetAssociative::extractTag(const Addr addr) const
     return addr;
 }
 
+void
+Stride::aggressiveness(bool increase)
+{
+	if(increase){
+		degree = 16;
+	}else{
+		degree = 4;
+	}
+}
+
 } // namespace Prefetcher
