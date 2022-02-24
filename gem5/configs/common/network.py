@@ -7,7 +7,7 @@ class QNetwork(nn.Module):
     def __init__(self, state_space: int, action_num: int, action_scale: int):
         super(QNetwork,self).__init__()
         # self.linear_1 = nn.Linear(state_space, state_space*s1)
-        self.linear_1 = nn.Linear(state_space, 256)
+        self.linear_1 = nn.Linear(state_space, 64)
         # self.linear_2 = nn.Linear(256, 64)
         
         # self.actions = [nn.Sequential(nn.Linear(state_space*s2, state_space*s3),
@@ -22,14 +22,14 @@ class QNetwork(nn.Module):
               # nn.Linear(state_space*s3, 1)
               # )
         # self.actions = [nn.Sequential(nn.Linear(state_space*s1, action_scale),
-        self.actions = [nn.Sequential(nn.Linear(256, action_scale),
+        self.actions = [nn.Sequential(nn.Linear(64, action_scale),
                nn.ReLU()
               ) for _ in range(action_num)]
 
         self.actions = nn.ModuleList(self.actions)
 
         # self.value = nn.Sequential(nn.Linear(state_space*s2, 1),
-        self.value = nn.Sequential(nn.Linear(256, 1),
+        self.value = nn.Sequential(nn.Linear(64, 1),
                nn.ReLU()
               )
         # self.double()      

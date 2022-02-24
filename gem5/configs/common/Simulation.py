@@ -416,13 +416,29 @@ def takeSimpointCheckpoints(simpoints, interval_length, cptdir):
     print("%d checkpoints taken" % num_checkpoints)
     sys.exit(code)
 
-def take_action(state, options):
+
+total_degree = 0
+count_degree = 0
+
+def take_action(state_all, options):
+    global total_degree, count_degree
+
     model_name = options.model
     state_space  = 28
     action_space = 20
     action_scale = 2
     acc = []
-    
+    count_degree += 1
+    needed_index = [ 0,  5,  6, 13, 15, 16,  
+                    20, 25, 26, 33, 35, 36,  
+                    40, 45, 46, 53, 55, 56, 
+                    60, 65, 66, 73, 75, 76,
+                    80, 81, 82, 83
+                   ]
+                  
+    state = []
+    for i in needed_index:
+        state.append( float(state_all[i]))
     acc = []
     th1 = 0.05
     toss = random()
@@ -436,9 +452,16 @@ def take_action(state, options):
         out =  q_model(torch.tensor(state, dtype=torch.float))
         for tor in out:
             acc.append(torch.argmax(tor, dim=1)[[0]].item() )
-        
-    print("state provided for the model ", state)
-    print("Actions suggested by the model ", acc)
+            
+            
+
+    for a in acc:
+        total_degree += a
+
+
+    print("actions ", acc)
+    print("state ", state)
+    print("avg  degree ", total_degree/count_degree)
     return acc
  
 def read_state(testsys, np, app, timestamp):
@@ -577,7 +600,7 @@ def restoreSimpointCheckpoint():
 
 big_arry = np.empty([1, 1])
 def find_median(state, cnt):
-    npstate = np.random.randint(5, size=(1, 88))
+    npstate = np.random.randint(5, size=(1, 89))
     for i, s in enumerate(state):
         if(s < 100000000):
             npstate[0, i] = s
@@ -589,7 +612,7 @@ def find_median(state, cnt):
     else:
         big_arry = np.append(big_arry, npstate, axis=0)
     if(cnt < 3):
-        return[0.00000001] * 88
+        return[0.00000001] * 89
     else:
         return  np.median(big_arry, axis=0).tolist()
 

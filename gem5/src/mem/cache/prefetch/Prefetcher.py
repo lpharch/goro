@@ -551,4 +551,4 @@ class L2MultiPrefetcher(MultiPrefetcher):
     prefetchers = VectorParam.BasePrefetcher( [StridePrefetcher(), SBOOEPrefetcher()], "Array of prefetchers")
     
 class L3MultiPrefetcher(MultiPrefetcher):
-    prefetchers = VectorParam.BasePrefetcher([AMPMPrefetcher(), SignaturePathPrefetcher(), IndirectMemoryPrefetcher()], "Array of prefetchers")
+    prefetchers = VectorParam.BasePrefetcher([AMPMPrefetcher(), SignaturePathPrefetcher(), IndirectMemoryPrefetcher(), IrregularStreamBufferPrefetcher()], "Array of prefetchers")

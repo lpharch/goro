@@ -189,7 +189,7 @@ def action():
         for i in needed_index:
             state.append( float(state_all[i]))
         
-        action_to_send = pickle.dumps(agent.action(state, True))
+        action_to_send = pickle.dumps(agent.action(state, idx_rnd))
         idx_rnd += 1
         if(idx_rnd == 1000):
             idx_rnd = 0

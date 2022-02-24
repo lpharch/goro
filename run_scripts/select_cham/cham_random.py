@@ -4,6 +4,9 @@ import shutil
 import argparse
 
 
+num_mixes = 4
+mixes_per_node = 2
+
 simpts = "/home/cc/mixes"
 gem5 = "/home/cc/goro/gem5"
 results = "/home/cc/goro/results/"
@@ -15,10 +18,6 @@ parser.add_argument('--simulation', type=str, default=True, help="(default: True
 
 args = parser.parse_args()
 simulation = args.simulation
-
-
-
-
 
 
 
@@ -34,15 +33,19 @@ if os.path.exists(dir):
 os.makedirs(dir)
 output += simulation
 
-all_mixes = os.listdir(simpts)
+intravl_lengh=[10000, 100000, 250000, 500000, 1000000, 2500000, 5000000, 10000000]
 
+all_mixes = os.listdir(simpts)
+chunk_counts = int(len(all_mixes) / mixes_per_node)
+app_idx = 0
+# ts -S 3
 os.system("tsp -S 60")
 
-for tryapp in range(40):  
+for length in intravl_lengh:
     for app in (all_mixes):
         cmd = ""
         cmd += (gem5 + "/build/ARM/gem5.opt ")
-        cmd += ("-d " + results + "/" + app+ "_try_"+str(tryapp)+" ")
+        cmd += ("-d " + results + "/" + app+".length"+str(length) + " ")
         cmd += (gem5 + "/configs/example/fs.py ")
         cmd += ("--caches ")
         cmd += ("--kernel /home/cc/disks/binaries/vmlinux.arm64 ")
@@ -56,15 +59,12 @@ for tryapp in range(40):
         cmd += ("--l1d-hwp-type=L1MultiPrefetcher ")
         cmd += ("--mem-size=64GB --mem-type=DDR4_2400_16x4 ")
         cmd += ("-n 4 ")
-        cmd += ("--mode Real ")
-        # cmd += ("--mode random ")
-        cmd += ("--real ")
-        cmd += ("--sample_length 100000 ")
-        cmd += ("--num_sample 1000 ")
-        cmd += ("--binspath /home/cc/bins/bins_levels_32.bins ")
-        cmd += ("--app "+app+"."+simulation+".try"+str(tryapp)+" ")
-        cmd += (" > " + output + "/" + app +".try."+str(tryapp)+".RL.out " )
-        
+        cmd += ("--inference ")
+        cmd += ("--sample_length "+str(length)+" ")
+        cmd += ("--num_sample "+str(int(100000000/length))+" ")
+        cmd += ("--model /home/cc/model_7 ")
+        cmd += ("--mode random ")
+        cmd += (" > " + output + "/" + app +".length"+str(length)+".out")
         st = 'tsp bash -c "' + cmd+'"'
         print(st)    
         os.system(st)

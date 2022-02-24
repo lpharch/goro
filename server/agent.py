@@ -27,12 +27,18 @@ class BQN(nn.Module):
         self.update_count = 0
         self.action_count = 0
         print("Loading the model")
-        # self.load_model("./models/model", self.device)
+        self.load_model("./models/model", self.device)
 
     
-    def action(self,x, go_low):
+    def action(self,x, idx_rnd):
         acc = []
-        th1 = 0.05
+        th1 = 1.0
+        if(idx_rnd < 80 ):
+            th1 -= (idx_rnd/100)
+        elif(idx_rnd < 200):
+            th1 = 0.15
+        else:
+            th1 = 0.1
         toss = random()
         if(toss< th1):
             for pf in range(20):

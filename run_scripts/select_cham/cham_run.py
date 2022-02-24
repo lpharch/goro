@@ -76,7 +76,7 @@ for app in (all_mixes):
     cmd += ("--inference ")
     cmd += ("--sample_length 100000 ")
     cmd += ("--num_sample 1000 ")
-    cmd += ("--model /home/cc/goro/server/models/model ")
+    cmd += ("--model /home/cc/model_7 ")
     cmd += ("--mode "+ simulation)
     cmd += (" > " + output + "/" + app + ".out")
 
