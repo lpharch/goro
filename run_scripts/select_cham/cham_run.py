@@ -74,13 +74,14 @@ for app in (all_mixes):
     cmd += ("--mem-size=64GB --mem-type=DDR4_2400_16x4 ")
     cmd += ("-n 4 ")
     cmd += ("--inference ")
-    cmd += ("--sample_length 100000 ")
-    cmd += ("--num_sample 1000 ")
-    cmd += ("--model /home/cc/model_7 ")
+    cmd += ("--sample_length 1000000 ")
+    cmd += ("--num_sample 100 ")
+    cmd += ("--model /home/cc/mmodel ")
     cmd += ("--mode "+ simulation)
     cmd += (" > " + output + "/" + app + ".out")
 
     
     
-    print("cmd", cmd)    
-    os.system("tsp " + cmd)
+    st = 'tsp bash -c "' + cmd+'"'
+    print(st)    
+    os.system(st)
